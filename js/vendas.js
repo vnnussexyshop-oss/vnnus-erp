@@ -1,6 +1,6 @@
 /* =====================================================
-   VNNUS ERP 3.3
-   HISTÓRICO DE VENDAS
+   VNNUS ERP 3.3.1
+   HISTÓRICO DE VENDAS - CORREÇÃO DO BOTÃO VER
 ===================================================== */
 
 let vendasHistorico33 = [];
@@ -40,6 +40,11 @@ window.init_vendas =
         'vendaCompartilhar'
       );
 
+    const tabela =
+      document.getElementById(
+        'vendasTabela'
+      );
+
 
     if (atualizar) {
       atualizar.onclick =
@@ -74,6 +79,51 @@ window.init_vendas =
     if (compartilhar) {
       compartilhar.onclick =
         compartilharVenda33;
+    }
+
+
+    /*
+      CORREÇÃO 3.3.1
+      O clique do botão "Ver" é tratado aqui,
+      sem depender de onclick inline.
+    */
+    if (tabela) {
+
+      tabela.onclick =
+        function(evento) {
+
+          const botao =
+            evento.target.closest(
+              '[data-venda-id]'
+            );
+
+
+          if (!botao) {
+            return;
+          }
+
+
+          const idVenda =
+            String(
+              botao.getAttribute(
+                'data-venda-id'
+              ) ||
+              ''
+            )
+            .trim();
+
+
+          if (!idVenda) {
+            return;
+          }
+
+
+          abrirDetalhesVenda33(
+            idVenda
+          );
+
+        };
+
     }
 
 
@@ -397,7 +447,8 @@ function renderHistoricoVendas33(
             <td>
               <button
                 class="btn-secondary"
-                onclick="abrirDetalhesVenda33('${escaparAtributoVendas33(venda.ID_VENDA)}')">
+                type="button"
+                data-venda-id="${escaparVendas33(venda.ID_VENDA)}">
                 👁️ Ver
               </button>
             </td>
@@ -945,26 +996,6 @@ function escaparVendas33(
   .replace(
     /'/g,
     '&#039;'
-  );
-
-}
-
-
-function escaparAtributoVendas33(
-  valor
-) {
-
-  return String(
-    valor ??
-    ''
-  )
-  .replace(
-    /\\/g,
-    '\\\\'
-  )
-  .replace(
-    /'/g,
-    "\\'"
   );
 
 }
