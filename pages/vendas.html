@@ -1,0 +1,272 @@
+<section>
+
+  <div class="page-header">
+
+    <div>
+      <h2>🧾 Histórico de Vendas</h2>
+      <p>Consulte vendas finalizadas e canceladas e reabra seus comprovantes.</p>
+    </div>
+
+    <button
+      class="btn-secondary"
+      id="vendasAtualizar">
+      ↻ Atualizar
+    </button>
+
+  </div>
+
+
+  <!-- DETALHE INLINE DA VENDA -->
+
+  <div
+    id="vendaDetalheArea"
+    class="card"
+    style="
+      display:none;
+      margin-bottom:18px;
+    ">
+
+    <div
+      style="
+        display:flex;
+        justify-content:space-between;
+        gap:12px;
+        align-items:flex-start;
+        flex-wrap:wrap;
+      ">
+
+      <div>
+        <h3 style="margin:0;">
+          🧾 Detalhes da Venda
+        </h3>
+
+        <p
+          id="vendaDetalheSubtitulo"
+          style="
+            color:var(--muted);
+            margin-top:5px;
+          ">
+        </p>
+      </div>
+
+      <button
+        class="btn-secondary"
+        id="vendaVoltarHistorico">
+        ← Voltar ao histórico
+      </button>
+
+    </div>
+
+
+    <div
+      id="vendaDetalheConteudo"
+      style="margin-top:15px;">
+    </div>
+
+
+    <div
+      style="
+        margin-top:16px;
+        display:flex;
+        gap:10px;
+        flex-wrap:wrap;
+      ">
+
+      <button
+        class="btn-primary"
+        id="vendaCompartilhar">
+        📤 Compartilhar comprovante
+      </button>
+
+      <button
+        class="btn-secondary"
+        id="vendaCancelar"
+        style="
+          display:none;
+          border-color:#7d2323;
+        ">
+        🚫 Cancelar venda
+      </button>
+
+    </div>
+
+
+    <div
+      id="vendaCancelarArea"
+      class="card"
+      style="
+        display:none;
+        margin-top:16px;
+        border-color:#7d2323;
+      ">
+
+      <h3 style="margin:0 0 8px 0;">
+        🚫 Cancelar venda
+      </h3>
+
+      <p
+        style="
+          color:var(--muted);
+          margin-bottom:12px;
+        ">
+        O cancelamento devolverá os itens ao estoque e não poderá ser repetido.
+      </p>
+
+      <label
+        style="
+          display:block;
+          margin-bottom:6px;
+        ">
+        Motivo do cancelamento *
+      </label>
+
+      <textarea
+        id="vendaMotivoCancelamento"
+        class="input"
+        rows="3"
+        placeholder="Ex.: Cliente desistiu da compra"
+        style="
+          width:100%;
+          resize:vertical;
+        "></textarea>
+
+      <div
+        id="vendaCancelarMensagem"
+        style="
+          color:var(--muted);
+          margin-top:10px;
+        ">
+      </div>
+
+      <div
+        style="
+          display:flex;
+          gap:10px;
+          flex-wrap:wrap;
+          margin-top:12px;
+        ">
+
+        <button
+          class="btn-secondary"
+          id="vendaCancelarVoltar">
+          Voltar
+        </button>
+
+        <button
+          class="btn-primary"
+          id="vendaConfirmarCancelamento"
+          style="
+            background:#8f1f1f;
+          ">
+          Confirmar cancelamento
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <div
+    id="vendasListaArea">
+
+    <div
+      class="cards"
+      style="margin-bottom:18px;">
+
+      <div class="card">
+        <div class="card-icon">🧾</div>
+        <div class="card-label">Vendas encontradas</div>
+        <div
+          class="card-value"
+          id="vendasQtd">
+          0
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-icon">💰</div>
+        <div class="card-label">Total finalizado</div>
+        <div
+          class="card-value"
+          id="vendasTotal">
+          R$ 0,00
+        </div>
+      </div>
+
+    </div>
+
+
+    <div class="toolbar">
+
+      <input
+        id="vendasBusca"
+        class="input input-grow"
+        type="text"
+        placeholder="Venda, cliente ou pagamento...">
+
+      <select
+        id="vendasStatus"
+        class="input">
+
+        <option value="">
+          Todos
+        </option>
+
+        <option value="FINALIZADA">
+          Finalizadas
+        </option>
+
+        <option value="CANCELADA">
+          Canceladas
+        </option>
+
+      </select>
+
+    </div>
+
+
+    <div
+      id="vendasMensagem"
+      style="
+        color:var(--muted);
+        margin-bottom:12px;
+      ">
+      Carregando vendas...
+    </div>
+
+
+    <div class="table-wrap">
+
+      <table>
+
+        <thead>
+          <tr>
+            <th>Venda</th>
+            <th>Data</th>
+            <th>Cliente</th>
+            <th>Pagamento</th>
+            <th>Total</th>
+            <th>Status</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+
+        <tbody id="vendasTabela">
+
+          <tr>
+            <td colspan="7">
+              Carregando...
+            </td>
+          </tr>
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
+</section>
