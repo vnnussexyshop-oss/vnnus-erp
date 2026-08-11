@@ -1,0 +1,355 @@
+<section>
+
+  <div class="page-header">
+    <div>
+      <h2>🛒 PDV</h2>
+      <p>Venda rápida por GTIN, scanner ou busca manual.</p>
+    </div>
+
+    <button
+      class="btn-secondary"
+      id="pdvLimparVenda">
+      Limpar venda
+    </button>
+  </div>
+
+
+  <div class="pdv-layout">
+
+    <div>
+
+      <div class="card">
+
+        <h3 class="section-title">
+          Adicionar produto
+        </h3>
+
+        <div class="toolbar">
+
+          <input
+            class="input input-grow"
+            type="text"
+            id="pdvGTIN"
+            placeholder="Digite ou bipe o GTIN...">
+
+          <button
+            class="btn-secondary"
+            id="pdvBuscar">
+            🔎 Buscar
+          </button>
+
+          <button
+            class="btn-primary"
+            id="pdvScanner">
+            📷 Scanner
+          </button>
+
+        </div>
+
+        <div
+          id="pdvStatus"
+          style="color:var(--muted);">
+          Aguardando produto.
+        </div>
+
+      </div>
+
+
+      <div
+        class="card"
+        style="margin-top:18px;">
+
+        <h3 class="section-title">
+          Carrinho
+        </h3>
+
+        <div id="pdvCarrinho">
+
+          <div class="empty-state">
+            Nenhum produto adicionado.
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <div>
+
+      <div class="card total-box">
+
+        <div class="card-label">
+          SUBTOTAL
+        </div>
+
+        <div
+          class="card-value"
+          id="pdvSubtotal">
+          R$ 0,00
+        </div>
+
+
+        <div style="margin-top:20px;">
+
+          <label
+            style="
+              display:block;
+              color:var(--muted);
+              font-size:12px;
+              margin-bottom:6px;
+            ">
+            Desconto geral (R$)
+          </label>
+
+          <input
+            class="input"
+            id="pdvDesconto"
+            type="number"
+            min="0"
+            step="0.01"
+            value="0"
+            style="width:100%;">
+
+        </div>
+
+
+        <div
+          style="
+            margin-top:20px;
+            border-top:1px solid var(--border);
+            padding-top:18px;
+          ">
+
+          <div class="card-label">
+            TOTAL
+          </div>
+
+          <div
+            class="card-value"
+            id="pdvTotal">
+            R$ 0,00
+          </div>
+
+        </div>
+
+
+        <button
+          class="btn-primary"
+          id="pdvFinalizar"
+          style="
+            width:100%;
+            margin-top:22px;
+            padding:15px;
+          "
+          disabled>
+
+          ✅ Finalizar Venda
+
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- MODAL FINALIZAÇÃO -->
+
+  <div
+    id="modalFinalizarVenda"
+    class="modal">
+
+    <div class="modal-conteudo">
+
+      <div class="modal-topo">
+
+        <div>
+          <h2>Finalizar Venda</h2>
+          <p style="color:#888;margin-top:5px;">
+            Revise os dados antes de confirmar.
+          </p>
+        </div>
+
+        <button id="pdvFecharModal">
+          ✕
+        </button>
+
+      </div>
+
+
+      <div class="form-grid">
+
+        <div class="campo campo-grande">
+
+          <label>Cliente</label>
+
+          <input
+            id="pdvCliente"
+            type="text"
+            placeholder="Consumidor Final">
+
+        </div>
+
+
+        <div class="campo campo-grande">
+
+          <label>Forma de Pagamento *</label>
+
+          <select id="pdvPagamento">
+
+            <option value="">
+              Selecione...
+            </option>
+
+            <option value="PIX">
+              PIX
+            </option>
+
+            <option value="DINHEIRO">
+              Dinheiro
+            </option>
+
+            <option value="DEBITO">
+              Cartão Débito
+            </option>
+
+            <option value="CREDITO">
+              Cartão Crédito
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <div class="campo campo-grande">
+
+          <label>Observação</label>
+
+          <input
+            id="pdvObservacao"
+            type="text"
+            placeholder="Opcional">
+
+        </div>
+
+      </div>
+
+
+      <div
+        class="card"
+        style="margin-top:15px;">
+
+        <div class="card-label">
+          Total da venda
+        </div>
+
+        <div
+          class="card-value"
+          id="pdvModalTotal">
+          R$ 0,00
+        </div>
+
+      </div>
+
+
+      <div
+        id="pdvMensagemFinal"
+        style="
+          margin-top:15px;
+          color:var(--muted);
+        ">
+      </div>
+
+
+      <div class="modal-rodape">
+
+        <button
+          class="btn-secondary"
+          id="pdvCancelarFinalizacao">
+          Cancelar
+        </button>
+
+        <button
+          class="btn-primary"
+          id="pdvConfirmarVenda">
+          Confirmar Venda
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- MODAL COMPROVANTE PDV 3.2 -->
+
+  <div
+    id="modalComprovanteVenda"
+    class="modal">
+
+    <div class="modal-conteudo">
+
+      <div class="modal-topo">
+        <div>
+          <h2>🧾 Comprovante de Venda</h2>
+          <p style="color:#888;margin-top:5px;">
+            Venda finalizada com sucesso.
+          </p>
+        </div>
+
+        <button id="pdvFecharComprovante">
+          ✕
+        </button>
+      </div>
+
+      <div
+        id="pdvComprovante"
+        class="card"
+        style="
+          margin-top:15px;
+          white-space:normal;
+          line-height:1.5;
+        ">
+      </div>
+
+      <div
+        id="pdvMensagemComprovante"
+        style="
+          margin-top:12px;
+          color:var(--muted);
+        ">
+      </div>
+
+      <div
+        class="modal-rodape"
+        style="
+          display:flex;
+          gap:10px;
+          flex-wrap:wrap;
+        ">
+
+        <button
+          class="btn-secondary"
+          id="pdvCompartilharComprovante">
+          📤 Compartilhar comprovante
+        </button>
+
+        <button
+          class="btn-primary"
+          id="pdvNovaVenda">
+          🛒 Nova venda
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
