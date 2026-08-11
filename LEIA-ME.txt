@@ -1,0 +1,27 @@
+VNNUS PDV 3.1A
+
+Este patch atualiza somente o PDV.
+
+Substituir no repositório vnnus-erp:
+- pages/pdv.html
+- js/pdv.js
+
+O que esta versão adiciona:
+- busca por GTIN
+- scanner continua funcionando
+- produto repetido aumenta quantidade
+- botões + e -
+- remover item
+- limpar venda
+- subtotal
+- desconto geral em R$
+- total
+- modal de finalização
+- cliente
+- forma de pagamento
+- observação
+
+IMPORTANTE:
+A confirmação ainda NÃO grava a venda na planilha nesta etapa.
+Primeiro validamos toda a interface e o carrinho.
+Depois faremos a versão 3.1B para salvar venda + baixar estoque.
