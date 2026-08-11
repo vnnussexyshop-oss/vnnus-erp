@@ -1,0 +1,164 @@
+<section>
+
+  <div class="page-header">
+
+    <div>
+      <h2>🧾 Histórico de Vendas</h2>
+      <p>Consulte vendas finalizadas e canceladas e reabra seus comprovantes.</p>
+    </div>
+
+    <button
+      class="btn-secondary"
+      id="vendasAtualizar">
+      ↻ Atualizar
+    </button>
+
+  </div>
+
+
+  <div
+    class="cards"
+    style="margin-bottom:18px;">
+
+    <div class="card">
+      <div class="card-icon">🧾</div>
+      <div class="card-label">Vendas encontradas</div>
+      <div
+        class="card-value"
+        id="vendasQtd">
+        0
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-icon">💰</div>
+      <div class="card-label">Total finalizado</div>
+      <div
+        class="card-value"
+        id="vendasTotal">
+        R$ 0,00
+      </div>
+    </div>
+
+  </div>
+
+
+  <div class="toolbar">
+
+    <input
+      id="vendasBusca"
+      class="input input-grow"
+      type="text"
+      placeholder="Venda, cliente ou pagamento...">
+
+    <select
+      id="vendasStatus"
+      class="input">
+
+      <option value="">
+        Todos
+      </option>
+
+      <option value="FINALIZADA">
+        Finalizadas
+      </option>
+
+      <option value="CANCELADA">
+        Canceladas
+      </option>
+
+    </select>
+
+  </div>
+
+
+  <div
+    id="vendasMensagem"
+    style="
+      color:var(--muted);
+      margin-bottom:12px;
+    ">
+    Carregando vendas...
+  </div>
+
+
+  <div class="table-wrap">
+
+    <table>
+
+      <thead>
+        <tr>
+          <th>Venda</th>
+          <th>Data</th>
+          <th>Cliente</th>
+          <th>Pagamento</th>
+          <th>Total</th>
+          <th>Status</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+
+      <tbody id="vendasTabela">
+
+        <tr>
+          <td colspan="7">
+            Carregando...
+          </td>
+        </tr>
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+
+  <!-- DETALHES DA VENDA -->
+
+  <div
+    id="modalDetalhesVenda"
+    class="modal">
+
+    <div class="modal-conteudo">
+
+      <div class="modal-topo">
+
+        <div>
+          <h2>Detalhes da Venda</h2>
+          <p
+            id="vendaDetalheSubtitulo"
+            style="color:#888;margin-top:5px;">
+          </p>
+        </div>
+
+        <button id="vendaFecharDetalhes">
+          ✕
+        </button>
+
+      </div>
+
+      <div
+        id="vendaDetalheConteudo">
+      </div>
+
+      <div class="modal-rodape">
+
+        <button
+          class="btn-secondary"
+          id="vendaCompartilhar">
+          📤 Compartilhar comprovante
+        </button>
+
+        <button
+          class="btn-primary"
+          id="vendaFecharDetalhes2">
+          Fechar
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
