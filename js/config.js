@@ -1,8 +1,9 @@
 window.VNNUS_CONFIG = {
-  // Depois de publicar o scanner, cole aqui a URL dele.
-  // Exemplo: "https://SEU-USUARIO.github.io/vnnus-scanner/"
-  SCANNER_URL: "",
 
-  // Na etapa de integração, colocaremos aqui a URL da API do Apps Script.
-  API_URL: ""
+  API_URL:
+    'https://script.google.com/macros/s/AKfycbwHNdcYei0oPwOSFzKYOvB9NgOjf16SA-SLoCt_jSjs8mOH_kj1KbrZV5pewxozZsmCsQ/exec',
+
+  SCANNER_URL:
+    ''
+
 };
