@@ -1,240 +1,38 @@
 <section>
-
   <div class="page-header">
-
     <div>
       <h2>🏠 Visão Geral</h2>
-      <p>Acompanhe os principais indicadores da VNNUS.</p>
+      <p>Acompanhe os principais indicadores reais da VNNUS.</p>
     </div>
-
-    <button
-      class="btn-secondary"
-      onclick="init_dashboard()">
-      ↻ Atualizar
-    </button>
-
+    <button class="btn-secondary" onclick="init_dashboard()">↻ Atualizar</button>
   </div>
 
+  <div id="dashStatus" style="color:var(--muted);margin-bottom:15px;">Conectando à API...</div>
 
   <div class="cards">
-
-    <div class="card">
-      <div class="card-icon">💰</div>
-      <div class="card-label">Vendas Hoje</div>
-      <div class="card-value" id="dashVendasHoje">
-        R$ 0,00
-      </div>
-    </div>
-
-
-    <div class="card">
-      <div class="card-icon">🛒</div>
-      <div class="card-label">Pedidos Hoje</div>
-      <div class="card-value" id="dashPedidosHoje">
-        0
-      </div>
-    </div>
-
-
-    <div class="card">
-      <div class="card-icon">📦</div>
-      <div class="card-label">Produtos</div>
-      <div class="card-value" id="dashProdutos">
-        0
-      </div>
-    </div>
-
-
-    <div class="card card-accent">
-      <div class="card-icon">⚠️</div>
-      <div class="card-label">Estoque Crítico</div>
-      <div class="card-value" id="dashEstoqueCritico">
-        0
-      </div>
-    </div>
-
+    <div class="card"><div class="card-icon">💰</div><div class="card-label">Vendas Hoje</div><div class="card-value" id="dashVendasHoje">R$ 0,00</div></div>
+    <div class="card"><div class="card-icon">🛒</div><div class="card-label">Pedidos Hoje</div><div class="card-value" id="dashPedidosHoje">0</div></div>
+    <div class="card"><div class="card-icon">📦</div><div class="card-label">Produtos</div><div class="card-value" id="dashProdutos">0</div></div>
+    <div class="card card-accent"><div class="card-icon">⚠️</div><div class="card-label">Estoque Crítico</div><div class="card-value" id="dashEstoqueCritico">0</div></div>
   </div>
 
-
-  <div
-    class="cards"
-    style="margin-top:18px">
-
-    <div class="card">
-      <div class="card-icon">💵</div>
-      <div class="card-label">Lucro Hoje</div>
-      <div class="card-value" id="dashLucroHoje">
-        R$ 0,00
-      </div>
-    </div>
-
-
-    <div class="card">
-      <div class="card-icon">🎯</div>
-      <div class="card-label">Ticket Médio</div>
-      <div class="card-value" id="dashTicketMedio">
-        R$ 0,00
-      </div>
-    </div>
-
-
-    <div class="card">
-      <div class="card-icon">📦</div>
-      <div class="card-label">Itens Vendidos</div>
-      <div class="card-value" id="dashItensVendidos">
-        0
-      </div>
-    </div>
-
-
-    <div class="card">
-      <div class="card-icon">🚫</div>
-      <div class="card-label">Sem Estoque</div>
-      <div class="card-value" id="dashSemEstoque">
-        0
-      </div>
-    </div>
-
+  <div class="cards" style="margin-top:18px;">
+    <div class="card"><div class="card-icon">💵</div><div class="card-label">Lucro Hoje</div><div class="card-value" id="dashLucroHoje">R$ 0,00</div></div>
+    <div class="card"><div class="card-icon">🎯</div><div class="card-label">Ticket Médio</div><div class="card-value" id="dashTicketMedio">R$ 0,00</div></div>
+    <div class="card"><div class="card-icon">📦</div><div class="card-label">Itens Vendidos</div><div class="card-value" id="dashItensVendidos">0</div></div>
+    <div class="card"><div class="card-icon">🚫</div><div class="card-label">Sem Estoque</div><div class="card-value" id="dashSemEstoque">0</div></div>
   </div>
-
 
   <div class="grid-2">
-
     <div class="card">
-
-      <h3 class="section-title">
-        🏆 Produto mais vendido
-      </h3>
-
-      <div class="empty-state">
-        O ranking será conectado às vendas reais
-        quando ligarmos o ERP à sua planilha.
-      </div>
-
+      <h3 class="section-title">🏆 Produto mais vendido</h3>
+      <div id="dashMaisVendidoNome" style="font-size:20px;font-weight:900;">-</div>
+      <div id="dashMaisVendidoQtd" style="color:var(--muted);margin-top:7px;"></div>
     </div>
 
-
     <div class="card">
-
-      <h3 class="section-title">
-        📈 Evolução de vendas
-      </h3>
-
-      <div class="empty-state">
-        Área preparada para o gráfico de vendas.
-      </div>
-
+      <h3 class="section-title">📈 Evolução de vendas</h3>
+      <div class="empty-state">O gráfico entra na próxima etapa.</div>
     </div>
-
   </div>
-
 </section>
-
-
-<script>
-
-window.init_dashboard =
-  async function() {
-
-    try {
-
-      const dados =
-        await VNNUS_API.dashboard();
-
-
-      const moeda =
-        function(valor) {
-
-          return Number(
-            valor || 0
-          )
-          .toLocaleString(
-            'pt-BR',
-            {
-              style: 'currency',
-              currency: 'BRL'
-            }
-          );
-
-        };
-
-
-      document.getElementById(
-        'dashVendasHoje'
-      ).textContent =
-        moeda(
-          dados.vendasHoje
-        );
-
-
-      document.getElementById(
-        'dashPedidosHoje'
-      ).textContent =
-        Number(
-          dados.pedidosHoje || 0
-        );
-
-
-      document.getElementById(
-        'dashProdutos'
-      ).textContent =
-        Number(
-          dados.produtos || 0
-        );
-
-
-      document.getElementById(
-        'dashEstoqueCritico'
-      ).textContent =
-        Number(
-          dados.estoqueCritico || 0
-        );
-
-
-      document.getElementById(
-        'dashLucroHoje'
-      ).textContent =
-        moeda(
-          dados.lucroHoje
-        );
-
-
-      document.getElementById(
-        'dashTicketMedio'
-      ).textContent =
-        moeda(
-          dados.ticketMedio
-        );
-
-
-      document.getElementById(
-        'dashItensVendidos'
-      ).textContent =
-        Number(
-          dados.itensVendidos || 0
-        );
-
-
-      document.getElementById(
-        'dashSemEstoque'
-      ).textContent =
-        Number(
-          dados.semEstoque || 0
-        );
-
-    }
-
-    catch (erro) {
-
-      console.error(
-        'Erro Dashboard:',
-        erro
-      );
-
-      throw erro;
-
-    }
-
-  };
-
-</script>

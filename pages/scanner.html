@@ -1,3 +1,17 @@
-<section><div class="page-header"><div><h2>📷 Scanner</h2><p>Leitura de código de barras integrada ao VNNUS.</p></div></div>
-<div class="card scan-box"><div class="scan-icon">📷</div><h3>Scanner externo VNNUS</h3><p style="color:var(--muted);margin-top:8px">A câmera abre fora do Apps Script.</p><button class="btn-primary" id="openScanner" style="margin-top:18px">Abrir Scanner</button></div>
-</section><script>window.init_scanner=()=>{openScanner.onclick=()=>{const u=window.VNNUS_CONFIG.SCANNER_URL;if(!u){alert("Cole primeiro a URL do scanner em js/config.js");return}const ret=location.href.split("#")[0]+"#pdv";location.href=u+"?return="+encodeURIComponent(ret)}}</script>
+<section>
+  <div class="page-header">
+    <div>
+      <h2>📷 Scanner</h2>
+      <p>Abra o scanner externo VNNUS para ler o GTIN.</p>
+    </div>
+  </div>
+
+  <div class="card scan-box">
+    <div class="scan-icon">📷</div>
+    <h3>Scanner VNNUS</h3>
+    <p style="color:var(--muted);margin-top:8px;line-height:1.5;">
+      A câmera abre no scanner externo e retorna o GTIN automaticamente para o PDV.
+    </p>
+    <button class="btn-primary" id="openScanner" style="margin-top:20px;">📷 Abrir Scanner</button>
+  </div>
+</section>

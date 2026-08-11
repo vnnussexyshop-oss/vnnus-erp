@@ -1,0 +1,56 @@
+VNNUS ERP 2.1 - PATCH DE INTEGRAÇÃO
+
+IMPORTANTE
+==========
+Este pacote NÃO substitui o seu js/config.js.
+Sua URL da API já está configurada nesse arquivo, então mantenha-o como está.
+
+ARQUIVOS PARA SUBSTITUIR NO GITHUB
+==================================
+index.html
+js/api.js
+pages/dashboard.html
+pages/produtos.html
+pages/scanner.html
+pages/pdv.html
+
+ARQUIVOS NOVOS PARA ADICIONAR
+=============================
+js/dashboard.js
+js/produtos.js
+js/scanner.js
+js/pdv.js
+
+COMO APLICAR
+============
+1. Extraia este ZIP no computador.
+2. No repositório vnnus-erp, use Add file > Upload files.
+3. Arraste todo o conteúdo extraído para o GitHub.
+4. Confirme a substituição dos arquivos existentes.
+5. Faça Commit changes.
+6. Aguarde o GitHub Pages publicar novamente.
+7. Abra o ERP e faça Ctrl+Shift+R.
+
+TESTE 1
+=======
+Abra Produtos.
+Devem aparecer os produtos reais da sua planilha.
+
+TESTE 2
+=======
+Abra Dashboard.
+Os indicadores devem vir da API real.
+
+SCANNER
+=======
+Para o botão Scanner funcionar de dentro do ERP, ainda falta preencher SCANNER_URL em js/config.js.
+Não altere isso agora se você ainda não copiou a URL publicada do scanner.
+
+PRÓXIMA ETAPA
+=============
+Depois de validar Produtos e Dashboard:
+- configurar SCANNER_URL
+- Scanner -> GTIN -> PDV
+- ativar finalização da venda
+- baixar estoque
+- gravar venda

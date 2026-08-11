@@ -1,2 +1,44 @@
-<section><div class="page-header"><div><h2>🛒 PDV</h2><p>Venda rápida por nome, GTIN ou scanner.</p></div></div><div class="pdv-layout"><div class="card"><h3 class="section-title">Adicionar produto</h3><div class="toolbar"><input class="input input-grow" id="pdvGTIN" placeholder="Nome ou GTIN..."><button class="btn-primary" id="pdvScanner">📷 Scanner</button></div><div class="empty-state">Carrinho será conectado ao backend na próxima fase.</div></div><div class="card total-box"><div class="card-label">TOTAL</div><div class="card-value">R$ 0,00</div></div></div></section>
-<script>window.init_pdv=()=>{const params=new URLSearchParams(location.search);const gtin=params.get("gtin");if(gtin)pdvGTIN.value=gtin;pdvScanner.onclick=()=>{const u=window.VNNUS_CONFIG.SCANNER_URL;if(!u){alert("Configure SCANNER_URL em js/config.js");return}const ret=location.origin+location.pathname+"?gtin={CODE}#pdv";location.href=u+"?return="+encodeURIComponent(ret)}}</script>
+<section>
+  <div class="page-header">
+    <div>
+      <h2>🛒 PDV</h2>
+      <p>Venda rápida usando GTIN real ou scanner.</p>
+    </div>
+  </div>
+
+  <div class="pdv-layout">
+    <div>
+      <div class="card">
+        <h3 class="section-title">Adicionar produto</h3>
+
+        <div class="toolbar">
+          <input class="input input-grow" type="text" id="pdvGTIN" placeholder="Digite ou bipe o GTIN...">
+          <button class="btn-secondary" id="pdvBuscar">🔎 Buscar</button>
+          <button class="btn-primary" id="pdvScanner">📷 Scanner</button>
+        </div>
+
+        <div id="pdvStatus" style="color:var(--muted);">Aguardando produto.</div>
+      </div>
+
+      <div class="card" style="margin-top:18px;">
+        <h3 class="section-title">Carrinho</h3>
+        <div id="pdvCarrinho">
+          <div class="empty-state">Nenhum produto adicionado.</div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="card total-box">
+        <div class="card-label">TOTAL</div>
+        <div class="card-value" id="pdvTotal">R$ 0,00</div>
+
+        <button class="btn-primary" style="width:100%;margin-top:22px;padding:15px;" disabled>
+          ✅ Finalizar Venda
+          <br>
+          <small>será ativado na próxima etapa</small>
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
