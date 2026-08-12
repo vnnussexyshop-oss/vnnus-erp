@@ -1,1 +1,247 @@
-<section><div class="page-header"><div><h2>📊 Estoque</h2><p>Entradas, saídas e inventário.</p></div><button class="btn-primary">+ Nova Movimentação</button></div><div class="empty-state">Estrutura pronta. Conectaremos aos dados reais na fase de API.</div></section>
+<section>
+
+  <div class="page-header">
+
+    <div>
+      <h2>📊 Estoque</h2>
+      <p>Controle de entradas, saídas, ajustes e saldo dos produtos.</p>
+    </div>
+
+    <button
+      class="btn-primary"
+      id="btnNovaMovimentacaoEstoque">
+      + Nova Movimentação
+    </button>
+
+  </div>
+
+
+  <div class="toolbar">
+
+    <input
+      id="pesquisaEstoque"
+      class="input input-grow"
+      type="text"
+      placeholder="Pesquisar produto ou GTIN...">
+
+    <button
+      class="btn-secondary"
+      id="btnAtualizarEstoque">
+      ↻ Atualizar
+    </button>
+
+  </div>
+
+
+  <div class="cards" style="margin-bottom:25px;">
+
+    <div class="card">
+      <div class="card-icon">📦</div>
+      <div class="card-label">Produtos no estoque</div>
+      <div class="card-value" id="totalProdutosEstoque">0</div>
+    </div>
+
+    <div class="card">
+      <div class="card-icon">⚠️</div>
+      <div class="card-label">Estoque baixo</div>
+      <div class="card-value" id="totalEstoqueBaixo">0</div>
+    </div>
+
+    <div class="card card-accent">
+      <div class="card-icon">🚫</div>
+      <div class="card-label">Sem estoque</div>
+      <div class="card-value" id="totalSemEstoque">0</div>
+    </div>
+
+  </div>
+
+
+  <div
+    id="statusEstoque"
+    style="color:var(--muted);margin-bottom:15px;">
+    Carregando estoque...
+  </div>
+
+
+  <div class="table-wrap">
+
+    <table>
+
+      <thead>
+        <tr>
+          <th>GTIN</th>
+          <th>Produto</th>
+          <th>Saldo</th>
+          <th>Mínimo</th>
+          <th>Status</th>
+          <th>Ação</th>
+        </tr>
+      </thead>
+
+      <tbody id="listaEstoque">
+
+        <tr>
+          <td colspan="6">
+            Carregando estoque...
+          </td>
+        </tr>
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+
+  <!-- MODAL MOVIMENTAÇÃO -->
+
+  <div
+    id="modalMovimentacaoEstoque"
+    class="modal">
+
+    <div class="modal-conteudo">
+
+      <div class="modal-topo">
+
+        <div>
+          <h2>Movimentação de Estoque</h2>
+          <p style="color:#888;margin-top:5px;">
+            Registre entrada, saída ou ajuste.
+          </p>
+        </div>
+
+        <button id="btnFecharMovEstoque">
+          ✕
+        </button>
+
+      </div>
+
+
+      <div class="form-grid">
+
+        <div class="campo campo-grande">
+
+          <label>Produto *</label>
+
+          <select id="movProduto">
+            <option value="">
+              Selecione...
+            </option>
+          </select>
+
+        </div>
+
+
+        <div class="campo">
+
+          <label>Tipo *</label>
+
+          <select id="movTipo">
+
+            <option value="ENTRADA">
+              Entrada
+            </option>
+
+            <option value="SAIDA">
+              Saída
+            </option>
+
+            <option value="AJUSTE_POSITIVO">
+              Ajuste +
+            </option>
+
+            <option value="AJUSTE_NEGATIVO">
+              Ajuste -
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <div class="campo">
+
+          <label>Quantidade *</label>
+
+          <input
+            id="movQuantidade"
+            type="number"
+            min="1"
+            step="1"
+            value="1">
+
+        </div>
+
+
+        <div class="campo">
+
+          <label>Origem</label>
+
+          <select id="movOrigem">
+
+            <option value="COMPRA">
+              Compra
+            </option>
+
+            <option value="DEVOLUCAO">
+              Devolução
+            </option>
+
+            <option value="INVENTARIO">
+              Inventário
+            </option>
+
+            <option value="PERDA">
+              Perda/Avaria
+            </option>
+
+            <option value="MANUAL">
+              Manual
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <div class="campo campo-grande">
+
+          <label>Observação</label>
+
+          <input
+            id="movObservacao"
+            type="text"
+            placeholder="Opcional">
+
+        </div>
+
+      </div>
+
+
+      <div
+        id="mensagemMovEstoque"
+        style="margin-top:15px;color:var(--muted);">
+      </div>
+
+
+      <div class="modal-rodape">
+
+        <button
+          class="btn-secondary"
+          id="btnCancelarMovEstoque">
+          Cancelar
+        </button>
+
+        <button
+          id="btnSalvarMovEstoque"
+          class="btn-primary">
+          Salvar Movimentação
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>

@@ -409,7 +409,6 @@ const VNNUS_API = {
     };
   },
 
-
   async cancelarVenda(
     idVenda,
     motivo
@@ -427,6 +426,47 @@ const VNNUS_API = {
         motivo
 
     });
+
+  },
+
+  async registrarMovimentacaoEstoque(
+    dadosMovimentacao
+  ) {
+
+    return await this.jsonp({
+
+      acao:
+        'registrar_movimentacao_estoque',
+
+      dados:
+        JSON.stringify(
+          dadosMovimentacao
+        )
+
+    });
+
+  },
+
+  async movimentacoesEstoque(
+    limite = 50
+  ) {
+
+    const resposta =
+      await this.jsonp({
+
+        acao:
+          'movimentacoes_estoque',
+
+        limite:
+          limite
+
+      });
+
+
+    return (
+      resposta.movimentacoes ||
+      []
+    );
 
   }
 
