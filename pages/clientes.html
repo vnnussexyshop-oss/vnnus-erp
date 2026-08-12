@@ -1,1 +1,358 @@
-<section><div class="page-header"><div><h2>👥 Clientes</h2><p>Cadastro e histórico.</p></div><button class="btn-primary">+ Novo Cliente</button></div><div class="empty-state">Módulo preparado para a próxima fase.</div></section>
+<section>
+
+  <div class="page-header">
+
+    <div>
+      <h2>👥 Clientes</h2>
+      <p>Cadastro e consulta de clientes da VNNUS.</p>
+    </div>
+
+    <button
+      class="btn-primary"
+      id="btnNovoCliente">
+      + Novo Cliente
+    </button>
+
+  </div>
+
+
+  <div class="toolbar">
+
+    <input
+      id="pesquisaClientes"
+      class="input input-grow"
+      type="text"
+      placeholder="Pesquisar por nome, telefone, WhatsApp, CPF ou e-mail...">
+
+    <button
+      class="btn-secondary"
+      id="btnAtualizarClientes">
+      ↻ Atualizar
+    </button>
+
+  </div>
+
+
+  <div class="cards" style="margin-bottom:25px;">
+
+    <div class="card">
+      <div class="card-icon">👥</div>
+      <div class="card-label">Clientes cadastrados</div>
+      <div class="card-value" id="totalClientes">0</div>
+    </div>
+
+    <div class="card">
+      <div class="card-icon">✅</div>
+      <div class="card-label">Clientes ativos</div>
+      <div class="card-value" id="totalClientesAtivos">0</div>
+    </div>
+
+    <div class="card">
+      <div class="card-icon">📱</div>
+      <div class="card-label">Com WhatsApp</div>
+      <div class="card-value" id="totalClientesWhatsapp">0</div>
+    </div>
+
+  </div>
+
+
+  <div
+    id="statusClientes"
+    style="color:var(--muted);margin-bottom:15px;">
+    Carregando clientes...
+  </div>
+
+
+  <div class="table-wrap">
+
+    <table>
+
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nome</th>
+          <th>WhatsApp</th>
+          <th>Telefone</th>
+          <th>Cidade/UF</th>
+          <th>Status</th>
+          <th>Ação</th>
+        </tr>
+      </thead>
+
+      <tbody id="listaClientes">
+
+        <tr>
+          <td colspan="7">
+            Carregando clientes...
+          </td>
+        </tr>
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+
+  <!-- MODAL CLIENTE -->
+
+  <div
+    id="modalCliente"
+    class="modal">
+
+    <div class="modal-conteudo">
+
+      <div class="modal-topo">
+
+        <div>
+          <h2 id="tituloModalCliente">
+            Novo Cliente
+          </h2>
+
+          <p style="color:#888;margin-top:5px;">
+            O ID e a data de cadastro são gerados automaticamente.
+          </p>
+        </div>
+
+        <button id="btnFecharCliente">
+          ✕
+        </button>
+
+      </div>
+
+
+      <input
+        id="clienteId"
+        type="hidden">
+
+
+      <div class="form-grid">
+
+        <div class="campo campo-grande">
+
+          <label>Nome *</label>
+
+          <input
+            id="clienteNome"
+            type="text"
+            placeholder="Nome completo">
+
+        </div>
+
+
+        <div class="campo">
+
+          <label>Telefone</label>
+
+          <input
+            id="clienteTelefone"
+            type="tel"
+            placeholder="(11) 99999-9999">
+
+        </div>
+
+
+        <div class="campo">
+
+          <label>WhatsApp</label>
+
+          <input
+            id="clienteWhatsapp"
+            type="tel"
+            placeholder="(11) 99999-9999">
+
+        </div>
+
+
+        <div class="campo campo-grande">
+
+          <label>E-mail</label>
+
+          <input
+            id="clienteEmail"
+            type="email"
+            placeholder="cliente@email.com">
+
+        </div>
+
+
+        <div class="campo">
+
+          <label>Data de nascimento</label>
+
+          <input
+            id="clienteNascimento"
+            type="date">
+
+        </div>
+
+
+        <div class="campo">
+
+          <label>CPF</label>
+
+          <input
+            id="clienteCpf"
+            type="text"
+            inputmode="numeric"
+            maxlength="14"
+            placeholder="000.000.000-00">
+
+        </div>
+
+
+        <div class="campo">
+
+          <label>CEP</label>
+
+          <input
+            id="clienteCep"
+            type="text"
+            inputmode="numeric"
+            maxlength="9"
+            placeholder="00000-000">
+
+        </div>
+
+
+        <div class="campo">
+
+          <label>&nbsp;</label>
+
+          <button
+            class="btn-secondary"
+            id="btnBuscarCepCliente"
+            type="button"
+            style="width:100%;">
+            🔎 Buscar CEP
+          </button>
+
+        </div>
+
+
+        <div class="campo campo-grande">
+
+          <label>Endereço</label>
+
+          <input
+            id="clienteEndereco"
+            type="text"
+            placeholder="Preenchido automaticamente pelo CEP">
+
+        </div>
+
+
+        <div class="campo">
+
+          <label>Número</label>
+
+          <input
+            id="clienteNumero"
+            type="text"
+            placeholder="123">
+
+        </div>
+
+
+        <div class="campo">
+
+          <label>Complemento</label>
+
+          <input
+            id="clienteComplemento"
+            type="text"
+            placeholder="Apto, bloco...">
+
+        </div>
+
+
+        <div class="campo">
+
+          <label>Bairro</label>
+
+          <input
+            id="clienteBairro"
+            type="text"
+            placeholder="Preenchido automaticamente">
+
+        </div>
+
+
+        <div class="campo">
+
+          <label>Cidade</label>
+
+          <input
+            id="clienteCidade"
+            type="text"
+            placeholder="Preenchido automaticamente">
+
+        </div>
+
+
+        <div class="campo">
+
+          <label>UF</label>
+
+          <input
+            id="clienteUf"
+            type="text"
+            maxlength="2"
+            placeholder="SP">
+
+        </div>
+
+
+        <div class="campo">
+
+          <label>Status</label>
+
+          <select id="clienteAtivo">
+            <option value="SIM">Ativo</option>
+            <option value="NAO">Inativo</option>
+          </select>
+
+        </div>
+
+
+        <div class="campo campo-grande">
+
+          <label>Observação</label>
+
+          <input
+            id="clienteObservacao"
+            type="text"
+            placeholder="Opcional">
+
+        </div>
+
+      </div>
+
+
+      <div
+        id="mensagemCliente"
+        style="margin-top:15px;color:var(--muted);">
+      </div>
+
+
+      <div class="modal-rodape">
+
+        <button
+          class="btn-secondary"
+          id="btnCancelarCliente">
+          Cancelar
+        </button>
+
+        <button
+          class="btn-primary"
+          id="btnSalvarCliente">
+          Salvar Cliente
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>

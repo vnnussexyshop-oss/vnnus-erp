@@ -468,6 +468,78 @@ const VNNUS_API = {
       []
     );
 
+  },
+
+  async clientes() {
+
+    const resposta =
+      await this.jsonp({
+
+        acao:
+          'clientes'
+
+      });
+
+
+    return (
+      resposta.clientes ||
+      []
+    );
+
+  },
+
+  async clientePorId(
+    idCliente
+  ) {
+
+    const resposta =
+      await this.jsonp({
+
+        acao:
+          'cliente_id',
+
+        idCliente:
+          idCliente
+
+      });
+
+
+    return resposta;
+
+  },
+
+  async salvarCliente(
+    dadosCliente
+  ) {
+
+    return await this.jsonp({
+
+      acao:
+        'salvar_cliente',
+
+      dados:
+        JSON.stringify(
+          dadosCliente
+        )
+
+    });
+
+  },
+
+  async consultarCep(
+    cep
+  ) {
+
+    return await this.jsonp({
+
+      acao:
+        'consultar_cep',
+
+      cep:
+        cep
+
+    });
+
   }
 
 };
