@@ -1,6 +1,6 @@
 /* =====================================================
    VNNUS ERP
-   FINANCEIRO 2.0
+   FINANCEIRO 2.2
 ===================================================== */
 
 let financeiroPeriodoAtual = {
@@ -557,15 +557,59 @@ function renderizarFinanceiroERP(
 
 
   const lucro =
-    Number(
-      resumo.lucro || 0
-    );
+  Number(
+    resumo.lucro || 0
+  );
 
 
-  const margem =
-    Number(
-      resumo.margem || 0
-    );
+/* =====================================================
+   FINANCEIRO 2.2
+   RESULTADO LÍQUIDO
+===================================================== */
+
+const lucroBruto =
+  Number(
+    resumo.lucroBruto ??
+    resumo.lucro ??
+    0
+  );
+
+
+const despesasPagas =
+  Number(
+    resumo.despesasPagas ||
+    0
+  );
+
+
+const despesasPendentes =
+  Number(
+    resumo.despesasPendentes ||
+    0
+  );
+
+
+const despesasVencidas =
+  Number(
+    resumo.despesasVencidas ||
+    0
+  );
+
+
+const lucroLiquido =
+  Number(
+    resumo.lucroLiquido ??
+    (
+      lucroBruto -
+      despesasPagas
+    )
+  );
+
+
+const margem =
+  Number(
+    resumo.margem || 0
+  );
 
 
   const quantidadeVendas =
@@ -608,21 +652,71 @@ function renderizarFinanceiroERP(
   );
 
 
-  definirTextoFinanceiro(
-    'finLucro',
-    formatarMoedaFinanceiro(
-      lucro
-    )
-  );
+ definirTextoFinanceiro(
+  'finLucro',
+  formatarMoedaFinanceiro(
+    lucroBruto
+  )
+);
 
 
-  definirTextoFinanceiro(
-    'finMargem',
-    formatarPercentualFinanceiro(
-      margem
-    )
-  );
+/* LUCRO BRUTO */
 
+definirTextoFinanceiro(
+  'finLucroBruto',
+  formatarMoedaFinanceiro(
+    lucroBruto
+  )
+);
+
+
+/* DESPESAS PAGAS */
+
+definirTextoFinanceiro(
+  'finDespesasPagas',
+  formatarMoedaFinanceiro(
+    despesasPagas
+  )
+);
+
+
+/* LUCRO LÍQUIDO */
+
+definirTextoFinanceiro(
+  'finLucroLiquido',
+  formatarMoedaFinanceiro(
+    lucroLiquido
+  )
+);
+
+
+/* CONTAS PENDENTES */
+
+definirTextoFinanceiro(
+  'finDespesasPendentes',
+  formatarMoedaFinanceiro(
+    despesasPendentes
+  )
+);
+
+
+/* DESPESAS VENCIDAS */
+
+definirTextoFinanceiro(
+  'finDespesasVencidas',
+  'Vencidas: ' +
+  formatarMoedaFinanceiro(
+    despesasVencidas
+  )
+);
+
+
+definirTextoFinanceiro(
+  'finMargem',
+  formatarPercentualFinanceiro(
+    margem
+  )
+);
 
   definirTextoFinanceiro(
     'finQtdVendas',
@@ -1363,5 +1457,5 @@ function escaparHtmlFinanceiro(
 
 /* =====================================================
    FIM
-   VNNUS FINANCEIRO 2.0
+   VNNUS FINANCEIRO 2.2
 ===================================================== */
