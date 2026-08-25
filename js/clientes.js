@@ -1,5 +1,5 @@
 /* =====================================================
-   VNNUS ERP 3.3
+   VNNUS ERP 3.5
    CLIENTES - GITHUB PAGES + API VNNUS
 ===================================================== */
 
@@ -50,6 +50,11 @@ window.init_clientes =
       );
 
 
+    const btnFecharHistorico = document.getElementById('btnFecharHistoricoCliente');
+    const btnFecharHistoricoRodape = document.getElementById('btnFecharHistoricoClienteRodape');
+    const btnFecharDetalhes = document.getElementById('btnFecharDetalhesCompraCliente');
+
+
     if (btnNovo) {
       btnNovo.onclick =
         abrirNovoClienteERP;
@@ -91,6 +96,10 @@ window.init_clientes =
         filtrarClientesERP;
     }
 
+
+    if (btnFecharHistorico) btnFecharHistorico.onclick = fecharHistoricoClienteERP;
+    if (btnFecharHistoricoRodape) btnFecharHistoricoRodape.onclick = fecharHistoricoClienteERP;
+    if (btnFecharDetalhes) btnFecharDetalhes.onclick = fecharDetalhesCompraClienteERP;
 
     if (campoCep) {
 
@@ -339,11 +348,8 @@ function renderizarClientesERP(
 
             <td>
 
-              <button
-                class="btn-secondary"
-                onclick="editarClienteERP('${escaparAtributoClienteERP(cliente.ID_CLIENTE)}')">
-                Editar
-              </button>
+              <button class="btn-secondary" onclick="abrirHistoricoClienteERP('${escaparAtributoClienteERP(cliente.ID_CLIENTE)}')">Compras</button>
+              <button class="btn-secondary" onclick="editarClienteERP('${escaparAtributoClienteERP(cliente.ID_CLIENTE)}')">Editar</button>
 
             </td>
 
@@ -668,7 +674,7 @@ function editarClienteERP(
 }
 
 
-/* =====================================================
+\n/* =====================================================\n   HISTÓRICO DE COMPRAS DO CLIENTE\n===================================================== */\nasync function abrirHistoricoClienteERP(idCliente) {\n  const cliente=clientesCarregadosERP.find(x=>String(x.ID_CLIENTE||'')===String(idCliente||''));\n  if(!cliente){ alert('Cliente não encontrado.'); return; }\n  const modal=document.getElementById('modalHistoricoCliente'), status=document.getElementById('statusHistoricoCliente'), tbody=document.getElementById('listaHistoricoCliente');\n  document.getElementById('tituloHistoricoCliente').textContent='Compras • '+(cliente.NOME||cliente.ID_CLIENTE);\n  document.getElementById('subtituloHistoricoCliente').textContent=cliente.ID_CLIENTE+' • Histórico vinculado pelo ID do cliente';\n  if(status) status.textContent='Carregando histórico...';\n  if(tbody) tbody.innerHTML='<tr><td colspan="6">Carregando compras...</td></tr>';\n  zerarResumoHistoricoClienteERP(); fecharDetalhesCompraClienteERP(); if(modal) modal.classList.add('aberto');\n  try {\n    const resposta=await VNNUS_API.historicoCliente(cliente.ID_CLIENTE); const vendas=Array.isArray(resposta.vendas)?resposta.vendas:[];\n    renderizarResumoHistoricoClienteERP(resposta.resumo||{},vendas); renderizarHistoricoClienteERP(vendas);\n    if(status) status.textContent=vendas.length?vendas.length+' compra(s) encontrada(s).':'Este cliente ainda não possui compras vinculadas.';\n  } catch(erro){ if(status) status.textContent='Erro ao carregar histórico: '+erro.message; if(tbody) tbody.innerHTML='<tr><td colspan="6">Erro: '+escaparHtmlClienteERP(erro.message)+'</td></tr>'; }\n}\nfunction fecharHistoricoClienteERP(){ const m=document.getElementById('modalHistoricoCliente'); if(m)m.classList.remove('aberto'); fecharDetalhesCompraClienteERP(); }\nfunction zerarResumoHistoricoClienteERP(){ definirTextoHistoricoClienteERP('histTotalCompras','0'); definirTextoHistoricoClienteERP('histTotalGasto','R$ 0,00'); definirTextoHistoricoClienteERP('histTicketMedio','R$ 0,00'); definirTextoHistoricoClienteERP('histUltimaCompra','-'); }\nfunction renderizarResumoHistoricoClienteERP(r,v){ definirTextoHistoricoClienteERP('histTotalCompras',String(Number(r.totalCompras??v.length??0))); definirTextoHistoricoClienteERP('histTotalGasto',formatarMoedaClienteERP(Number(r.totalGasto||0))); definirTextoHistoricoClienteERP('histTicketMedio',formatarMoedaClienteERP(Number(r.ticketMedio||0))); definirTextoHistoricoClienteERP('histUltimaCompra',String(r.ultimaCompra||(v.length?(v[0].DATA||v[0].DATA_HORA||'-'):'-'))); }\nfunction renderizarHistoricoClienteERP(vendas){ const tbody=document.getElementById('listaHistoricoCliente'); if(!tbody)return; if(!vendas.length){tbody.innerHTML='<tr><td colspan="6">Nenhuma compra vinculada a este cliente.</td></tr>';return;} tbody.innerHTML=vendas.map(v=>{const id=v.ID_VENDA||v.ID||'', status=String(v.STATUS||'').toUpperCase(); return `<tr><td><strong>${escaparHtmlClienteERP(id)}</strong></td><td>${escaparHtmlClienteERP(v.DATA||v.DATA_HORA||v.DATA_VENDA||'-')}</td><td>${escaparHtmlClienteERP(v.FORMA_PAGAMENTO||v.PAGAMENTO||'-')}</td><td>${escaparHtmlClienteERP(formatarMoedaClienteERP(Number(v.TOTAL||0)))}</td><td><span class="status-badge ${status==='CANCELADA'?'status-danger':'status-ok'}">${escaparHtmlClienteERP(status||'-')}</span></td><td><button class="btn-secondary" onclick="abrirDetalhesCompraClienteERP('${escaparAtributoClienteERP(id)}')">Ver itens</button></td></tr>`;}).join(''); }\nasync function abrirDetalhesCompraClienteERP(idVenda){ const area=document.getElementById('detalhesCompraCliente'), tbody=document.getElementById('listaItensCompraCliente'), resumo=document.getElementById('resumoDetalhesCompraCliente'); if(area)area.style.display='block'; document.getElementById('tituloDetalhesCompraCliente').textContent='Itens • '+idVenda; if(resumo)resumo.textContent='Carregando detalhes...'; try{const d=await VNNUS_API.detalhesVenda(idVenda), venda=d.venda||{}, itens=Array.isArray(d.itens)?d.itens:[]; if(resumo)resumo.textContent=[venda.DATA||venda.DATA_HORA||'',venda.FORMA_PAGAMENTO||venda.PAGAMENTO||'',formatarMoedaClienteERP(Number(venda.TOTAL||0))].filter(Boolean).join(' • '); if(tbody)tbody.innerHTML=itens.length?itens.map(i=>{const q=Number(i.QUANTIDADE||i.QTD||0),u=Number(i.PRECO_UNITARIO||i.PRECO||i.VALOR_UNITARIO||0),t=Number(i.TOTAL_ITEM||i.TOTAL||(q*u));return `<tr><td>${escaparHtmlClienteERP(i.PRODUTO||i.DESCRICAO||i.NOME||'-')}</td><td>${q}</td><td>${formatarMoedaClienteERP(u)}</td><td>${formatarMoedaClienteERP(t)}</td></tr>`;}).join(''):'<tr><td colspan="4">Nenhum item encontrado.</td></tr>'; }catch(e){if(resumo)resumo.textContent='Erro: '+e.message;} }\nfunction fecharDetalhesCompraClienteERP(){const a=document.getElementById('detalhesCompraCliente');if(a)a.style.display='none';}\nfunction definirTextoHistoricoClienteERP(id,v){const e=document.getElementById(id);if(e)e.textContent=v;}\nfunction formatarMoedaClienteERP(v){return Number(v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});}\n\n/* =====================================================
    CEP
 ===================================================== */
 
