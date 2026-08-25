@@ -1,13 +1,23 @@
 /* =====================================================
    VNNUS ERP
-   DASHBOARD 2.0
+   DASHBOARD 2.2
+   INDICADORES + DESPESAS + EVOLUÇÃO FINANCEIRA
 ===================================================== */
 
+
+let dashboardGraficoDias =
+  7;
+
+
+/* =====================================================
+   INICIALIZAÇÃO
+===================================================== */
 
 window.init_dashboard =
   async function() {
 
     atualizarDataDashboard();
+
 
     const status =
       document.getElementById(
@@ -25,213 +35,47 @@ window.init_dashboard =
       }
 
 
+      /* =================================================
+         DASHBOARD + DESPESAS DE HOJE
+      ================================================= */
+
+      const hojeIso =
+        dataIsoDashboardHoje();
+
+
       const resultados =
-  await Promise.all([
+        await Promise.all([
 
-    VNNUS_API.dashboard(),
+          VNNUS_API.dashboard(),
 
-    VNNUS_API.resumoDespesas(
-      dataIsoDashboardHoje(),
-      dataIsoDashboardHoje()
-    )
+          VNNUS_API.resumoDespesas(
+            hojeIso,
+            hojeIso
+          )
 
-  ]);
-
-
-const dados =
-  resultados[0] || {};
+        ]);
 
 
-const despesas =
-  resultados[1] || {};
+      const dados =
+        resultados[0] ||
+        {};
+
+
+      const despesas =
+        resultados[1] ||
+        {};
 
 
       preencherIndicadoresDashboard(
-        dados || {}
-      );
-preencherDespesasDashboard(
-  despesas
-);/* =====================================================
-   DESPESAS / RESULTADO LÍQUIDO
-===================================================== */
-
-function preencherDespesasDashboard(
-  despesas
-) {
-
-  despesas =
-    despesas || {};
-
-
-  const pagas =
-    Number(
-      despesas.pago ||
-      0
-    );
-
-
-  const pendentes =
-    Number(
-      despesas.pendente ||
-      0
-    );
-
-
-  const vencidas =
-    Number(
-      despesas.vencido ||
-      0
-    );
-
-
-  const lucroBrutoTexto =
-    document.getElementById(
-      'dashLucroHoje'
-    );
-
-
-  let lucroBruto =
-    0;
-
-
-  if (lucroBrutoTexto) {
-
-    lucroBruto =
-      numeroMoedaDashboard(
-        lucroBrutoTexto.textContent
+        dados
       );
 
-  }
 
+      preencherDespesasDashboard(
+        despesas,
+        dados
+      );
 
-  const lucroLiquido =
-    lucroBruto -
-    pagas;
-
-
-  definirTextoDashboard(
-    'dashDespesasHoje',
-    moedaDashboard(
-      pagas
-    )
-  );
-
-
-  definirTextoDashboard(
-    'dashLucroLiquidoHoje',
-    moedaDashboard(
-      lucroLiquido
-    )
-  );
-
-
-  definirTextoDashboard(
-    'dashDespesasPendentes',
-    moedaDashboard(
-      pendentes
-    )
-  );
-
-
-  definirTextoDashboard(
-    'dashDespesasVencidas',
-    moedaDashboard(
-      vencidas
-    )
-  );
-
-}
-
-
-/* =====================================================
-   DATA DE HOJE EM ISO
-===================================================== */
-
-function dataIsoDashboardHoje() {
-
-  const agora =
-    new Date();
-
-
-  const ano =
-    agora.getFullYear();
-
-
-  const mes =
-    String(
-      agora.getMonth() + 1
-    )
-    .padStart(
-      2,
-      '0'
-    );
-
-
-  const dia =
-    String(
-      agora.getDate()
-    )
-    .padStart(
-      2,
-      '0'
-    );
-
-
-  return (
-    ano +
-    '-' +
-    mes +
-    '-' +
-    dia
-  );
-
-}
-
-
-/* =====================================================
-   CONVERTER TEXTO DE MOEDA
-===================================================== */
-
-function numeroMoedaDashboard(
-  valor
-) {
-
-  const texto =
-    String(
-      valor ||
-      ''
-    )
-    .replace(
-      /R\$/gi,
-      ''
-    )
-    .replace(
-      /\s/g,
-      ''
-    )
-    .replace(
-      /\./g,
-      ''
-    )
-    .replace(
-      ',',
-      '.'
-    );
-
-
-  const numero =
-    Number(
-      texto
-    );
-
-
-  return Number.isFinite(
-    numero
-  )
-    ? numero
-    : 0;
-
-}
 
       preencherProdutoMaisVendidoDashboard(
         dados &&
@@ -248,6 +92,23 @@ function numeroMoedaDashboard(
         )
           ? dados.ultimasVendas
           : []
+      );
+
+
+      /* =================================================
+         GRÁFICO
+      ================================================= */
+
+      configurarGraficoDashboard();
+
+
+      atualizarBotoesGraficoDashboard(
+        dashboardGraficoDias
+      );
+
+
+      await carregarGraficoDashboard(
+        dashboardGraficoDias
       );
 
 
@@ -348,6 +209,51 @@ function atualizarDataDashboard() {
 
 
 /* =====================================================
+   DATA DE HOJE ISO
+===================================================== */
+
+function dataIsoDashboardHoje() {
+
+  const agora =
+    new Date();
+
+
+  const ano =
+    agora.getFullYear();
+
+
+  const mes =
+    String(
+      agora.getMonth() + 1
+    )
+    .padStart(
+      2,
+      '0'
+    );
+
+
+  const dia =
+    String(
+      agora.getDate()
+    )
+    .padStart(
+      2,
+      '0'
+    );
+
+
+  return (
+    ano +
+    '-' +
+    mes +
+    '-' +
+    dia
+  );
+
+}
+
+
+/* =====================================================
    INDICADORES
 ===================================================== */
 
@@ -355,91 +261,155 @@ function preencherIndicadoresDashboard(
   dados
 ) {
 
+  dados =
+    dados || {};
+
+
   definirTextoDashboard(
-
     'dashVendasHoje',
-
     moedaDashboard(
       dados.vendasHoje
     )
-
   );
 
 
   definirTextoDashboard(
-
     'dashPedidosHoje',
-
     numeroDashboard(
       dados.pedidosHoje
     )
-
   );
 
 
   definirTextoDashboard(
-
     'dashProdutos',
-
     numeroDashboard(
       dados.produtos
     )
-
   );
 
 
   definirTextoDashboard(
-
     'dashEstoqueCritico',
-
     numeroDashboard(
       dados.estoqueCritico
     )
-
   );
 
 
   definirTextoDashboard(
-
     'dashLucroHoje',
-
     moedaDashboard(
       dados.lucroHoje
     )
-
   );
 
 
   definirTextoDashboard(
-
     'dashTicketMedio',
-
     moedaDashboard(
       dados.ticketMedio
     )
-
   );
 
 
   definirTextoDashboard(
-
     'dashItensVendidos',
-
     numeroDashboard(
       dados.itensVendidos
     )
-
   );
 
 
   definirTextoDashboard(
-
     'dashSemEstoque',
-
     numeroDashboard(
       dados.semEstoque
     )
+  );
 
+}
+
+
+/* =====================================================
+   DESPESAS / LUCRO LÍQUIDO
+===================================================== */
+
+function preencherDespesasDashboard(
+  despesas,
+  dadosDashboard
+) {
+
+  despesas =
+    despesas || {};
+
+
+  dadosDashboard =
+    dadosDashboard || {};
+
+
+  const pagas =
+    Number(
+      despesas.pago ||
+      0
+    );
+
+
+  const pendentes =
+    Number(
+      despesas.pendente ||
+      0
+    );
+
+
+  const vencidas =
+    Number(
+      despesas.vencido ||
+      0
+    );
+
+
+  const lucroBruto =
+    Number(
+      dadosDashboard.lucroHoje ||
+      0
+    );
+
+
+  const lucroLiquido =
+    lucroBruto -
+    pagas;
+
+
+  definirTextoDashboard(
+    'dashDespesasHoje',
+    moedaDashboard(
+      pagas
+    )
+  );
+
+
+  definirTextoDashboard(
+    'dashLucroLiquidoHoje',
+    moedaDashboard(
+      lucroLiquido
+    )
+  );
+
+
+  definirTextoDashboard(
+    'dashDespesasPendentes',
+    moedaDashboard(
+      pendentes
+    )
+  );
+
+
+  definirTextoDashboard(
+    'dashDespesasVencidas',
+    moedaDashboard(
+      vencidas
+    )
   );
 
 }
@@ -479,7 +449,6 @@ function preencherProdutoMaisVendidoDashboard(
 
 
   definirTextoDashboard(
-
     'dashMaisVendidoQtd',
 
     quantidade > 0
@@ -492,7 +461,6 @@ function preencherProdutoMaisVendidoDashboard(
           )
         )
       : ''
-
   );
 
 }
@@ -700,15 +668,907 @@ function navegarDashboardPagina(
 }
 
 
-/*
-   Compatibilidade com o HTML do Dashboard 2.0.
-
-   Assim os botões de ações rápidas funcionam
-   sem depender de uma função específica do router.
-*/
-
 window.abrirPagina =
   navegarDashboardPagina;
+
+
+/* =====================================================
+   CONFIGURAR GRÁFICO
+===================================================== */
+
+function configurarGraficoDashboard() {
+
+  const botao7 =
+    document.getElementById(
+      'dashGrafico7'
+    );
+
+
+  const botao30 =
+    document.getElementById(
+      'dashGrafico30'
+    );
+
+
+  if (botao7) {
+
+    botao7.onclick =
+      async function() {
+
+        dashboardGraficoDias =
+          7;
+
+
+        atualizarBotoesGraficoDashboard(
+          7
+        );
+
+
+        await carregarGraficoDashboard(
+          7
+        );
+
+      };
+
+  }
+
+
+  if (botao30) {
+
+    botao30.onclick =
+      async function() {
+
+        dashboardGraficoDias =
+          30;
+
+
+        atualizarBotoesGraficoDashboard(
+          30
+        );
+
+
+        await carregarGraficoDashboard(
+          30
+        );
+
+      };
+
+  }
+
+}
+
+
+/* =====================================================
+   BOTÕES 7 / 30 DIAS
+===================================================== */
+
+function atualizarBotoesGraficoDashboard(
+  dias
+) {
+
+  const botao7 =
+    document.getElementById(
+      'dashGrafico7'
+    );
+
+
+  const botao30 =
+    document.getElementById(
+      'dashGrafico30'
+    );
+
+
+  if (
+    !botao7 ||
+    !botao30
+  ) {
+
+    return;
+
+  }
+
+
+  if (
+    Number(dias) ===
+    7
+  ) {
+
+    botao7.classList.remove(
+      'btn-secondary'
+    );
+
+    botao7.classList.add(
+      'btn-primary'
+    );
+
+
+    botao30.classList.remove(
+      'btn-primary'
+    );
+
+    botao30.classList.add(
+      'btn-secondary'
+    );
+
+  }
+
+  else {
+
+    botao30.classList.remove(
+      'btn-secondary'
+    );
+
+    botao30.classList.add(
+      'btn-primary'
+    );
+
+
+    botao7.classList.remove(
+      'btn-primary'
+    );
+
+    botao7.classList.add(
+      'btn-secondary'
+    );
+
+  }
+
+}
+
+
+/* =====================================================
+   CARREGAR EVOLUÇÃO
+===================================================== */
+
+async function carregarGraficoDashboard(
+  dias
+) {
+
+  const area =
+    document.getElementById(
+      'dashGraficoFinanceiro'
+    );
+
+
+  const status =
+    document.getElementById(
+      'dashGraficoStatus'
+    );
+
+
+  const periodo =
+    document.getElementById(
+      'dashGraficoPeriodo'
+    );
+
+
+  if (!area) {
+
+    return;
+
+  }
+
+
+  if (status) {
+
+    status.textContent =
+      'Carregando evolução financeira...';
+
+  }
+
+
+  area.innerHTML = `
+    <div class="loading-card">
+      Preparando gráfico...
+    </div>
+  `;
+
+
+  try {
+
+    const resposta =
+      await VNNUS_API
+        .evolucaoFinanceira(
+          dias
+        );
+
+
+    const dados =
+      resposta &&
+      Array.isArray(
+        resposta.dados
+      )
+        ? resposta.dados
+        : [];
+
+
+    if (
+      !dados.length
+    ) {
+
+      area.innerHTML = `
+        <div class="empty-state">
+          Ainda não há dados suficientes para o gráfico.
+        </div>
+      `;
+
+
+      if (status) {
+
+        status.textContent =
+          'Nenhum dado encontrado.';
+
+      }
+
+
+      if (periodo) {
+
+        periodo.textContent =
+          '';
+
+      }
+
+
+      return;
+
+    }
+
+
+    desenharGraficoFinanceiroDashboard(
+      dados
+    );
+
+
+    if (status) {
+
+      status.textContent =
+        'Evolução atualizada.';
+
+    }
+
+
+    if (periodo) {
+
+      periodo.textContent =
+        (
+          resposta.inicio &&
+          resposta.fim
+        )
+          ? (
+              'Período: ' +
+              resposta.inicio +
+              ' até ' +
+              resposta.fim
+            )
+          : '';
+
+    }
+
+  }
+
+  catch (erro) {
+
+    console.error(
+      'Gráfico Dashboard:',
+      erro
+    );
+
+
+    area.innerHTML = `
+      <div class="empty-state">
+        Não foi possível carregar o gráfico.
+      </div>
+    `;
+
+
+    if (status) {
+
+      status.textContent =
+        'Erro: ' +
+        erro.message;
+
+    }
+
+  }
+
+}
+
+
+/* =====================================================
+   DESENHAR GRÁFICO SVG
+===================================================== */
+
+function desenharGraficoFinanceiroDashboard(
+  dados
+) {
+
+  const area =
+    document.getElementById(
+      'dashGraficoFinanceiro'
+    );
+
+
+  if (!area) {
+
+    return;
+
+  }
+
+
+  const largura =
+    Math.max(
+      720,
+
+      dados.length *
+      (
+        dashboardGraficoDias === 30
+          ? 42
+          : 90
+      )
+    );
+
+
+  const altura =
+    310;
+
+
+  const margem = {
+
+    topo:
+      20,
+
+    direita:
+      25,
+
+    baixo:
+      48,
+
+    esquerda:
+      72
+
+  };
+
+
+  const larguraUtil =
+    largura -
+    margem.esquerda -
+    margem.direita;
+
+
+  const alturaUtil =
+    altura -
+    margem.topo -
+    margem.baixo;
+
+
+  let maiorValor =
+    0;
+
+
+  let menorValor =
+    0;
+
+
+  dados.forEach(
+    function(item) {
+
+      const valores = [
+
+        Number(
+          item.faturamento ||
+          0
+        ),
+
+        Number(
+          item.lucroBruto ||
+          0
+        ),
+
+        Number(
+          item.despesasPagas ||
+          0
+        ),
+
+        Number(
+          item.lucroLiquido ||
+          0
+        )
+
+      ];
+
+
+      maiorValor =
+        Math.max(
+          maiorValor,
+          ...valores
+        );
+
+
+      menorValor =
+        Math.min(
+          menorValor,
+          ...valores
+        );
+
+    }
+  );
+
+
+  if (
+    maiorValor === 0 &&
+    menorValor === 0
+  ) {
+
+    maiorValor =
+      100;
+
+  }
+
+
+  if (
+    maiorValor > 0
+  ) {
+
+    maiorValor *=
+      1.15;
+
+  }
+
+
+  if (
+    menorValor < 0
+  ) {
+
+    menorValor *=
+      1.15;
+
+  }
+
+
+  const intervalo =
+    maiorValor -
+    menorValor || 1;
+
+
+  function x(indice) {
+
+    if (
+      dados.length === 1
+    ) {
+
+      return (
+        margem.esquerda +
+        larguraUtil / 2
+      );
+
+    }
+
+
+    return (
+      margem.esquerda +
+      (
+        indice /
+        (
+          dados.length - 1
+        )
+      ) *
+      larguraUtil
+    );
+
+  }
+
+
+  function y(valor) {
+
+    return (
+      margem.topo +
+      alturaUtil -
+      (
+        (
+          Number(
+            valor ||
+            0
+          ) -
+          menorValor
+        ) /
+        intervalo
+      ) *
+      alturaUtil
+    );
+
+  }
+
+
+  function pontos(
+    chave
+  ) {
+
+    return dados
+      .map(
+        function(item, indice) {
+
+          return (
+            x(indice) +
+            ',' +
+            y(
+              item[chave]
+            )
+          );
+
+        }
+      )
+      .join(' ');
+
+  }
+
+
+  /* =================================================
+     GRADE
+  ================================================= */
+
+  let linhasGrade =
+    '';
+
+
+  for (
+    let i = 0;
+    i <= 4;
+    i++
+  ) {
+
+    const valor =
+      maiorValor -
+      (
+        intervalo *
+        i / 4
+      );
+
+
+    const posicaoY =
+      margem.topo +
+      (
+        alturaUtil *
+        i / 4
+      );
+
+
+    linhasGrade += `
+      <line
+        x1="${margem.esquerda}"
+        y1="${posicaoY}"
+        x2="${largura - margem.direita}"
+        y2="${posicaoY}"
+        stroke="rgba(255,255,255,.07)"
+        stroke-width="1"
+      />
+
+      <text
+        x="${margem.esquerda - 10}"
+        y="${posicaoY + 4}"
+        text-anchor="end"
+        fill="#8f8f8f"
+        font-size="10">
+        ${escaparHtmlDashboard(
+          formatarValorEixoDashboard(
+            valor
+          )
+        )}
+      </text>
+    `;
+
+  }
+
+
+  /* =================================================
+     LINHA ZERO
+  ================================================= */
+
+  let linhaZero =
+    '';
+
+
+  if (
+    menorValor < 0 &&
+    maiorValor > 0
+  ) {
+
+    linhaZero = `
+      <line
+        x1="${margem.esquerda}"
+        y1="${y(0)}"
+        x2="${largura - margem.direita}"
+        y2="${y(0)}"
+        stroke="rgba(212,168,77,.35)"
+        stroke-width="1"
+        stroke-dasharray="5 5"
+      />
+    `;
+
+  }
+
+
+  /* =================================================
+     DATAS
+  ================================================= */
+
+  let labelsDatas =
+    '';
+
+
+  dados.forEach(
+    function(item, indice) {
+
+      const mostrar =
+        dashboardGraficoDias === 30
+          ? (
+              indice % 3 === 0 ||
+              indice ===
+              dados.length - 1
+            )
+          : true;
+
+
+      if (!mostrar) {
+
+        return;
+
+      }
+
+
+      labelsDatas += `
+        <text
+          x="${x(indice)}"
+          y="${altura - 18}"
+          text-anchor="middle"
+          fill="#8f8f8f"
+          font-size="10">
+          ${escaparHtmlDashboard(
+            item.data ||
+            ''
+          )}
+        </text>
+      `;
+
+    }
+  );
+
+
+  /* =================================================
+     PONTOS
+  ================================================= */
+
+  let pontosInterativos =
+    '';
+
+
+  dados.forEach(
+    function(item, indice) {
+
+      pontosInterativos += `
+
+        ${criarPontoGraficoDashboard(
+          x(indice),
+          y(item.faturamento),
+          item,
+          'Faturamento',
+          item.faturamento,
+          '#d4a84d'
+        )}
+
+        ${criarPontoGraficoDashboard(
+          x(indice),
+          y(item.lucroBruto),
+          item,
+          'Lucro bruto',
+          item.lucroBruto,
+          '#f0d99a'
+        )}
+
+        ${criarPontoGraficoDashboard(
+          x(indice),
+          y(item.despesasPagas),
+          item,
+          'Despesas',
+          item.despesasPagas,
+          '#a82132'
+        )}
+
+        ${criarPontoGraficoDashboard(
+          x(indice),
+          y(item.lucroLiquido),
+          item,
+          'Lucro líquido',
+          item.lucroLiquido,
+          '#ffffff'
+        )}
+
+      `;
+
+    }
+  );
+
+
+  /* =================================================
+     SVG FINAL
+  ================================================= */
+
+  area.innerHTML = `
+
+    <div
+      style="
+        min-width:${largura}px;
+        position:relative;
+      ">
+
+      <svg
+        width="${largura}"
+        height="${altura}"
+        viewBox="0 0 ${largura} ${altura}"
+        role="img"
+        aria-label="Evolução financeira">
+
+        ${linhasGrade}
+
+        ${linhaZero}
+
+        ${labelsDatas}
+
+
+        <polyline
+          points="${pontos(
+            'faturamento'
+          )}"
+          fill="none"
+          stroke="#d4a84d"
+          stroke-width="3"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+
+
+        <polyline
+          points="${pontos(
+            'lucroBruto'
+          )}"
+          fill="none"
+          stroke="#f0d99a"
+          stroke-width="2.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+
+
+        <polyline
+          points="${pontos(
+            'despesasPagas'
+          )}"
+          fill="none"
+          stroke="#a82132"
+          stroke-width="2.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+
+
+        <polyline
+          points="${pontos(
+            'lucroLiquido'
+          )}"
+          fill="none"
+          stroke="#ffffff"
+          stroke-width="2.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+
+
+        ${pontosInterativos}
+
+      </svg>
+
+    </div>
+  `;
+
+}
+
+
+/* =====================================================
+   PONTO + TOOLTIP
+===================================================== */
+
+function criarPontoGraficoDashboard(
+  x,
+  y,
+  item,
+  titulo,
+  valor,
+  cor
+) {
+
+  const texto =
+    (
+      item.dataCompleta ||
+      item.data ||
+      ''
+    ) +
+    ' • ' +
+    titulo +
+    ': ' +
+    moedaDashboard(
+      valor
+    );
+
+
+  return `
+    <circle
+      cx="${x}"
+      cy="${y}"
+      r="4"
+      fill="${cor}"
+      stroke="#0f0f0f"
+      stroke-width="2">
+
+      <title>${escaparHtmlDashboard(
+        texto
+      )}</title>
+
+    </circle>
+  `;
+
+}
+
+
+/* =====================================================
+   VALORES DO EIXO
+===================================================== */
+
+function formatarValorEixoDashboard(
+  valor
+) {
+
+  const numero =
+    Number(
+      valor ||
+      0
+    );
+
+
+  if (
+    Math.abs(numero) >=
+    1000
+  ) {
+
+    return (
+      'R$ ' +
+      (
+        numero /
+        1000
+      )
+      .toLocaleString(
+        'pt-BR',
+        {
+          maximumFractionDigits:
+            1
+        }
+      ) +
+      ' mil'
+    );
+
+  }
+
+
+  return (
+    'R$ ' +
+    numero.toLocaleString(
+      'pt-BR',
+      {
+        maximumFractionDigits:
+          0
+      }
+    )
+  );
+
+}
 
 
 /* =====================================================
@@ -721,7 +1581,8 @@ function moedaDashboard(
 
   let numero =
     Number(
-      valor || 0
+      valor ||
+      0
     );
 
 
@@ -731,7 +1592,8 @@ function moedaDashboard(
     )
   ) {
 
-    numero = 0;
+    numero =
+      0;
 
   }
 
@@ -760,7 +1622,8 @@ function numeroDashboard(
 
   let numero =
     Number(
-      valor || 0
+      valor ||
+      0
     );
 
 
@@ -770,7 +1633,8 @@ function numeroDashboard(
     )
   ) {
 
-    numero = 0;
+    numero =
+      0;
 
   }
 
@@ -848,5 +1712,5 @@ function escaparHtmlDashboard(
 
 /* =====================================================
    FIM
-   VNNUS DASHBOARD 2.1
+   VNNUS DASHBOARD 2.2
 ===================================================== */
