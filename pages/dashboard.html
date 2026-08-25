@@ -1,38 +1,474 @@
 <section>
-  <div class="page-header">
-    <div>
-      <h2>🏠 Visão Geral</h2>
-      <p>Acompanhe os principais indicadores reais da VNNUS.</p>
+
+  <!-- =================================================
+       BOAS-VINDAS
+  ================================================== -->
+
+  <div
+    class="card"
+    style="
+      margin-bottom:18px;
+      background:
+        radial-gradient(
+          circle at right top,
+          rgba(150,0,18,.20),
+          transparent 38%
+        ),
+        linear-gradient(
+          145deg,
+          #151515,
+          #090909
+        );
+    ">
+
+    <div
+      style="
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:18px;
+        flex-wrap:wrap;
+      ">
+
+      <div>
+
+        <div
+          style="
+            color:var(--gold);
+            font-size:12px;
+            text-transform:uppercase;
+            letter-spacing:.15em;
+            margin-bottom:8px;
+          ">
+          VNNUS ERP
+        </div>
+
+        <h2
+          style="
+            font-family:'Cinzel',serif;
+            color:var(--gold2);
+            font-size:24px;
+            line-height:1.2;
+          ">
+          Bem-vinda ao seu painel
+        </h2>
+
+        <p
+          style="
+            color:var(--muted);
+            margin-top:7px;
+          ">
+          Aqui está o resumo da sua operação hoje.
+        </p>
+
+      </div>
+
+
+      <div
+        style="
+          min-width:180px;
+          border:1px solid rgba(212,168,77,.20);
+          border-radius:13px;
+          padding:14px 16px;
+          background:#0d0d0d;
+        ">
+
+        <div
+          style="
+            color:var(--gold-soft);
+            font-size:11px;
+            text-transform:uppercase;
+            letter-spacing:.08em;
+          ">
+          Hoje
+        </div>
+
+        <div
+          id="dashDataHoje"
+          style="
+            margin-top:6px;
+            font-weight:700;
+            color:#fff;
+          ">
+          -
+        </div>
+
+        <div
+          id="dashDiaSemana"
+          style="
+            color:var(--muted);
+            margin-top:3px;
+            font-size:12px;
+          ">
+        </div>
+
+      </div>
+
     </div>
-    <button class="btn-secondary" onclick="init_dashboard()">↻ Atualizar</button>
+
   </div>
 
-  <div id="dashStatus" style="color:var(--muted);margin-bottom:15px;">Conectando à API...</div>
+
+  <!-- =================================================
+       CABEÇALHO
+  ================================================== -->
+
+  <div class="page-header">
+
+    <div>
+
+      <h2>
+        Visão Geral
+      </h2>
+
+      <p>
+        Indicadores reais da VNNUS em tempo real.
+      </p>
+
+    </div>
+
+    <button
+      class="btn-secondary"
+      onclick="init_dashboard()">
+      ↻ Atualizar
+    </button>
+
+  </div>
+
+
+  <div
+    id="dashStatus"
+    style="
+      color:var(--muted);
+      margin-bottom:15px;
+    ">
+    Conectando à API...
+  </div>
+
+
+  <!-- =================================================
+       PRINCIPAIS INDICADORES
+  ================================================== -->
 
   <div class="cards">
-    <div class="card"><div class="card-icon">💰</div><div class="card-label">Vendas Hoje</div><div class="card-value" id="dashVendasHoje">R$ 0,00</div></div>
-    <div class="card"><div class="card-icon">🛒</div><div class="card-label">Pedidos Hoje</div><div class="card-value" id="dashPedidosHoje">0</div></div>
-    <div class="card"><div class="card-icon">📦</div><div class="card-label">Produtos</div><div class="card-value" id="dashProdutos">0</div></div>
-    <div class="card card-accent"><div class="card-icon">⚠️</div><div class="card-label">Estoque Crítico</div><div class="card-value" id="dashEstoqueCritico">0</div></div>
+
+    <div class="card card-accent">
+
+      <div class="card-icon">
+        💰
+      </div>
+
+      <div class="card-label">
+        Faturamento Hoje
+      </div>
+
+      <div
+        class="card-value"
+        id="dashVendasHoje">
+        R$ 0,00
+      </div>
+
+    </div>
+
+
+    <div class="card">
+
+      <div class="card-icon">
+        🛒
+      </div>
+
+      <div class="card-label">
+        Pedidos Hoje
+      </div>
+
+      <div
+        class="card-value"
+        id="dashPedidosHoje">
+        0
+      </div>
+
+    </div>
+
+
+    <div class="card">
+
+      <div class="card-icon">
+        💎
+      </div>
+
+      <div class="card-label">
+        Lucro Hoje
+      </div>
+
+      <div
+        class="card-value"
+        id="dashLucroHoje">
+        R$ 0,00
+      </div>
+
+    </div>
+
+
+    <div class="card card-accent">
+
+      <div class="card-icon">
+        ⚠️
+      </div>
+
+      <div class="card-label">
+        Estoque Crítico
+      </div>
+
+      <div
+        class="card-value"
+        id="dashEstoqueCritico">
+        0
+      </div>
+
+    </div>
+
   </div>
 
-  <div class="cards" style="margin-top:18px;">
-    <div class="card"><div class="card-icon">💵</div><div class="card-label">Lucro Hoje</div><div class="card-value" id="dashLucroHoje">R$ 0,00</div></div>
-    <div class="card"><div class="card-icon">🎯</div><div class="card-label">Ticket Médio</div><div class="card-value" id="dashTicketMedio">R$ 0,00</div></div>
-    <div class="card"><div class="card-icon">📦</div><div class="card-label">Itens Vendidos</div><div class="card-value" id="dashItensVendidos">0</div></div>
-    <div class="card"><div class="card-icon">🚫</div><div class="card-label">Sem Estoque</div><div class="card-value" id="dashSemEstoque">0</div></div>
+
+  <!-- =================================================
+       INDICADORES SECUNDÁRIOS
+  ================================================== -->
+
+  <div
+    class="cards"
+    style="margin-top:18px;">
+
+    <div class="card">
+
+      <div class="card-icon">
+        🎯
+      </div>
+
+      <div class="card-label">
+        Ticket Médio
+      </div>
+
+      <div
+        class="card-value"
+        id="dashTicketMedio">
+        R$ 0,00
+      </div>
+
+    </div>
+
+
+    <div class="card">
+
+      <div class="card-icon">
+        📦
+      </div>
+
+      <div class="card-label">
+        Itens Vendidos
+      </div>
+
+      <div
+        class="card-value"
+        id="dashItensVendidos">
+        0
+      </div>
+
+    </div>
+
+
+    <div class="card">
+
+      <div class="card-icon">
+        🗃️
+      </div>
+
+      <div class="card-label">
+        Produtos
+      </div>
+
+      <div
+        class="card-value"
+        id="dashProdutos">
+        0
+      </div>
+
+    </div>
+
+
+    <div class="card">
+
+      <div class="card-icon">
+        🚫
+      </div>
+
+      <div class="card-label">
+        Sem Estoque
+      </div>
+
+      <div
+        class="card-value"
+        id="dashSemEstoque">
+        0
+      </div>
+
+    </div>
+
   </div>
+
+
+  <!-- =================================================
+       DESTAQUES
+  ================================================== -->
 
   <div class="grid-2">
-    <div class="card">
-      <h3 class="section-title">🏆 Produto mais vendido</h3>
-      <div id="dashMaisVendidoNome" style="font-size:20px;font-weight:900;">-</div>
-      <div id="dashMaisVendidoQtd" style="color:var(--muted);margin-top:7px;"></div>
-    </div>
 
     <div class="card">
-      <h3 class="section-title">📈 Evolução de vendas</h3>
-      <div class="empty-state">O gráfico entra na próxima etapa.</div>
+
+      <h3 class="section-title">
+        🏆 Produto mais vendido
+      </h3>
+
+      <div
+        id="dashMaisVendidoNome"
+        style="
+          font-size:20px;
+          font-weight:800;
+          color:#fff;
+        ">
+        -
+      </div>
+
+      <div
+        id="dashMaisVendidoQtd"
+        style="
+          color:var(--muted);
+          margin-top:7px;
+        ">
+      </div>
+
     </div>
+
+
+    <div class="card">
+
+      <h3 class="section-title">
+        ⚡ Ações rápidas
+      </h3>
+
+      <div
+        style="
+          display:grid;
+          grid-template-columns:repeat(2,minmax(0,1fr));
+          gap:10px;
+        ">
+
+        <button
+          class="btn-secondary"
+          onclick="abrirPagina('pdv')">
+          🛒 Nova Venda
+        </button>
+
+        <button
+          class="btn-secondary"
+          onclick="abrirPagina('produtos')">
+          📦 Produtos
+        </button>
+
+        <button
+          class="btn-secondary"
+          onclick="abrirPagina('clientes')">
+          👥 Clientes
+        </button>
+
+        <button
+          class="btn-secondary"
+          onclick="abrirPagina('financeiro')">
+          💰 Financeiro
+        </button>
+
+      </div>
+
+    </div>
+
   </div>
+
+
+  <!-- =================================================
+       ÚLTIMAS VENDAS
+  ================================================== -->
+
+  <div
+    class="card"
+    style="margin-top:18px;">
+
+    <div
+      class="page-header"
+      style="margin-bottom:14px;">
+
+      <div>
+
+        <h3>
+          🧾 Últimas vendas
+        </h3>
+
+        <p>
+          Movimentações recentes da VNNUS.
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <div class="table-wrap">
+
+      <table>
+
+        <thead>
+
+          <tr>
+
+            <th>
+              Venda
+            </th>
+
+            <th>
+              Data
+            </th>
+
+            <th>
+              Cliente
+            </th>
+
+            <th>
+              Pagamento
+            </th>
+
+            <th>
+              Total
+            </th>
+
+          </tr>
+
+        </thead>
+
+
+        <tbody id="dashUltimasVendas">
+
+          <tr>
+
+            <td colspan="5">
+              Carregando...
+            </td>
+
+          </tr>
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
 </section>
