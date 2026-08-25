@@ -1,0 +1,573 @@
+<section class="despesas-page">
+
+  <!-- CABEÇALHO -->
+
+  <div class="page-header">
+    <div>
+      <h2>💳 Despesas</h2>
+      <p>Controle de despesas e contas a pagar da VNNUS.</p>
+    </div>
+
+    <button
+      class="btn-primary"
+      id="despNova">
+      ＋ Nova despesa
+    </button>
+  </div>
+
+
+  <!-- RESUMO -->
+
+  <div class="cards">
+
+    <div class="card">
+      <div class="card-icon">💸</div>
+      <div class="card-label">Despesas do período</div>
+      <div class="card-value" id="despTotal">
+        R$ 0,00
+      </div>
+    </div>
+
+
+    <div class="card">
+      <div class="card-icon">✅</div>
+      <div class="card-label">Pago</div>
+      <div class="card-value" id="despPago">
+        R$ 0,00
+      </div>
+    </div>
+
+
+    <div class="card">
+      <div class="card-icon">⏳</div>
+      <div class="card-label">Pendente</div>
+      <div class="card-value" id="despPendente">
+        R$ 0,00
+      </div>
+    </div>
+
+
+    <div class="card card-accent">
+      <div class="card-icon">⚠️</div>
+      <div class="card-label">Vencido</div>
+      <div class="card-value" id="despVencido">
+        R$ 0,00
+      </div>
+    </div>
+
+  </div>
+
+
+  <!-- FILTROS -->
+
+  <div
+    class="card"
+    style="margin-top:18px;">
+
+    <h3 class="section-title">
+      🔎 Consulta
+    </h3>
+
+
+    <div class="toolbar">
+
+      <input
+        class="input input-grow"
+        id="despBusca"
+        type="text"
+        placeholder="Descrição, fornecedor ou categoria...">
+
+
+      <select
+        class="select"
+        id="despFiltroStatus">
+
+        <option value="">
+          Todos os status
+        </option>
+
+        <option value="PENDENTE">
+          Pendente
+        </option>
+
+        <option value="PAGA">
+          Paga
+        </option>
+
+        <option value="VENCIDA">
+          Vencida
+        </option>
+
+        <option value="CANCELADA">
+          Cancelada
+        </option>
+
+      </select>
+
+
+      <select
+        class="select"
+        id="despFiltroCategoria">
+
+        <option value="">
+          Todas as categorias
+        </option>
+
+        <option value="MERCADORIA">
+          Mercadoria
+        </option>
+
+        <option value="EMBALAGENS">
+          Embalagens
+        </option>
+
+        <option value="FRETE">
+          Frete
+        </option>
+
+        <option value="MARKETING">
+          Marketing
+        </option>
+
+        <option value="TAXAS">
+          Taxas
+        </option>
+
+        <option value="TRANSPORTE">
+          Transporte
+        </option>
+
+        <option value="INTERNET">
+          Internet
+        </option>
+
+        <option value="MATERIAL">
+          Material
+        </option>
+
+        <option value="OUTROS">
+          Outros
+        </option>
+
+      </select>
+
+
+      <button
+        class="btn-secondary"
+        id="despAtualizar">
+        ↻ Atualizar
+      </button>
+
+    </div>
+
+
+    <div
+      id="despStatus"
+      style="color:var(--muted);">
+
+      Carregando despesas...
+
+    </div>
+
+  </div>
+
+
+  <!-- LISTAGEM -->
+
+  <div
+    class="card"
+    style="margin-top:18px;">
+
+    <div
+      style="
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:12px;
+        margin-bottom:14px;
+      ">
+
+      <h3
+        class="section-title"
+        style="margin:0;">
+        📋 Contas e despesas
+      </h3>
+
+      <span
+        id="despQuantidade"
+        style="color:var(--muted);font-size:12px;">
+        0 registro(s)
+      </span>
+
+    </div>
+
+
+    <div id="despLista">
+
+      <div class="empty-state">
+        Nenhuma despesa cadastrada.
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- ==================================================
+       MODAL NOVA / EDITAR DESPESA
+  =================================================== -->
+
+  <div
+    id="modalDespesa"
+    class="modal">
+
+    <div class="modal-conteudo">
+
+
+      <div class="modal-topo">
+
+        <div>
+          <h2 id="despModalTitulo">
+            💳 Nova Despesa
+          </h2>
+
+          <p
+            style="
+              color:var(--muted);
+              margin-top:5px;
+            ">
+            Informe os dados da conta.
+          </p>
+        </div>
+
+
+        <button
+          id="despFecharModal"
+          type="button">
+          ✕
+        </button>
+
+      </div>
+
+
+      <div class="form-grid">
+
+
+        <input
+          type="hidden"
+          id="despId">
+
+
+        <div class="campo campo-grande">
+
+          <label>
+            Descrição *
+          </label>
+
+          <input
+            id="despDescricao"
+            type="text"
+            placeholder="Ex.: Embalagens para pedidos">
+
+        </div>
+
+
+        <div class="campo">
+
+          <label>
+            Categoria *
+          </label>
+
+          <select id="despCategoria">
+
+            <option value="MERCADORIA">
+              Mercadoria
+            </option>
+
+            <option value="EMBALAGENS">
+              Embalagens
+            </option>
+
+            <option value="FRETE">
+              Frete
+            </option>
+
+            <option value="MARKETING">
+              Marketing
+            </option>
+
+            <option value="TAXAS">
+              Taxas
+            </option>
+
+            <option value="TRANSPORTE">
+              Transporte
+            </option>
+
+            <option value="INTERNET">
+              Internet
+            </option>
+
+            <option value="MATERIAL">
+              Material
+            </option>
+
+            <option value="OUTROS">
+              Outros
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <div class="campo">
+
+          <label>
+            Valor *
+          </label>
+
+          <input
+            id="despValor"
+            type="number"
+            min="0.01"
+            step="0.01"
+            placeholder="0,00">
+
+        </div>
+
+
+        <div class="campo">
+
+          <label>
+            Vencimento *
+          </label>
+
+          <input
+            id="despVencimento"
+            type="date">
+
+        </div>
+
+
+        <div class="campo">
+
+          <label>
+            Fornecedor
+          </label>
+
+          <input
+            id="despFornecedor"
+            type="text"
+            placeholder="Nome do fornecedor">
+
+        </div>
+
+
+        <div class="campo">
+
+          <label>
+            Forma de pagamento
+          </label>
+
+          <select id="despFormaPagamento">
+
+            <option value="">
+              Não definida
+            </option>
+
+            <option value="PIX">
+              PIX
+            </option>
+
+            <option value="DINHEIRO">
+              Dinheiro
+            </option>
+
+            <option value="DEBITO">
+              Cartão Débito
+            </option>
+
+            <option value="CREDITO">
+              Cartão Crédito
+            </option>
+
+            <option value="BOLETO">
+              Boleto
+            </option>
+
+            <option value="TRANSFERENCIA">
+              Transferência
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <div class="campo">
+
+          <label>
+            Despesa recorrente?
+          </label>
+
+          <select id="despRecorrente">
+
+            <option value="NAO">
+              Não
+            </option>
+
+            <option value="SIM">
+              Sim
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <div class="campo campo-grande">
+
+          <label>
+            Observação
+          </label>
+
+          <textarea
+            id="despObservacao"
+            rows="3"
+            placeholder="Informações adicionais..."></textarea>
+
+        </div>
+
+      </div>
+
+
+      <div
+        id="despMensagemModal"
+        style="
+          padding:0 17px;
+          color:var(--muted);
+        ">
+      </div>
+
+
+      <div class="modal-rodape">
+
+        <button
+          class="btn-secondary"
+          id="despCancelarModal"
+          type="button">
+          Cancelar
+        </button>
+
+        <button
+          class="btn-primary"
+          id="despSalvar"
+          type="button">
+          💾 Salvar despesa
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- ==================================================
+       MODAL DETALHES
+  =================================================== -->
+
+  <div
+    id="modalDespesaDetalhes"
+    class="modal">
+
+    <div class="modal-conteudo">
+
+
+      <div class="modal-topo">
+
+        <div>
+          <h2>
+            💳 Detalhes da Despesa
+          </h2>
+
+          <p
+            style="
+              color:var(--muted);
+              margin-top:5px;
+            ">
+            Consulte e gerencie esta conta.
+          </p>
+        </div>
+
+
+        <button
+          id="despFecharDetalhes"
+          type="button">
+          ✕
+        </button>
+
+      </div>
+
+
+      <div
+        id="despDetalhesConteudo"
+        style="padding:17px;">
+
+        <div class="loading-card">
+          Carregando...
+        </div>
+
+      </div>
+
+
+      <div
+        id="despMensagemDetalhes"
+        style="
+          padding:0 17px;
+          color:var(--muted);
+        ">
+      </div>
+
+
+      <div
+        class="modal-rodape"
+        id="despAcoesDetalhes">
+
+        <button
+          class="btn-secondary"
+          id="despEditar"
+          type="button">
+          ✏️ Editar
+        </button>
+
+        <button
+          class="btn-secondary"
+          id="despReabrir"
+          type="button"
+          style="display:none;">
+          ↻ Reabrir
+        </button>
+
+        <button
+          class="btn-secondary"
+          id="despCancelar"
+          type="button">
+          🚫 Cancelar
+        </button>
+
+        <button
+          class="btn-primary"
+          id="despPagar"
+          type="button">
+          ✅ Marcar como paga
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
