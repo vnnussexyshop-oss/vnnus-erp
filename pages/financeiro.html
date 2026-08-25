@@ -1,1 +1,679 @@
-<section><div class="page-header"><div><h2>💰 Financeiro</h2><p>Faturamento, custos e lucro.</p></div></div><div class="empty-state">Painel financeiro será conectado à API atual.</div></section>
+<section>
+
+  <!-- ================================================
+       CABEÇALHO
+  ================================================= -->
+
+  <div class="page-header">
+
+    <div>
+
+      <h2>
+        💰 Financeiro
+      </h2>
+
+      <p>
+        Faturamento, custos, lucro e desempenho da VNNUS.
+      </p>
+
+    </div>
+
+    <button
+      id="btnAtualizarFinanceiro"
+      class="btn-secondary">
+      ↻ Atualizar
+    </button>
+
+  </div>
+
+
+  <!-- ================================================
+       FILTROS
+  ================================================= -->
+
+  <div
+    class="toolbar"
+    style="
+      gap:10px;
+      flex-wrap:wrap;
+      margin-bottom:20px;
+    ">
+
+    <button
+      id="filtroFinanceiroHoje"
+      class="btn-secondary">
+      Hoje
+    </button>
+
+    <button
+      id="filtroFinanceiroSemana"
+      class="btn-secondary">
+      Esta semana
+    </button>
+
+    <button
+      id="filtroFinanceiroMes"
+      class="btn-primary">
+      Este mês
+    </button>
+
+    <button
+      id="filtroFinanceiroTudo"
+      class="btn-secondary">
+      Tudo
+    </button>
+
+
+    <input
+      id="financeiroDataInicio"
+      class="input"
+      type="date"
+      title="Data inicial">
+
+
+    <input
+      id="financeiroDataFim"
+      class="input"
+      type="date"
+      title="Data final">
+
+
+    <button
+      id="btnAplicarPeriodoFinanceiro"
+      class="btn-secondary">
+      Aplicar período
+    </button>
+
+  </div>
+
+
+  <div
+    id="periodoFinanceiroAtual"
+    style="
+      color:var(--muted);
+      margin-bottom:18px;
+    ">
+    Carregando período...
+  </div>
+
+
+  <!-- ================================================
+       CARDS PRINCIPAIS
+  ================================================= -->
+
+  <div
+    class="cards"
+    style="margin-bottom:18px;">
+
+
+    <div class="card">
+
+      <div class="card-icon">
+        💵
+      </div>
+
+      <div class="card-label">
+        Faturamento
+      </div>
+
+      <div
+        class="card-value"
+        id="finFaturamento">
+        R$ 0,00
+      </div>
+
+    </div>
+
+
+    <div class="card">
+
+      <div class="card-icon">
+        📦
+      </div>
+
+      <div class="card-label">
+        Custo dos produtos
+      </div>
+
+      <div
+        class="card-value"
+        id="finCusto">
+        R$ 0,00
+      </div>
+
+    </div>
+
+
+    <div class="card">
+
+      <div class="card-icon">
+        💎
+      </div>
+
+      <div class="card-label">
+        Lucro bruto
+      </div>
+
+      <div
+        class="card-value"
+        id="finLucro">
+        R$ 0,00
+      </div>
+
+    </div>
+
+
+    <div class="card">
+
+      <div class="card-icon">
+        📈
+      </div>
+
+      <div class="card-label">
+        Margem bruta
+      </div>
+
+      <div
+        class="card-value"
+        id="finMargem">
+        0%
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <div
+    class="cards"
+    style="margin-bottom:25px;">
+
+
+    <div class="card">
+
+      <div class="card-icon">
+        🛍️
+      </div>
+
+      <div class="card-label">
+        Vendas finalizadas
+      </div>
+
+      <div
+        class="card-value"
+        id="finQtdVendas">
+        0
+      </div>
+
+    </div>
+
+
+    <div class="card">
+
+      <div class="card-icon">
+        📦
+      </div>
+
+      <div class="card-label">
+        Itens vendidos
+      </div>
+
+      <div
+        class="card-value"
+        id="finItensVendidos">
+        0
+      </div>
+
+    </div>
+
+
+    <div class="card">
+
+      <div class="card-icon">
+        🎟️
+      </div>
+
+      <div class="card-label">
+        Ticket médio
+      </div>
+
+      <div
+        class="card-value"
+        id="finTicketMedio">
+        R$ 0,00
+      </div>
+
+    </div>
+
+
+    <div class="card">
+
+      <div class="card-icon">
+        🧾
+      </div>
+
+      <div class="card-label">
+        Vendas canceladas
+      </div>
+
+      <div
+        class="card-value"
+        id="finVendasCanceladas">
+        0
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- ================================================
+       DESTAQUES
+  ================================================= -->
+
+  <div
+    class="cards"
+    style="margin-bottom:25px;">
+
+
+    <div class="card">
+
+      <div class="card-icon">
+        🏆
+      </div>
+
+      <div class="card-label">
+        Produto mais vendido
+      </div>
+
+      <div
+        class="card-value"
+        id="finProdutoMaisVendido"
+        style="
+          font-size:17px;
+          line-height:1.35;
+        ">
+        -
+      </div>
+
+      <div
+        id="finProdutoMaisVendidoQtd"
+        style="
+          color:var(--muted);
+          margin-top:6px;
+          font-size:12px;
+        ">
+      </div>
+
+    </div>
+
+
+    <div class="card">
+
+      <div class="card-icon">
+        💰
+      </div>
+
+      <div class="card-label">
+        Produto mais lucrativo
+      </div>
+
+      <div
+        class="card-value"
+        id="finProdutoMaisLucrativo"
+        style="
+          font-size:17px;
+          line-height:1.35;
+        ">
+        -
+      </div>
+
+      <div
+        id="finProdutoMaisLucrativoValor"
+        style="
+          color:var(--muted);
+          margin-top:6px;
+          font-size:12px;
+        ">
+      </div>
+
+    </div>
+
+
+    <div class="card">
+
+      <div class="card-icon">
+        👑
+      </div>
+
+      <div class="card-label">
+        Cliente campeão
+      </div>
+
+      <div
+        class="card-value"
+        id="finClienteCampeao"
+        style="
+          font-size:17px;
+          line-height:1.35;
+        ">
+        -
+      </div>
+
+      <div
+        id="finClienteCampeaoValor"
+        style="
+          color:var(--muted);
+          margin-top:6px;
+          font-size:12px;
+        ">
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- ================================================
+       FORMAS DE PAGAMENTO
+  ================================================= -->
+
+  <div
+    class="page-header"
+    style="margin-top:30px;">
+
+    <div>
+
+      <h3>
+        💳 Formas de pagamento
+      </h3>
+
+      <p>
+        Distribuição das vendas no período selecionado.
+      </p>
+
+    </div>
+
+  </div>
+
+
+  <div class="table-wrap">
+
+    <table>
+
+      <thead>
+
+        <tr>
+
+          <th>
+            Forma
+          </th>
+
+          <th>
+            Vendas
+          </th>
+
+          <th>
+            Valor
+          </th>
+
+          <th>
+            Participação
+          </th>
+
+        </tr>
+
+      </thead>
+
+
+      <tbody id="listaFormasPagamentoFinanceiro">
+
+        <tr>
+
+          <td colspan="4">
+            Carregando...
+          </td>
+
+        </tr>
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+
+  <!-- ================================================
+       TOP PRODUTOS
+  ================================================= -->
+
+  <div
+    class="page-header"
+    style="margin-top:30px;">
+
+    <div>
+
+      <h3>
+        🏆 Produtos mais vendidos
+      </h3>
+
+      <p>
+        Ranking por quantidade no período.
+      </p>
+
+    </div>
+
+  </div>
+
+
+  <div class="table-wrap">
+
+    <table>
+
+      <thead>
+
+        <tr>
+
+          <th>
+            #
+          </th>
+
+          <th>
+            Produto
+          </th>
+
+          <th>
+            Qtd.
+          </th>
+
+          <th>
+            Faturamento
+          </th>
+
+          <th>
+            Lucro
+          </th>
+
+        </tr>
+
+      </thead>
+
+
+      <tbody id="listaTopProdutosFinanceiro">
+
+        <tr>
+
+          <td colspan="5">
+            Carregando...
+          </td>
+
+        </tr>
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+
+  <!-- ================================================
+       TOP CLIENTES
+  ================================================= -->
+
+  <div
+    class="page-header"
+    style="margin-top:30px;">
+
+    <div>
+
+      <h3>
+        👑 Melhores clientes
+      </h3>
+
+      <p>
+        Ranking por valor comprado no período.
+      </p>
+
+    </div>
+
+  </div>
+
+
+  <div class="table-wrap">
+
+    <table>
+
+      <thead>
+
+        <tr>
+
+          <th>
+            #
+          </th>
+
+          <th>
+            Cliente
+          </th>
+
+          <th>
+            Compras
+          </th>
+
+          <th>
+            Total gasto
+          </th>
+
+          <th>
+            Ticket médio
+          </th>
+
+        </tr>
+
+      </thead>
+
+
+      <tbody id="listaTopClientesFinanceiro">
+
+        <tr>
+
+          <td colspan="5">
+            Carregando...
+          </td>
+
+        </tr>
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+
+  <!-- ================================================
+       ÚLTIMAS VENDAS
+  ================================================= -->
+
+  <div
+    class="page-header"
+    style="margin-top:30px;">
+
+    <div>
+
+      <h3>
+        🧾 Vendas do período
+      </h3>
+
+      <p>
+        Vendas finalizadas utilizadas nos indicadores.
+      </p>
+
+    </div>
+
+  </div>
+
+
+  <div class="table-wrap">
+
+    <table>
+
+      <thead>
+
+        <tr>
+
+          <th>
+            Venda
+          </th>
+
+          <th>
+            Data
+          </th>
+
+          <th>
+            Cliente
+          </th>
+
+          <th>
+            Pagamento
+          </th>
+
+          <th>
+            Total
+          </th>
+
+          <th>
+            Lucro
+          </th>
+
+        </tr>
+
+      </thead>
+
+
+      <tbody id="listaVendasFinanceiro">
+
+        <tr>
+
+          <td colspan="6">
+            Carregando...
+          </td>
+
+        </tr>
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+
+  <div
+    id="statusFinanceiro"
+    style="
+      color:var(--muted);
+      margin-top:20px;
+      margin-bottom:10px;
+    ">
+    Preparando painel financeiro...
+  </div>
+
+</section>
