@@ -1281,16 +1281,51 @@ const VNNUS_API = {
       );
 
 
-    return (
+      return (
       resposta.resumo ||
       {}
+    );
+
+  },
+
+
+  /* =====================================================
+     EVOLUÇÃO FINANCEIRA
+     DASHBOARD 2.2
+  ===================================================== */
+
+  async evolucaoFinanceira(
+    dias
+  ) {
+
+    const resposta =
+      await this.jsonp({
+
+        acao:
+          'evolucao_financeira',
+
+        dias:
+          Number(
+            dias ||
+            7
+          )
+
+      });
+
+
+    return (
+      resposta.evolucao ||
+      {
+        dias: 7,
+        inicio: '',
+        fim: '',
+        dados: []
+      }
     );
 
   }
 
 };
-
-
 /* =====================================================
    FIM
    VNNUS API FRONT-END
