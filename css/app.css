@@ -2288,7 +2288,278 @@ textarea,
   }
 
 }
+/* =====================================================
+   VNNUS ERP 2.2
+   CORREÇÃO BOTÕES X — CLIENTES + ESTOQUE
+===================================================== */
 
+
+/* Esconde X que esteja aparecendo fora de modal aberto */
+
+.modal:not(.aberto){
+  display:none !important;
+}
+
+
+/* Modal aberto */
+
+.modal.aberto{
+  display:flex;
+  position:fixed;
+  inset:0;
+  z-index:999;
+
+  align-items:center;
+  justify-content:center;
+
+  padding:12px;
+
+  background:rgba(0,0,0,.82);
+
+  backdrop-filter:blur(4px);
+}
+
+
+/* Caixa do modal */
+
+.modal.aberto .modal-conteudo{
+  position:relative;
+
+  width:min(650px,100%);
+  max-height:calc(100vh - 24px);
+
+  overflow-y:auto;
+
+  margin:0;
+
+  border:1px solid rgba(212,168,77,.30);
+  border-radius:18px;
+
+  background:
+    radial-gradient(
+      circle at right top,
+      rgba(130,0,18,.13),
+      transparent 35%
+    ),
+    linear-gradient(
+      160deg,
+      #151515,
+      #090909
+    );
+
+  box-shadow:
+    0 28px 90px rgba(0,0,0,.72);
+}
+
+
+/* =====================================================
+   CABEÇALHO DOS MODAIS
+===================================================== */
+
+.modal.aberto .modal-topo{
+  position:sticky;
+  top:0;
+  z-index:5;
+
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+
+  gap:12px;
+
+  padding:15px 17px;
+
+  background:rgba(10,10,10,.98);
+
+  border-bottom:
+    1px solid rgba(212,168,77,.16);
+}
+
+
+.modal.aberto .modal-topo h2{
+  margin:0;
+
+  font-family:
+    "Cinzel",
+    serif;
+
+  color:var(--gold2);
+
+  font-size:18px;
+}
+
+
+/* =====================================================
+   BOTÃO FECHAR
+===================================================== */
+
+.modal.aberto .modal-topo > button{
+  appearance:none;
+
+  width:36px;
+  min-width:36px;
+  height:36px;
+  min-height:36px;
+
+  padding:0;
+
+  display:grid;
+  place-items:center;
+
+  flex-shrink:0;
+
+  border-radius:50%;
+
+  border:
+    1px solid rgba(212,168,77,.32);
+
+  background:
+    linear-gradient(
+      180deg,
+      #1b1b1b,
+      #0c0c0c
+    );
+
+  color:var(--gold2);
+
+  font-size:15px;
+  line-height:1;
+
+  cursor:pointer;
+}
+
+
+/* =====================================================
+   FORMULÁRIOS DENTRO DOS MODAIS
+===================================================== */
+
+.modal.aberto .form-grid{
+  padding:17px;
+}
+
+
+.modal.aberto .campo{
+  margin-bottom:13px;
+}
+
+
+.modal.aberto .campo label{
+  display:block;
+
+  margin-bottom:6px;
+
+  color:#e1ca91;
+
+  font-size:11px;
+  font-weight:600;
+}
+
+
+.modal.aberto .campo input,
+.modal.aberto .campo select,
+.modal.aberto .campo textarea{
+  width:100%;
+
+  min-height:44px;
+
+  padding:10px 12px;
+
+  border:
+    1px solid rgba(212,168,77,.20);
+
+  border-radius:9px;
+
+  background:#101010;
+
+  color:#fff;
+
+  outline:none;
+}
+
+
+.modal.aberto .campo input:focus,
+.modal.aberto .campo select:focus,
+.modal.aberto .campo textarea:focus{
+  border-color:var(--gold);
+}
+
+
+/* =====================================================
+   RODAPÉ
+===================================================== */
+
+.modal.aberto .modal-rodape{
+  display:flex;
+
+  justify-content:flex-end;
+
+  gap:9px;
+
+  padding:14px 17px 17px;
+
+  border-top:
+    1px solid rgba(212,168,77,.12);
+}
+
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media(max-width:760px){
+
+  .modal.aberto{
+    padding:7px;
+  }
+
+
+  .modal.aberto .modal-conteudo{
+    width:100%;
+
+    max-height:
+      calc(100vh - 14px);
+
+    border-radius:14px;
+  }
+
+
+  .modal.aberto .modal-topo{
+    padding:12px 13px;
+  }
+
+
+  .modal.aberto .modal-topo h2{
+    font-size:16px;
+  }
+
+
+  .modal.aberto .form-grid{
+    padding:13px;
+  }
+
+
+  .modal.aberto .modal-rodape{
+    display:grid;
+
+    grid-template-columns:
+      1fr 1fr;
+
+    padding:11px;
+  }
+
+
+  .modal.aberto .modal-rodape button{
+    width:100%;
+
+    min-width:0;
+  }
+
+}
+
+
+/* =====================================================
+   FIM — CORREÇÃO MODAIS VNNUS 2.2
+===================================================== */
 
 /* =====================================================
    FIM — VNNUS PDV 2.1
