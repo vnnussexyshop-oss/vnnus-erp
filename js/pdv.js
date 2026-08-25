@@ -1,5 +1,7 @@
 let carrinhoPDV31 = [];
 let ultimoComprovantePDV32 = null;
+let clientesPDV34 = [];
+let clientesPDV34Carregados = false;
 
 
 window.init_pdv = async function() {
@@ -415,8 +417,376 @@ function abrirScannerPDV31() {
 }
 
 
-function abrirFinalizacaoPDV31() {
+/* =====================================================
+   CLIENTES NO PDV
+===================================================== */
+
+async function prepararClientesPDV34() {
+
+  const campo =
+    document.getElementById(
+      'pdvCliente'
+    );
+
+
+  if (!campo) {
+    return;
+  }
+
+
+  campo.placeholder =
+    'Consumidor Final ou pesquise um cliente...';
+
+
+  let lista =
+    document.getElementById(
+      'pdvClientesLista'
+    );
+
+
+  if (!lista) {
+
+    lista =
+      document.createElement(
+        'datalist'
+      );
+
+
+    lista.id =
+      'pdvClientesLista';
+
+
+    document.body.appendChild(
+      lista
+    );
+
+  }
+
+
+  campo.setAttribute(
+    'list',
+    'pdvClientesLista'
+  );
+
+
+  if (
+    !clientesPDV34Carregados
+  ) {
+
+    try {
+
+      clientesPDV34 =
+        await VNNUS_API.clientes();
+
+
+      clientesPDV34 =
+        (
+          Array.isArray(
+            clientesPDV34
+          )
+            ? clientesPDV34
+            : []
+        )
+        .filter(function(cliente) {
+
+          return (
+            String(
+              cliente.ATIVO || 'SIM'
+            )
+            .trim()
+            .toUpperCase() !==
+            'NAO'
+          );
+
+        });
+
+
+      clientesPDV34Carregados =
+        true;
+
+    }
+
+    catch (erro) {
+
+      console.error(
+        'Clientes PDV:',
+        erro
+      );
+
+
+      clientesPDV34 = [];
+
+    }
+
+  }
+
+
+  lista.innerHTML = '';
+
+
+  clientesPDV34.forEach(
+    function(cliente) {
+
+      const option =
+        document.createElement(
+          'option'
+        );
+
+
+      option.value =
+        montarRotuloClientePDV34(
+          cliente
+        );
+
+
+      option.label =
+        [
+          cliente.NOME || '',
+          formatarTelefonePDV34(
+            cliente.WHATSAPP ||
+            cliente.TELEFONE
+          )
+        ]
+        .filter(Boolean)
+        .join(' • ');
+
+
+      lista.appendChild(
+        option
+      );
+
+    }
+  );
+
+
+  campo.oninput =
+    function() {
+
+      sincronizarClienteDigitadoPDV34();
+
+    };
+
+
+  campo.onchange =
+    function() {
+
+      sincronizarClienteDigitadoPDV34();
+
+    };
+
+}
+
+
+function montarRotuloClientePDV34(
+  cliente
+) {
+
+  const nome =
+    String(
+      cliente.NOME || ''
+    ).trim();
+
+
+  const id =
+    String(
+      cliente.ID_CLIENTE || ''
+    ).trim();
+
+
+  if (!id) {
+    return nome;
+  }
+
+
+  return (
+    nome +
+    ' [' +
+    id +
+    ']'
+  );
+
+}
+
+
+function sincronizarClienteDigitadoPDV34() {
+
+  const campo =
+    document.getElementById(
+      'pdvCliente'
+    );
+
+
+  if (!campo) {
+    return;
+  }
+
+
+  const digitado =
+    String(
+      campo.value || ''
+    )
+    .trim();
+
+
+  const encontrado =
+    clientesPDV34.find(
+      function(cliente) {
+
+        return (
+          montarRotuloClientePDV34(
+            cliente
+          ) ===
+          digitado
+        );
+
+      }
+    );
+
+
+  campo.dataset.idCliente =
+    encontrado
+      ? String(
+          encontrado.ID_CLIENTE || ''
+        )
+      : '';
+
+
+  campo.dataset.nomeCliente =
+    encontrado
+      ? String(
+          encontrado.NOME || ''
+        )
+      : '';
+
+}
+
+
+function obterClienteSelecionadoPDV34() {
+
+  const campo =
+    document.getElementById(
+      'pdvCliente'
+    );
+
+
+  if (!campo) {
+
+    return {
+      id: '',
+      nome: 'Consumidor Final'
+    };
+
+  }
+
+
+  sincronizarClienteDigitadoPDV34();
+
+
+  const id =
+    String(
+      campo.dataset.idCliente || ''
+    )
+    .trim();
+
+
+  const nomeCadastro =
+    String(
+      campo.dataset.nomeCliente || ''
+    )
+    .trim();
+
+
+  if (
+    id &&
+    nomeCadastro
+  ) {
+
+    return {
+      id: id,
+      nome: nomeCadastro
+    };
+
+  }
+
+
+  const digitado =
+    String(
+      campo.value || ''
+    )
+    .trim();
+
+
+  /*
+    Mantém compatibilidade:
+    se o usuário digitar um nome não cadastrado,
+    a venda pode continuar, porém sem ID_CLIENTE.
+  */
+
+  return {
+    id: '',
+    nome:
+      digitado ||
+      'Consumidor Final'
+  };
+
+}
+
+
+function formatarTelefonePDV34(
+  valor
+) {
+
+  const numeros =
+    String(
+      valor || ''
+    )
+    .replace(
+      /\D/g,
+      ''
+    );
+
+
+  if (
+    numeros.length === 11
+  ) {
+
+    return (
+      '(' +
+      numeros.substring(0, 2) +
+      ') ' +
+      numeros.substring(2, 7) +
+      '-' +
+      numeros.substring(7)
+    );
+
+  }
+
+
+  if (
+    numeros.length === 10
+  ) {
+
+    return (
+      '(' +
+      numeros.substring(0, 2) +
+      ') ' +
+      numeros.substring(2, 6) +
+      '-' +
+      numeros.substring(6)
+    );
+
+  }
+
+
+  return valor || '';
+
+}
+
+
+async function abrirFinalizacaoPDV31() {
   if (!carrinhoPDV31.length) return;
+
+  await prepararClientesPDV34();
 
   const modal =
     document.getElementById(
@@ -481,6 +851,9 @@ async function confirmarVendaPDV31() {
       'pdvCliente'
     );
 
+  const clienteSelecionado =
+    obterClienteSelecionadoPDV34();
+
   const observacao =
     document.getElementById(
       'pdvObservacao'
@@ -520,11 +893,10 @@ async function confirmarVendaPDV31() {
 
   const dadosVenda = {
     CLIENTE:
-      (
-        cliente &&
-        cliente.value.trim()
-      ) ||
-      'Consumidor Final',
+      clienteSelecionado.nome,
+
+    ID_CLIENTE:
+      clienteSelecionado.id,
 
     FORMA_PAGAMENTO:
       pagamento.value,
@@ -787,6 +1159,8 @@ function novaVendaPDV32() {
 
   if (cliente) {
     cliente.value = '';
+    cliente.dataset.idCliente = '';
+    cliente.dataset.nomeCliente = '';
   }
 
   if (pagamento) {
