@@ -151,7 +151,99 @@
   ================================================== -->
 
   <div class="cards">
+<!-- =================================================
+     RESULTADO FINANCEIRO DE HOJE
+================================================== -->
 
+<div
+  class="cards"
+  style="margin-top:18px;">
+
+  <div class="card">
+
+    <div class="card-icon">
+      💸
+    </div>
+
+    <div class="card-label">
+      Despesas Pagas Hoje
+    </div>
+
+    <div
+      class="card-value"
+      id="dashDespesasHoje">
+      R$ 0,00
+    </div>
+
+  </div>
+
+
+  <div class="card card-accent">
+
+    <div class="card-icon">
+      💰
+    </div>
+
+    <div class="card-label">
+      Lucro Líquido Hoje
+    </div>
+
+    <div
+      class="card-value"
+      id="dashLucroLiquidoHoje">
+      R$ 0,00
+    </div>
+
+    <div
+      style="
+        color:var(--muted);
+        font-size:11px;
+        margin-top:7px;
+      ">
+      Lucro bruto − despesas pagas
+    </div>
+
+  </div>
+
+
+  <div class="card">
+
+    <div class="card-icon">
+      ⏳
+    </div>
+
+    <div class="card-label">
+      Contas a Pagar
+    </div>
+
+    <div
+      class="card-value"
+      id="dashDespesasPendentes">
+      R$ 0,00
+    </div>
+
+  </div>
+
+
+  <div class="card">
+
+    <div class="card-icon">
+      🚨
+    </div>
+
+    <div class="card-label">
+      Contas Vencidas
+    </div>
+
+    <div
+      class="card-value"
+      id="dashDespesasVencidas">
+      R$ 0,00
+    </div>
+
+  </div>
+
+</div>
     <div class="card card-accent">
 
       <div class="card-icon">
@@ -196,9 +288,9 @@
         💎
       </div>
 
-      <div class="card-label">
-        Lucro Hoje
-      </div>
+    <div class="card-label">
+  Lucro Bruto Hoje
+</div>
 
       <div
         class="card-value"
@@ -385,7 +477,11 @@
           onclick="abrirPagina('financeiro')">
           💰 Financeiro
         </button>
-
+<button
+  class="btn-secondary"
+  onclick="abrirPagina('despesas')">
+  💳 Despesas
+</button>
       </div>
 
     </div>
