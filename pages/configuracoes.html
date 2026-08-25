@@ -1,1 +1,569 @@
-<section><div class="page-header"><div><h2>⚙️ Configurações</h2><p>Integrações e usuários.</p></div></div><div class="grid-2"><div class="card"><h3 class="section-title">Scanner</h3><p style="color:var(--muted)">Configure a URL em <strong>js/config.js</strong>.</p></div><div class="card"><h3 class="section-title">API</h3><p style="color:var(--muted)">Na próxima fase conectaremos ao Apps Script.</p></div></div></section>
+<section>
+
+  <!-- =================================================
+       CABEÇALHO
+  ================================================== -->
+
+  <div class="page-header">
+
+    <div>
+      <h2>⚙️ Configurações</h2>
+      <p>Dados da VNNUS e preferências do sistema.</p>
+    </div>
+
+    <button
+      class="btn-primary"
+      id="btnSalvarConfiguracoes">
+      💾 Salvar Configurações
+    </button>
+
+  </div>
+
+
+  <div
+    id="statusConfiguracoes"
+    style="color:var(--muted);margin-bottom:20px;">
+    Carregando configurações...
+  </div>
+
+
+  <!-- =================================================
+       DADOS DA LOJA
+  ================================================== -->
+
+  <div class="card" style="margin-bottom:20px;">
+
+    <h3 class="section-title">
+      🏪 Dados da VNNUS
+    </h3>
+
+    <p style="color:var(--muted);margin-bottom:20px;">
+      Informações principais da loja.
+    </p>
+
+
+    <div class="form-grid">
+
+      <div class="campo campo-grande">
+
+        <label>Nome da loja</label>
+
+        <input
+          id="configNomeLoja"
+          type="text"
+          placeholder="VNNUS">
+
+      </div>
+
+
+      <div class="campo">
+
+        <label>WhatsApp</label>
+
+        <input
+          id="configWhatsapp"
+          type="tel"
+          placeholder="(11) 99999-9999">
+
+      </div>
+
+
+      <div class="campo">
+
+        <label>Telefone</label>
+
+        <input
+          id="configTelefone"
+          type="tel"
+          placeholder="(11) 99999-9999">
+
+      </div>
+
+
+      <div class="campo">
+
+        <label>Instagram</label>
+
+        <input
+          id="configInstagram"
+          type="text"
+          placeholder="@sexys_hoplove">
+
+      </div>
+
+
+      <div class="campo campo-grande">
+
+        <label>E-mail</label>
+
+        <input
+          id="configEmail"
+          type="email"
+          placeholder="contato@vnnus.com">
+
+      </div>
+
+
+      <div class="campo">
+
+        <label>CEP</label>
+
+        <input
+          id="configCep"
+          type="text"
+          inputmode="numeric"
+          maxlength="9"
+          placeholder="00000-000">
+
+      </div>
+
+
+      <div class="campo">
+
+        <label>&nbsp;</label>
+
+        <button
+          class="btn-secondary"
+          id="btnBuscarCepConfiguracoes"
+          type="button"
+          style="width:100%;">
+          🔎 Buscar CEP
+        </button>
+
+      </div>
+
+
+      <div class="campo campo-grande">
+
+        <label>Endereço</label>
+
+        <input
+          id="configEndereco"
+          type="text"
+          placeholder="Rua / Avenida">
+
+      </div>
+
+
+      <div class="campo">
+
+        <label>Número</label>
+
+        <input
+          id="configNumero"
+          type="text"
+          placeholder="123">
+
+      </div>
+
+
+      <div class="campo">
+
+        <label>Complemento</label>
+
+        <input
+          id="configComplemento"
+          type="text"
+          placeholder="Opcional">
+
+      </div>
+
+
+      <div class="campo">
+
+        <label>Bairro</label>
+
+        <input
+          id="configBairro"
+          type="text">
+
+      </div>
+
+
+      <div class="campo">
+
+        <label>Cidade</label>
+
+        <input
+          id="configCidade"
+          type="text">
+
+      </div>
+
+
+      <div class="campo">
+
+        <label>UF</label>
+
+        <input
+          id="configUf"
+          type="text"
+          maxlength="2"
+          placeholder="SP">
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =================================================
+       COMPROVANTE
+  ================================================== -->
+
+  <div class="card" style="margin-bottom:20px;">
+
+    <h3 class="section-title">
+      🧾 Comprovante de Venda
+    </h3>
+
+    <p style="color:var(--muted);margin-bottom:20px;">
+      Personalize as informações exibidas no comprovante do PDV.
+    </p>
+
+
+    <div class="form-grid">
+
+      <div class="campo campo-grande">
+
+        <label>Nome exibido no comprovante</label>
+
+        <input
+          id="configNomeComprovante"
+          type="text"
+          placeholder="VNNUS">
+
+      </div>
+
+
+      <div class="campo campo-grande">
+
+        <label>Mensagem de agradecimento</label>
+
+        <textarea
+          id="configMensagemComprovante"
+          rows="4"
+          placeholder="Obrigada pela preferência! ❤️"
+          style="width:100%;"></textarea>
+
+      </div>
+
+
+      <div class="campo campo-grande">
+
+        <label>Rodapé do comprovante</label>
+
+        <input
+          id="configRodapeComprovante"
+          type="text"
+          placeholder="Siga @sexys_hoplove">
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =================================================
+       PDV
+  ================================================== -->
+
+  <div class="card" style="margin-bottom:20px;">
+
+    <h3 class="section-title">
+      🛒 Preferências do PDV
+    </h3>
+
+    <p style="color:var(--muted);margin-bottom:20px;">
+      Defina comportamentos padrão para novas vendas.
+    </p>
+
+
+    <div class="form-grid">
+
+      <div class="campo campo-grande">
+
+        <label>Cliente padrão</label>
+
+        <select id="configClientePadrao">
+
+          <option value="">
+            Consumidor Final
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <div class="campo">
+
+        <label>Forma de pagamento padrão</label>
+
+        <select id="configPagamentoPadrao">
+
+          <option value="">
+            Selecione
+          </option>
+
+          <option value="DINHEIRO">
+            Dinheiro
+          </option>
+
+          <option value="PIX">
+            PIX
+          </option>
+
+          <option value="DEBITO">
+            Débito
+          </option>
+
+          <option value="CREDITO">
+            Crédito
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <div class="campo">
+
+        <label>Desconto máximo (%)</label>
+
+        <input
+          id="configDescontoMaximo"
+          type="number"
+          min="0"
+          max="100"
+          step="0.01"
+          placeholder="0">
+
+      </div>
+
+
+      <div class="campo">
+
+        <label>Permitir venda sem estoque</label>
+
+        <select id="configPermitirSemEstoque">
+
+          <option value="NAO">
+            Não
+          </option>
+
+          <option value="SIM">
+            Sim
+          </option>
+
+        </select>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =================================================
+       ESTOQUE
+  ================================================== -->
+
+  <div class="card" style="margin-bottom:20px;">
+
+    <h3 class="section-title">
+      📦 Preferências de Estoque
+    </h3>
+
+    <p style="color:var(--muted);margin-bottom:20px;">
+      Valores utilizados como padrão no controle de produtos.
+    </p>
+
+
+    <div class="form-grid">
+
+      <div class="campo">
+
+        <label>Estoque mínimo padrão</label>
+
+        <input
+          id="configEstoqueMinimo"
+          type="number"
+          min="0"
+          step="1"
+          placeholder="2">
+
+      </div>
+
+
+      <div class="campo">
+
+        <label>Alerta de estoque baixo</label>
+
+        <select id="configAlertaEstoque">
+
+          <option value="SIM">
+            Ativado
+          </option>
+
+          <option value="NAO">
+            Desativado
+          </option>
+
+        </select>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =================================================
+       INTEGRAÇÕES
+  ================================================== -->
+
+  <div class="grid-2" style="margin-bottom:20px;">
+
+    <div class="card">
+
+      <h3 class="section-title">
+        🔌 API VNNUS
+      </h3>
+
+      <p style="color:var(--muted);margin-bottom:15px;">
+        Comunicação entre o ERP e o Google Apps Script.
+      </p>
+
+
+      <div
+        id="configStatusApi"
+        style="margin-bottom:15px;">
+        ⚪ Verificando...
+      </div>
+
+
+      <button
+        class="btn-secondary"
+        id="btnTestarApiConfiguracoes"
+        type="button">
+        🔄 Testar conexão
+      </button>
+
+    </div>
+
+
+    <div class="card">
+
+      <h3 class="section-title">
+        📷 Scanner
+      </h3>
+
+      <p style="color:var(--muted);margin-bottom:15px;">
+        Scanner externo utilizado para leitura dos códigos dos produtos.
+      </p>
+
+
+      <div
+        id="configStatusScanner"
+        style="margin-bottom:15px;">
+        ⚪ Configurado
+      </div>
+
+
+      <button
+        class="btn-secondary"
+        id="btnAbrirScannerConfiguracoes"
+        type="button">
+        📷 Abrir Scanner
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <!-- =================================================
+       SISTEMA
+  ================================================== -->
+
+  <div class="card" style="margin-bottom:20px;">
+
+    <h3 class="section-title">
+      🖥️ Sistema
+    </h3>
+
+
+    <div class="table-wrap">
+
+      <table>
+
+        <tbody>
+
+          <tr>
+            <th>Sistema</th>
+            <td>VNNUS ERP</td>
+          </tr>
+
+          <tr>
+            <th>Versão do ERP</th>
+            <td id="configVersaoErp">
+              2.1
+            </td>
+          </tr>
+
+          <tr>
+            <th>Versão da API</th>
+            <td id="configVersaoApi">
+              -
+            </td>
+          </tr>
+
+          <tr>
+            <th>Status da API</th>
+            <td id="configApiStatusSistema">
+              Verificando...
+            </td>
+          </tr>
+
+          <tr>
+            <th>Última atualização das configurações</th>
+            <td id="configUltimaAtualizacao">
+              -
+            </td>
+          </tr>
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
+
+  <!-- =================================================
+       SALVAR
+  ================================================== -->
+
+  <div
+    class="card"
+    style="margin-bottom:20px;text-align:right;">
+
+    <span
+      id="mensagemConfiguracoes"
+      style="color:var(--muted);margin-right:15px;">
+    </span>
+
+
+    <button
+      class="btn-primary"
+      id="btnSalvarConfiguracoesRodape">
+      💾 Salvar Configurações
+    </button>
+
+  </div>
+
+</section>
