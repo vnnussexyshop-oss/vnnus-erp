@@ -1994,7 +1994,305 @@ textarea,
   }
 
 }
+/* =====================================================
+   VNNUS PDV 2.1
+   MODAIS + COMPROVANTE MOBILE
+===================================================== */
 
+
+/* Fundo dos modais */
+
+#modalFinalizarVenda,
+#modalComprovanteVenda{
+  position:fixed;
+  inset:0;
+
+  display:none;
+
+  align-items:center;
+  justify-content:center;
+
+  padding:12px;
+
+  background:
+    rgba(0,0,0,.82);
+
+  backdrop-filter:
+    blur(4px);
+
+  z-index:999;
+}
+
+
+#modalFinalizarVenda.aberto,
+#modalComprovanteVenda.aberto{
+  display:flex;
+}
+
+
+/* Caixa principal */
+
+#modalFinalizarVenda .modal-conteudo,
+#modalComprovanteVenda .modal-conteudo{
+  width:min(650px,100%);
+  max-height:calc(100vh - 24px);
+
+  overflow-y:auto;
+
+  margin:0;
+
+  border:
+    1px solid rgba(212,168,77,.32);
+
+  border-radius:18px;
+
+  background:
+    radial-gradient(
+      circle at right top,
+      rgba(140,0,18,.14),
+      transparent 34%
+    ),
+    linear-gradient(
+      160deg,
+      #141414,
+      #080808
+    );
+
+  box-shadow:
+    0 28px 90px rgba(0,0,0,.72);
+}
+
+
+/* =====================================================
+   CABEÇALHO DO MODAL
+===================================================== */
+
+#modalFinalizarVenda .modal-topo,
+#modalComprovanteVenda .modal-topo{
+  position:sticky;
+  top:0;
+  z-index:3;
+
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+
+  gap:12px;
+
+  padding:16px 18px;
+
+  background:
+    rgba(10,10,10,.98);
+
+  border-bottom:
+    1px solid rgba(212,168,77,.18);
+}
+
+
+#modalFinalizarVenda .modal-topo h2,
+#modalComprovanteVenda .modal-topo h2{
+  font-family:
+    "Cinzel",
+    serif;
+
+  color:
+    var(--gold2);
+
+  font-size:18px;
+}
+
+
+/* Botão X */
+
+#modalFinalizarVenda .modal-topo > button,
+#modalComprovanteVenda .modal-topo > button{
+  width:36px;
+  min-width:36px;
+  height:36px;
+
+  display:grid;
+  place-items:center;
+
+  padding:0;
+
+  border-radius:50%;
+
+  border:
+    1px solid rgba(212,168,77,.30);
+
+  background:
+    linear-gradient(
+      180deg,
+      #1a1a1a,
+      #0c0c0c
+    );
+
+  color:
+    var(--gold2);
+
+  font-size:15px;
+
+  line-height:1;
+}
+
+
+#modalFinalizarVenda .modal-topo > button:hover,
+#modalComprovanteVenda .modal-topo > button:hover{
+  border-color:
+    var(--red2);
+
+  color:#fff;
+
+  box-shadow:
+    0 0 16px rgba(200,0,25,.24);
+}
+
+
+/* =====================================================
+   COMPROVANTE
+===================================================== */
+
+#pdvComprovante{
+  margin:16px !important;
+
+  padding:20px !important;
+
+  border:
+    1px solid rgba(212,168,77,.28) !important;
+
+  border-radius:15px;
+
+  background:
+    radial-gradient(
+      circle at top,
+      rgba(125,0,18,.10),
+      transparent 28%
+    ),
+    linear-gradient(
+      160deg,
+      #121212,
+      #090909
+    ) !important;
+
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.02),
+    0 15px 40px rgba(0,0,0,.30);
+}
+
+
+/* Rodapé */
+
+#modalComprovanteVenda .modal-rodape,
+#modalFinalizarVenda .modal-rodape{
+  padding:
+    14px 16px 18px;
+
+  border-top:
+    1px solid rgba(212,168,77,.12);
+
+  background:
+    rgba(8,8,8,.92);
+}
+
+
+/* Mensagens */
+
+#pdvMensagemComprovante,
+#pdvMensagemFinal{
+  padding-left:16px;
+  padding-right:16px;
+}
+
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media(max-width:760px){
+
+  #modalFinalizarVenda,
+  #modalComprovanteVenda{
+    padding:7px;
+  }
+
+
+  #modalFinalizarVenda .modal-conteudo,
+  #modalComprovanteVenda .modal-conteudo{
+    width:100%;
+
+    max-height:
+      calc(100vh - 14px);
+
+    border-radius:14px;
+  }
+
+
+  #modalFinalizarVenda .modal-topo,
+  #modalComprovanteVenda .modal-topo{
+    padding:
+      12px 13px;
+  }
+
+
+  #modalFinalizarVenda .modal-topo h2,
+  #modalComprovanteVenda .modal-topo h2{
+    font-size:16px;
+  }
+
+
+  #pdvComprovante{
+    margin:
+      11px !important;
+
+    padding:
+      16px !important;
+  }
+
+
+  #modalComprovanteVenda .modal-rodape,
+  #modalFinalizarVenda .modal-rodape{
+    display:grid !important;
+
+    grid-template-columns:
+      1fr 1fr;
+
+    gap:8px;
+
+    padding:
+      11px;
+  }
+
+
+  #modalComprovanteVenda .modal-rodape button,
+  #modalFinalizarVenda .modal-rodape button{
+    width:100%;
+
+    min-width:0;
+
+    padding:
+      10px 8px;
+  }
+
+}
+
+
+/* =====================================================
+   CELULAR MUITO ESTREITO
+===================================================== */
+
+@media(max-width:380px){
+
+  #modalComprovanteVenda .modal-rodape,
+  #modalFinalizarVenda .modal-rodape{
+    grid-template-columns:1fr;
+  }
+
+}
+
+
+/* =====================================================
+   FIM — VNNUS PDV 2.1
+===================================================== */
 
 /* =====================================================
    FIM — VNNUS PDV 2.0 LUXURY
