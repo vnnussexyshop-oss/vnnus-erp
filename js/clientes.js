@@ -1,169 +1,211 @@
 /* =====================================================
    VNNUS ERP 3.5
-   CLIENTES - GITHUB PAGES + API VNNUS
+   CLIENTES
 ===================================================== */
 
 let clientesCarregadosERP = [];
-
-
-window.init_clientes =
-  async function() {
-
-    const btnNovo =
-      document.getElementById(
-        'btnNovoCliente'
-      );
-
-    const btnAtualizar =
-      document.getElementById(
-        'btnAtualizarClientes'
-      );
-
-    const btnFechar =
-      document.getElementById(
-        'btnFecharCliente'
-      );
-
-    const btnCancelar =
-      document.getElementById(
-        'btnCancelarCliente'
-      );
-
-    const btnSalvar =
-      document.getElementById(
-        'btnSalvarCliente'
-      );
-
-    const btnCep =
-      document.getElementById(
-        'btnBuscarCepCliente'
-      );
-
-    const pesquisa =
-      document.getElementById(
-        'pesquisaClientes'
-      );
-
-    const campoCep =
-      document.getElementById(
-        'clienteCep'
-      );
-
-
-    const btnFecharHistorico = document.getElementById('btnFecharHistoricoCliente');
-    const btnFecharHistoricoRodape = document.getElementById('btnFecharHistoricoClienteRodape');
-    const btnFecharDetalhes = document.getElementById('btnFecharDetalhesCompraCliente');
-
-
-    if (btnNovo) {
-      btnNovo.onclick =
-        abrirNovoClienteERP;
-    }
-
-
-    if (btnAtualizar) {
-      btnAtualizar.onclick =
-        carregarClientesERP;
-    }
-
-
-    if (btnFechar) {
-      btnFechar.onclick =
-        fecharClienteERP;
-    }
-
-
-    if (btnCancelar) {
-      btnCancelar.onclick =
-        fecharClienteERP;
-    }
-
-
-    if (btnSalvar) {
-      btnSalvar.onclick =
-        salvarClienteERP;
-    }
-
-
-    if (btnCep) {
-      btnCep.onclick =
-        consultarCepClienteERP;
-    }
-
-
-    if (pesquisa) {
-      pesquisa.oninput =
-        filtrarClientesERP;
-    }
-
-
-    if (btnFecharHistorico) btnFecharHistorico.onclick = fecharHistoricoClienteERP;
-    if (btnFecharHistoricoRodape) btnFecharHistoricoRodape.onclick = fecharHistoricoClienteERP;
-    if (btnFecharDetalhes) btnFecharDetalhes.onclick = fecharDetalhesCompraClienteERP;
-
-    if (campoCep) {
-
-      campoCep.oninput =
-        function() {
-
-          campoCep.value =
-            formatarCepVisualERP(
-              campoCep.value
-            );
-
-        };
-
-
-      campoCep.onblur =
-        function() {
-
-          const cep =
-            somenteNumerosERP(
-              campoCep.value
-            );
-
-
-          if (
-            cep.length === 8
-          ) {
-
-            consultarCepClienteERP();
-
-          }
-
-        };
-
-    }
-
-
-    const campoCpf =
-      document.getElementById(
-        'clienteCpf'
-      );
-
-
-    if (campoCpf) {
-
-      campoCpf.oninput =
-        function() {
-
-          campoCpf.value =
-            formatarCpfVisualERP(
-              campoCpf.value
-            );
-
-        };
-
-    }
-
-
-    await carregarClientesERP();
-
-  };
+let eventosClientesERP = false;
 
 
 /* =====================================================
-   CARREGAR
+   INICIALIZAÇÃO
+===================================================== */
+
+function initClientes() {
+
+  configurarEventosClientesERP();
+
+  carregarClientesERP();
+
+}
+
+
+/* =====================================================
+   EVENTOS
+===================================================== */
+
+function configurarEventosClientesERP() {
+
+  if (eventosClientesERP) {
+    return;
+  }
+
+  eventosClientesERP = true;
+
+
+  const btnNovo =
+    document.getElementById(
+      'btnNovoCliente'
+    );
+
+
+  const btnAtualizar =
+    document.getElementById(
+      'btnAtualizarClientes'
+    );
+
+
+  const pesquisa =
+    document.getElementById(
+      'pesquisaClientes'
+    );
+
+
+  const btnFechar =
+    document.getElementById(
+      'btnFecharCliente'
+    );
+
+
+  const btnCancelar =
+    document.getElementById(
+      'btnCancelarCliente'
+    );
+
+
+  const btnSalvar =
+    document.getElementById(
+      'btnSalvarCliente'
+    );
+
+
+  const btnBuscarCep =
+    document.getElementById(
+      'btnBuscarCepCliente'
+    );
+
+
+  const campoCep =
+    document.getElementById(
+      'clienteCep'
+    );
+
+
+  const btnFecharHistorico =
+    document.getElementById(
+      'btnFecharHistoricoCliente'
+    );
+
+
+  const btnFecharHistoricoRodape =
+    document.getElementById(
+      'btnFecharHistoricoClienteRodape'
+    );
+
+
+  const btnFecharDetalhes =
+    document.getElementById(
+      'btnFecharDetalhesCompraCliente'
+    );
+
+
+  if (btnNovo) {
+
+    btnNovo.onclick =
+      abrirNovoClienteERP;
+
+  }
+
+
+  if (btnAtualizar) {
+
+    btnAtualizar.onclick =
+      carregarClientesERP;
+
+  }
+
+
+  if (pesquisa) {
+
+    pesquisa.oninput =
+      filtrarClientesERP;
+
+  }
+
+
+  if (btnFechar) {
+
+    btnFechar.onclick =
+      fecharModalClienteERP;
+
+  }
+
+
+  if (btnCancelar) {
+
+    btnCancelar.onclick =
+      fecharModalClienteERP;
+
+  }
+
+
+  if (btnSalvar) {
+
+    btnSalvar.onclick =
+      salvarClienteERP;
+
+  }
+
+
+  if (btnBuscarCep) {
+
+    btnBuscarCep.onclick =
+      buscarCepClienteERP;
+
+  }
+
+
+  if (btnFecharHistorico) {
+
+    btnFecharHistorico.onclick =
+      fecharHistoricoClienteERP;
+
+  }
+
+
+  if (btnFecharHistoricoRodape) {
+
+    btnFecharHistoricoRodape.onclick =
+      fecharHistoricoClienteERP;
+
+  }
+
+
+  if (btnFecharDetalhes) {
+
+    btnFecharDetalhes.onclick =
+      fecharDetalhesCompraClienteERP;
+
+  }
+
+
+  if (campoCep) {
+
+    campoCep.addEventListener(
+      'blur',
+      function() {
+
+        const cep =
+          somenteNumerosClienteERP(
+            campoCep.value
+          );
+
+        if (cep.length === 8) {
+
+          buscarCepClienteERP();
+
+        }
+
+      }
+    );
+
+  }
+
+}
+
+
+/* =====================================================
+   CARREGAR CLIENTES
 ===================================================== */
 
 async function carregarClientesERP() {
@@ -173,29 +215,31 @@ async function carregarClientesERP() {
       'listaClientes'
     );
 
+
   const status =
     document.getElementById(
       'statusClientes'
     );
 
 
-  if (!tbody) {
-    return;
+  if (tbody) {
+
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="7">
+          Carregando clientes...
+        </td>
+      </tr>
+    `;
+
   }
 
 
-  tbody.innerHTML = `
-    <tr>
-      <td colspan="7">
-        Carregando clientes...
-      </td>
-    </tr>
-  `;
-
-
   if (status) {
+
     status.textContent =
-      'Atualizando clientes...';
+      'Carregando clientes...';
+
   }
 
 
@@ -232,24 +276,32 @@ async function carregarClientesERP() {
   catch (erro) {
 
     console.error(
-      'Clientes:',
+      'Erro ao carregar clientes:',
       erro
     );
 
 
-    tbody.innerHTML = `
-      <tr>
-        <td colspan="7">
-          Erro: ${escaparHtmlClienteERP(erro.message)}
-        </td>
-      </tr>
-    `;
+    clientesCarregadosERP = [];
+
+
+    if (tbody) {
+
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="7">
+            Erro ao carregar clientes.
+          </td>
+        </tr>
+      `;
+
+    }
 
 
     if (status) {
 
       status.textContent =
-        'Erro ao carregar clientes.';
+        'Erro: ' +
+        erro.message;
 
     }
 
@@ -259,7 +311,7 @@ async function carregarClientesERP() {
 
 
 /* =====================================================
-   RENDER
+   RENDERIZAR CLIENTES
 ===================================================== */
 
 function renderizarClientesERP(
@@ -296,60 +348,88 @@ function renderizarClientesERP(
     clientes.map(
       function(cliente) {
 
-        const ativo =
-          String(
-            cliente.ATIVO || 'SIM'
-          )
-          .trim()
-          .toUpperCase() !==
-          'NAO';
-
-
         const cidadeUf =
           [
             cliente.CIDADE || '',
             cliente.UF || ''
           ]
           .filter(Boolean)
-          .join('/');
+          .join(' / ');
+
+
+        const ativo =
+          String(
+            cliente.ATIVO || 'SIM'
+          )
+          .trim()
+          .toUpperCase();
 
 
         return `
           <tr>
 
             <td>
+              ${escaparHtmlClienteERP(
+                cliente.ID_CLIENTE
+              )}
+            </td>
+
+            <td>
               <strong>
-                ${escaparHtmlClienteERP(cliente.ID_CLIENTE)}
+                ${escaparHtmlClienteERP(
+                  cliente.NOME
+                )}
               </strong>
             </td>
 
             <td>
-              ${escaparHtmlClienteERP(cliente.NOME)}
+              ${escaparHtmlClienteERP(
+                cliente.WHATSAPP
+              )}
             </td>
 
             <td>
-              ${escaparHtmlClienteERP(formatarTelefoneVisualERP(cliente.WHATSAPP))}
+              ${escaparHtmlClienteERP(
+                cliente.TELEFONE
+              )}
             </td>
 
             <td>
-              ${escaparHtmlClienteERP(formatarTelefoneVisualERP(cliente.TELEFONE))}
-            </td>
-
-            <td>
-              ${escaparHtmlClienteERP(cidadeUf || '-')}
+              ${escaparHtmlClienteERP(
+                cidadeUf || '-'
+              )}
             </td>
 
             <td>
               <span
-                class="status-badge ${ativo ? 'status-ok' : 'status-danger'}">
-                ${ativo ? 'ATIVO' : 'INATIVO'}
+                class="status-badge ${
+                  ativo === 'SIM'
+                    ? 'status-ok'
+                    : 'status-danger'
+                }">
+
+                ${
+                  ativo === 'SIM'
+                    ? 'Ativo'
+                    : 'Inativo'
+                }
+
               </span>
             </td>
 
             <td>
 
-              <button class="btn-secondary" onclick="abrirHistoricoClienteERP('${escaparAtributoClienteERP(cliente.ID_CLIENTE)}')">Compras</button>
-              <button class="btn-secondary" onclick="editarClienteERP('${escaparAtributoClienteERP(cliente.ID_CLIENTE)}')">Editar</button>
+              <button
+                class="btn-secondary"
+                onclick="abrirHistoricoClienteERP('${escaparAtributoClienteERP(cliente.ID_CLIENTE)}')">
+                Compras
+              </button>
+
+              <button
+                class="btn-secondary"
+                onclick="editarClienteERP('${escaparAtributoClienteERP(cliente.ID_CLIENTE)}')">
+                Editar
+              </button>
 
             </td>
 
@@ -382,68 +462,51 @@ function atualizarResumoClientesERP() {
             cliente.ATIVO || 'SIM'
           )
           .trim()
-          .toUpperCase() !==
-          'NAO'
+          .toUpperCase() ===
+          'SIM'
         );
 
       }
     ).length;
 
 
-  const comWhatsapp =
+  const whatsapp =
     clientesCarregadosERP.filter(
       function(cliente) {
 
         return (
-          somenteNumerosERP(
-            cliente.WHATSAPP
-          ).length >= 10
+          String(
+            cliente.WHATSAPP || ''
+          )
+          .trim() !== ''
         );
 
       }
     ).length;
 
 
-  const totalEl =
-    document.getElementById(
-      'totalClientes'
-    );
+  definirTextoClienteERP(
+    'totalClientes',
+    total
+  );
 
 
-  const ativosEl =
-    document.getElementById(
-      'totalClientesAtivos'
-    );
+  definirTextoClienteERP(
+    'totalClientesAtivos',
+    ativos
+  );
 
 
-  const whatsappEl =
-    document.getElementById(
-      'totalClientesWhatsapp'
-    );
-
-
-  if (totalEl) {
-    totalEl.textContent =
-      total;
-  }
-
-
-  if (ativosEl) {
-    ativosEl.textContent =
-      ativos;
-  }
-
-
-  if (whatsappEl) {
-    whatsappEl.textContent =
-      comWhatsapp;
-  }
+  definirTextoClienteERP(
+    'totalClientesWhatsapp',
+    whatsapp
+  );
 
 }
 
 
 /* =====================================================
-   FILTRO
+   PESQUISA
 ===================================================== */
 
 function filtrarClientesERP() {
@@ -454,34 +517,47 @@ function filtrarClientesERP() {
     );
 
 
-  if (!campo) {
-    return;
-  }
-
-
   const termo =
-    campo.value
-      .trim()
-      .toLowerCase();
+    String(
+      campo
+        ? campo.value
+        : ''
+    )
+    .trim()
+    .toLowerCase();
+
+
+  if (!termo) {
+
+    renderizarClientesERP(
+      clientesCarregadosERP
+    );
+
+    return;
+
+  }
 
 
   const filtrados =
     clientesCarregadosERP.filter(
       function(cliente) {
 
-        const base =
+        const texto =
           [
+            cliente.ID_CLIENTE,
             cliente.NOME,
             cliente.TELEFONE,
             cliente.WHATSAPP,
             cliente.CPF,
-            cliente.EMAIL
+            cliente.EMAIL,
+            cliente.CIDADE,
+            cliente.UF
           ]
           .join(' ')
           .toLowerCase();
 
 
-        return base.includes(
+        return texto.includes(
           termo
         );
 
@@ -497,7 +573,7 @@ function filtrarClientesERP() {
 
 
 /* =====================================================
-   NOVO / EDITAR
+   NOVO CLIENTE
 ===================================================== */
 
 function abrirNovoClienteERP() {
@@ -505,16 +581,10 @@ function abrirNovoClienteERP() {
   limparFormularioClienteERP();
 
 
-  const titulo =
-    document.getElementById(
-      'tituloModalCliente'
-    );
-
-
-  if (titulo) {
-    titulo.textContent =
-      'Novo Cliente';
-  }
+  definirTextoClienteERP(
+    'tituloModalCliente',
+    'Novo Cliente'
+  );
 
 
   abrirModalClienteERP();
@@ -522,7 +592,382 @@ function abrirNovoClienteERP() {
 }
 
 
-function editarClienteERP(
+/* =====================================================
+   EDITAR CLIENTE
+===================================================== */
+
+async function editarClienteERP(
+  idCliente
+) {
+
+  limparFormularioClienteERP();
+
+
+  definirTextoClienteERP(
+    'tituloModalCliente',
+    'Editar Cliente'
+  );
+
+
+  definirTextoClienteERP(
+    'mensagemCliente',
+    'Carregando cliente...'
+  );
+
+
+  abrirModalClienteERP();
+
+
+  try {
+
+    const cliente =
+      await VNNUS_API
+        .clientePorId(
+          idCliente
+        );
+
+
+    preencherFormularioClienteERP(
+      cliente
+    );
+
+
+    definirTextoClienteERP(
+      'mensagemCliente',
+      ''
+    );
+
+  }
+
+  catch (erro) {
+
+    console.error(
+      'Erro ao carregar cliente:',
+      erro
+    );
+
+
+    definirTextoClienteERP(
+      'mensagemCliente',
+      'Erro: ' +
+      erro.message
+    );
+
+  }
+
+}
+
+
+/* =====================================================
+   PREENCHER FORMULÁRIO
+===================================================== */
+
+function preencherFormularioClienteERP(
+  cliente
+) {
+
+  definirValorClienteERP(
+    'clienteId',
+    cliente.ID_CLIENTE
+  );
+
+
+  definirValorClienteERP(
+    'clienteNome',
+    cliente.NOME
+  );
+
+
+  definirValorClienteERP(
+    'clienteTelefone',
+    cliente.TELEFONE
+  );
+
+
+  definirValorClienteERP(
+    'clienteWhatsapp',
+    cliente.WHATSAPP
+  );
+
+
+  definirValorClienteERP(
+    'clienteEmail',
+    cliente.EMAIL
+  );
+
+
+  definirValorClienteERP(
+    'clienteNascimento',
+    normalizarDataInputClienteERP(
+      cliente.DATA_NASCIMENTO
+    )
+  );
+
+
+  definirValorClienteERP(
+    'clienteCpf',
+    cliente.CPF
+  );
+
+
+  definirValorClienteERP(
+    'clienteCep',
+    cliente.CEP
+  );
+
+
+  definirValorClienteERP(
+    'clienteEndereco',
+    cliente.ENDERECO
+  );
+
+
+  definirValorClienteERP(
+    'clienteNumero',
+    cliente.NUMERO
+  );
+
+
+  definirValorClienteERP(
+    'clienteComplemento',
+    cliente.COMPLEMENTO
+  );
+
+
+  definirValorClienteERP(
+    'clienteBairro',
+    cliente.BAIRRO
+  );
+
+
+  definirValorClienteERP(
+    'clienteCidade',
+    cliente.CIDADE
+  );
+
+
+  definirValorClienteERP(
+    'clienteUf',
+    cliente.UF
+  );
+
+
+  definirValorClienteERP(
+    'clienteAtivo',
+    cliente.ATIVO || 'SIM'
+  );
+
+
+  definirValorClienteERP(
+    'clienteObservacao',
+    cliente.OBSERVACAO
+  );
+
+}
+
+
+/* =====================================================
+   SALVAR CLIENTE
+===================================================== */
+
+async function salvarClienteERP() {
+
+  const botao =
+    document.getElementById(
+      'btnSalvarCliente'
+    );
+
+
+  const mensagem =
+    document.getElementById(
+      'mensagemCliente'
+    );
+
+
+  const dados = {
+
+    ID_CLIENTE:
+      obterValorClienteERP(
+        'clienteId'
+      ),
+
+    NOME:
+      obterValorClienteERP(
+        'clienteNome'
+      ).trim(),
+
+    TELEFONE:
+      obterValorClienteERP(
+        'clienteTelefone'
+      ).trim(),
+
+    WHATSAPP:
+      obterValorClienteERP(
+        'clienteWhatsapp'
+      ).trim(),
+
+    EMAIL:
+      obterValorClienteERP(
+        'clienteEmail'
+      ).trim(),
+
+    DATA_NASCIMENTO:
+      obterValorClienteERP(
+        'clienteNascimento'
+      ),
+
+    CPF:
+      obterValorClienteERP(
+        'clienteCpf'
+      ).trim(),
+
+    CEP:
+      obterValorClienteERP(
+        'clienteCep'
+      ).trim(),
+
+    ENDERECO:
+      obterValorClienteERP(
+        'clienteEndereco'
+      ).trim(),
+
+    NUMERO:
+      obterValorClienteERP(
+        'clienteNumero'
+      ).trim(),
+
+    COMPLEMENTO:
+      obterValorClienteERP(
+        'clienteComplemento'
+      ).trim(),
+
+    BAIRRO:
+      obterValorClienteERP(
+        'clienteBairro'
+      ).trim(),
+
+    CIDADE:
+      obterValorClienteERP(
+        'clienteCidade'
+      ).trim(),
+
+    UF:
+      obterValorClienteERP(
+        'clienteUf'
+      )
+      .trim()
+      .toUpperCase(),
+
+    ATIVO:
+      obterValorClienteERP(
+        'clienteAtivo'
+      ) || 'SIM',
+
+    OBSERVACAO:
+      obterValorClienteERP(
+        'clienteObservacao'
+      ).trim()
+
+  };
+
+
+  if (!dados.NOME) {
+
+    if (mensagem) {
+
+      mensagem.textContent =
+        'Informe o nome do cliente.';
+
+    }
+
+    return;
+
+  }
+
+
+  if (botao) {
+
+    botao.disabled = true;
+
+  }
+
+
+  if (mensagem) {
+
+    mensagem.textContent =
+      'Salvando cliente...';
+
+  }
+
+
+  try {
+
+    const resposta =
+      await VNNUS_API
+        .salvarCliente(
+          dados
+        );
+
+
+    if (mensagem) {
+
+      mensagem.textContent =
+        resposta.mensagem ||
+        'Cliente salvo com sucesso.';
+
+    }
+
+
+    await carregarClientesERP();
+
+
+    setTimeout(
+      function() {
+
+        fecharModalClienteERP();
+
+      },
+      700
+    );
+
+  }
+
+  catch (erro) {
+
+    console.error(
+      'Erro ao salvar cliente:',
+      erro
+    );
+
+
+    if (mensagem) {
+
+      mensagem.textContent =
+        'Erro: ' +
+        erro.message;
+
+    }
+
+  }
+
+  finally {
+
+    if (botao) {
+
+      botao.disabled = false;
+
+    }
+
+  }
+
+}
+
+
+/* =====================================================
+   HISTÓRICO DE COMPRAS
+===================================================== */
+
+async function abrirHistoricoClienteERP(
   idCliente
 ) {
 
@@ -554,141 +999,646 @@ function editarClienteERP(
   }
 
 
-  limparFormularioClienteERP();
-
-
-  preencherCampoClienteERP(
-    'clienteId',
-    cliente.ID_CLIENTE
-  );
-
-  preencherCampoClienteERP(
-    'clienteNome',
-    cliente.NOME
-  );
-
-  preencherCampoClienteERP(
-    'clienteTelefone',
-    formatarTelefoneVisualERP(
-      cliente.TELEFONE
-    )
-  );
-
-  preencherCampoClienteERP(
-    'clienteWhatsapp',
-    formatarTelefoneVisualERP(
-      cliente.WHATSAPP
-    )
-  );
-
-  preencherCampoClienteERP(
-    'clienteEmail',
-    cliente.EMAIL
-  );
-
-  preencherCampoClienteERP(
-    'clienteNascimento',
-    converterDataParaInputERP(
-      cliente.DATA_NASCIMENTO
-    )
-  );
-
-  preencherCampoClienteERP(
-    'clienteCpf',
-    formatarCpfVisualERP(
-      cliente.CPF
-    )
-  );
-
-  preencherCampoClienteERP(
-    'clienteCep',
-    formatarCepVisualERP(
-      cliente.CEP
-    )
-  );
-
-  preencherCampoClienteERP(
-    'clienteEndereco',
-    cliente.ENDERECO
-  );
-
-  preencherCampoClienteERP(
-    'clienteNumero',
-    cliente.NUMERO
-  );
-
-  preencherCampoClienteERP(
-    'clienteComplemento',
-    cliente.COMPLEMENTO
-  );
-
-  preencherCampoClienteERP(
-    'clienteBairro',
-    cliente.BAIRRO
-  );
-
-  preencherCampoClienteERP(
-    'clienteCidade',
-    cliente.CIDADE
-  );
-
-  preencherCampoClienteERP(
-    'clienteUf',
-    cliente.UF
-  );
-
-  preencherCampoClienteERP(
-    'clienteObservacao',
-    cliente.OBSERVACAO
-  );
-
-  preencherCampoClienteERP(
-    'clienteAtivo',
-    String(
-      cliente.ATIVO || 'SIM'
-    )
-    .trim()
-    .toUpperCase() === 'NAO'
-      ? 'NAO'
-      : 'SIM'
-  );
-
-
-  const titulo =
+  const modal =
     document.getElementById(
-      'tituloModalCliente'
+      'modalHistoricoCliente'
     );
 
 
-  if (titulo) {
+  definirTextoClienteERP(
+    'tituloHistoricoCliente',
+    'Compras • ' +
+    (
+      cliente.NOME ||
+      cliente.ID_CLIENTE
+    )
+  );
 
-    titulo.textContent =
-      'Editar Cliente • ' +
-      cliente.ID_CLIENTE;
+
+  definirTextoClienteERP(
+    'subtituloHistoricoCliente',
+    cliente.ID_CLIENTE +
+    ' • Histórico vinculado pelo ID do cliente'
+  );
+
+
+  definirTextoClienteERP(
+    'statusHistoricoCliente',
+    'Carregando histórico...'
+  );
+
+
+  const tbody =
+    document.getElementById(
+      'listaHistoricoCliente'
+    );
+
+
+  if (tbody) {
+
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="6">
+          Carregando compras...
+        </td>
+      </tr>
+    `;
 
   }
 
 
-  abrirModalClienteERP();
+  zerarResumoHistoricoClienteERP();
+
+  fecharDetalhesCompraClienteERP();
+
+
+  if (modal) {
+
+    modal.classList.add(
+      'aberto'
+    );
+
+  }
+
+
+  try {
+
+    const resposta =
+      await VNNUS_API
+        .historicoCliente(
+          cliente.ID_CLIENTE
+        );
+
+
+    const vendas =
+      Array.isArray(
+        resposta.vendas
+      )
+        ? resposta.vendas
+        : [];
+
+
+    renderizarResumoHistoricoClienteERP(
+      resposta.resumo || {},
+      vendas
+    );
+
+
+    renderizarHistoricoClienteERP(
+      vendas
+    );
+
+
+    definirTextoClienteERP(
+      'statusHistoricoCliente',
+      vendas.length
+        ? vendas.length +
+          ' venda(s) vinculada(s) ao cliente.'
+        : 'Este cliente ainda não possui compras vinculadas.'
+    );
+
+  }
+
+  catch (erro) {
+
+    console.error(
+      'Histórico do cliente:',
+      erro
+    );
+
+
+    definirTextoClienteERP(
+      'statusHistoricoCliente',
+      'Erro ao carregar histórico: ' +
+      erro.message
+    );
+
+
+    if (tbody) {
+
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="6">
+            Erro ao carregar histórico.
+          </td>
+        </tr>
+      `;
+
+    }
+
+  }
 
 }
 
 
-\n/* =====================================================\n   HISTÓRICO DE COMPRAS DO CLIENTE\n===================================================== */\nasync function abrirHistoricoClienteERP(idCliente) {\n  const cliente=clientesCarregadosERP.find(x=>String(x.ID_CLIENTE||'')===String(idCliente||''));\n  if(!cliente){ alert('Cliente não encontrado.'); return; }\n  const modal=document.getElementById('modalHistoricoCliente'), status=document.getElementById('statusHistoricoCliente'), tbody=document.getElementById('listaHistoricoCliente');\n  document.getElementById('tituloHistoricoCliente').textContent='Compras • '+(cliente.NOME||cliente.ID_CLIENTE);\n  document.getElementById('subtituloHistoricoCliente').textContent=cliente.ID_CLIENTE+' • Histórico vinculado pelo ID do cliente';\n  if(status) status.textContent='Carregando histórico...';\n  if(tbody) tbody.innerHTML='<tr><td colspan="6">Carregando compras...</td></tr>';\n  zerarResumoHistoricoClienteERP(); fecharDetalhesCompraClienteERP(); if(modal) modal.classList.add('aberto');\n  try {\n    const resposta=await VNNUS_API.historicoCliente(cliente.ID_CLIENTE); const vendas=Array.isArray(resposta.vendas)?resposta.vendas:[];\n    renderizarResumoHistoricoClienteERP(resposta.resumo||{},vendas); renderizarHistoricoClienteERP(vendas);\n    if(status) status.textContent=vendas.length?vendas.length+' compra(s) encontrada(s).':'Este cliente ainda não possui compras vinculadas.';\n  } catch(erro){ if(status) status.textContent='Erro ao carregar histórico: '+erro.message; if(tbody) tbody.innerHTML='<tr><td colspan="6">Erro: '+escaparHtmlClienteERP(erro.message)+'</td></tr>'; }\n}\nfunction fecharHistoricoClienteERP(){ const m=document.getElementById('modalHistoricoCliente'); if(m)m.classList.remove('aberto'); fecharDetalhesCompraClienteERP(); }\nfunction zerarResumoHistoricoClienteERP(){ definirTextoHistoricoClienteERP('histTotalCompras','0'); definirTextoHistoricoClienteERP('histTotalGasto','R$ 0,00'); definirTextoHistoricoClienteERP('histTicketMedio','R$ 0,00'); definirTextoHistoricoClienteERP('histUltimaCompra','-'); }\nfunction renderizarResumoHistoricoClienteERP(r,v){ definirTextoHistoricoClienteERP('histTotalCompras',String(Number(r.totalCompras??v.length??0))); definirTextoHistoricoClienteERP('histTotalGasto',formatarMoedaClienteERP(Number(r.totalGasto||0))); definirTextoHistoricoClienteERP('histTicketMedio',formatarMoedaClienteERP(Number(r.ticketMedio||0))); definirTextoHistoricoClienteERP('histUltimaCompra',String(r.ultimaCompra||(v.length?(v[0].DATA||v[0].DATA_HORA||'-'):'-'))); }\nfunction renderizarHistoricoClienteERP(vendas){ const tbody=document.getElementById('listaHistoricoCliente'); if(!tbody)return; if(!vendas.length){tbody.innerHTML='<tr><td colspan="6">Nenhuma compra vinculada a este cliente.</td></tr>';return;} tbody.innerHTML=vendas.map(v=>{const id=v.ID_VENDA||v.ID||'', status=String(v.STATUS||'').toUpperCase(); return `<tr><td><strong>${escaparHtmlClienteERP(id)}</strong></td><td>${escaparHtmlClienteERP(v.DATA||v.DATA_HORA||v.DATA_VENDA||'-')}</td><td>${escaparHtmlClienteERP(v.FORMA_PAGAMENTO||v.PAGAMENTO||'-')}</td><td>${escaparHtmlClienteERP(formatarMoedaClienteERP(Number(v.TOTAL||0)))}</td><td><span class="status-badge ${status==='CANCELADA'?'status-danger':'status-ok'}">${escaparHtmlClienteERP(status||'-')}</span></td><td><button class="btn-secondary" onclick="abrirDetalhesCompraClienteERP('${escaparAtributoClienteERP(id)}')">Ver itens</button></td></tr>`;}).join(''); }\nasync function abrirDetalhesCompraClienteERP(idVenda){ const area=document.getElementById('detalhesCompraCliente'), tbody=document.getElementById('listaItensCompraCliente'), resumo=document.getElementById('resumoDetalhesCompraCliente'); if(area)area.style.display='block'; document.getElementById('tituloDetalhesCompraCliente').textContent='Itens • '+idVenda; if(resumo)resumo.textContent='Carregando detalhes...'; try{const d=await VNNUS_API.detalhesVenda(idVenda), venda=d.venda||{}, itens=Array.isArray(d.itens)?d.itens:[]; if(resumo)resumo.textContent=[venda.DATA||venda.DATA_HORA||'',venda.FORMA_PAGAMENTO||venda.PAGAMENTO||'',formatarMoedaClienteERP(Number(venda.TOTAL||0))].filter(Boolean).join(' • '); if(tbody)tbody.innerHTML=itens.length?itens.map(i=>{const q=Number(i.QUANTIDADE||i.QTD||0),u=Number(i.PRECO_UNITARIO||i.PRECO||i.VALOR_UNITARIO||0),t=Number(i.TOTAL_ITEM||i.TOTAL||(q*u));return `<tr><td>${escaparHtmlClienteERP(i.PRODUTO||i.DESCRICAO||i.NOME||'-')}</td><td>${q}</td><td>${formatarMoedaClienteERP(u)}</td><td>${formatarMoedaClienteERP(t)}</td></tr>`;}).join(''):'<tr><td colspan="4">Nenhum item encontrado.</td></tr>'; }catch(e){if(resumo)resumo.textContent='Erro: '+e.message;} }\nfunction fecharDetalhesCompraClienteERP(){const a=document.getElementById('detalhesCompraCliente');if(a)a.style.display='none';}\nfunction definirTextoHistoricoClienteERP(id,v){const e=document.getElementById(id);if(e)e.textContent=v;}\nfunction formatarMoedaClienteERP(v){return Number(v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});}\n\n/* =====================================================
+/* =====================================================
+   RESUMO HISTÓRICO
+===================================================== */
+
+function zerarResumoHistoricoClienteERP() {
+
+  definirTextoClienteERP(
+    'histTotalCompras',
+    '0'
+  );
+
+
+  definirTextoClienteERP(
+    'histTotalGasto',
+    'R$ 0,00'
+  );
+
+
+  definirTextoClienteERP(
+    'histTicketMedio',
+    'R$ 0,00'
+  );
+
+
+  definirTextoClienteERP(
+    'histUltimaCompra',
+    '-'
+  );
+
+}
+
+
+function renderizarResumoHistoricoClienteERP(
+  resumo,
+  vendas
+) {
+
+  const totalCompras =
+    Number(
+      resumo.totalCompras ?? 0
+    );
+
+
+  const totalGasto =
+    Number(
+      resumo.totalGasto || 0
+    );
+
+
+  const ticketMedio =
+    Number(
+      resumo.ticketMedio || 0
+    );
+
+
+  const ultimaCompra =
+    resumo.ultimaCompra ||
+    (
+      vendas.length
+        ? (
+            vendas[0].DATA ||
+            vendas[0].DATA_HORA ||
+            '-'
+          )
+        : '-'
+    );
+
+
+  definirTextoClienteERP(
+    'histTotalCompras',
+    String(totalCompras)
+  );
+
+
+  definirTextoClienteERP(
+    'histTotalGasto',
+    formatarMoedaClienteERP(
+      totalGasto
+    )
+  );
+
+
+  definirTextoClienteERP(
+    'histTicketMedio',
+    formatarMoedaClienteERP(
+      ticketMedio
+    )
+  );
+
+
+  definirTextoClienteERP(
+    'histUltimaCompra',
+    String(
+      ultimaCompra || '-'
+    )
+  );
+
+}
+
+
+/* =====================================================
+   LISTAR HISTÓRICO
+===================================================== */
+
+function renderizarHistoricoClienteERP(
+  vendas
+) {
+
+  const tbody =
+    document.getElementById(
+      'listaHistoricoCliente'
+    );
+
+
+  if (!tbody) {
+    return;
+  }
+
+
+  if (!vendas.length) {
+
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="6">
+          Nenhuma compra vinculada a este cliente.
+        </td>
+      </tr>
+    `;
+
+    return;
+
+  }
+
+
+  tbody.innerHTML =
+    vendas.map(
+      function(venda) {
+
+        const idVenda =
+          venda.ID_VENDA ||
+          venda.ID ||
+          '';
+
+
+        const data =
+          venda.DATA ||
+          venda.DATA_HORA ||
+          venda.DATA_VENDA ||
+          '-';
+
+
+        const pagamento =
+          venda.FORMA_PAGAMENTO ||
+          venda.PAGAMENTO ||
+          '-';
+
+
+        const total =
+          Number(
+            venda.TOTAL || 0
+          );
+
+
+        const status =
+          String(
+            venda.STATUS || ''
+          )
+          .trim()
+          .toUpperCase();
+
+
+        return `
+          <tr>
+
+            <td>
+              <strong>
+                ${escaparHtmlClienteERP(
+                  idVenda
+                )}
+              </strong>
+            </td>
+
+            <td>
+              ${escaparHtmlClienteERP(
+                data
+              )}
+            </td>
+
+            <td>
+              ${escaparHtmlClienteERP(
+                pagamento
+              )}
+            </td>
+
+            <td>
+              ${escaparHtmlClienteERP(
+                formatarMoedaClienteERP(
+                  total
+                )
+              )}
+            </td>
+
+            <td>
+              ${escaparHtmlClienteERP(
+                status || '-'
+              )}
+            </td>
+
+            <td>
+
+              <button
+                class="btn-secondary"
+                onclick="abrirDetalhesCompraClienteERP('${escaparAtributoClienteERP(idVenda)}')">
+                Ver itens
+              </button>
+
+            </td>
+
+          </tr>
+        `;
+
+      }
+    )
+    .join('');
+
+}
+
+
+/* =====================================================
+   DETALHES DA COMPRA
+===================================================== */
+
+async function abrirDetalhesCompraClienteERP(
+  idVenda
+) {
+
+  if (!idVenda) {
+    return;
+  }
+
+
+  const area =
+    document.getElementById(
+      'detalhesCompraCliente'
+    );
+
+
+  const tbody =
+    document.getElementById(
+      'listaItensCompraCliente'
+    );
+
+
+  if (area) {
+
+    area.style.display =
+      'block';
+
+  }
+
+
+  definirTextoClienteERP(
+    'tituloDetalhesCompraCliente',
+    'Itens • ' +
+    idVenda
+  );
+
+
+  definirTextoClienteERP(
+    'resumoDetalhesCompraCliente',
+    'Carregando detalhes...'
+  );
+
+
+  if (tbody) {
+
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="4">
+          Carregando itens...
+        </td>
+      </tr>
+    `;
+
+  }
+
+
+  try {
+
+    const detalhes =
+      await VNNUS_API
+        .detalhesVenda(
+          idVenda
+        );
+
+
+    const venda =
+      detalhes.venda || {};
+
+
+    const itens =
+      Array.isArray(
+        detalhes.itens
+      )
+        ? detalhes.itens
+        : [];
+
+
+    definirTextoClienteERP(
+      'resumoDetalhesCompraCliente',
+      [
+        venda.DATA ||
+        venda.DATA_HORA ||
+        '',
+
+        venda.FORMA_PAGAMENTO ||
+        venda.PAGAMENTO ||
+        '',
+
+        formatarMoedaClienteERP(
+          Number(
+            venda.TOTAL || 0
+          )
+        )
+      ]
+      .filter(Boolean)
+      .join(' • ')
+    );
+
+
+    if (!tbody) {
+      return;
+    }
+
+
+    if (!itens.length) {
+
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="4">
+            Nenhum item encontrado.
+          </td>
+        </tr>
+      `;
+
+      return;
+
+    }
+
+
+    tbody.innerHTML =
+      itens.map(
+        function(item) {
+
+          const quantidade =
+            Number(
+              item.QUANTIDADE ||
+              item.QTD ||
+              0
+            );
+
+
+          const unitario =
+            Number(
+              item.PRECO_UNITARIO ||
+              item.PRECO ||
+              item.VALOR_UNITARIO ||
+              0
+            );
+
+
+          const totalItem =
+            Number(
+              item.TOTAL_ITEM ||
+              item.TOTAL ||
+              (
+                quantidade *
+                unitario
+              )
+            );
+
+
+          return `
+            <tr>
+
+              <td>
+                ${escaparHtmlClienteERP(
+                  item.PRODUTO ||
+                  item.DESCRICAO ||
+                  item.NOME ||
+                  '-'
+                )}
+              </td>
+
+              <td>
+                ${escaparHtmlClienteERP(
+                  quantidade
+                )}
+              </td>
+
+              <td>
+                ${escaparHtmlClienteERP(
+                  formatarMoedaClienteERP(
+                    unitario
+                  )
+                )}
+              </td>
+
+              <td>
+                ${escaparHtmlClienteERP(
+                  formatarMoedaClienteERP(
+                    totalItem
+                  )
+                )}
+              </td>
+
+            </tr>
+          `;
+
+        }
+      )
+      .join('');
+
+  }
+
+  catch (erro) {
+
+    console.error(
+      'Detalhes da compra:',
+      erro
+    );
+
+
+    definirTextoClienteERP(
+      'resumoDetalhesCompraCliente',
+      'Erro: ' +
+      erro.message
+    );
+
+
+    if (tbody) {
+
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="4">
+            Não foi possível carregar os itens.
+          </td>
+        </tr>
+      `;
+
+    }
+
+  }
+
+}
+
+
+function fecharDetalhesCompraClienteERP() {
+
+  const area =
+    document.getElementById(
+      'detalhesCompraCliente'
+    );
+
+
+  if (area) {
+
+    area.style.display =
+      'none';
+
+  }
+
+}
+
+
+function fecharHistoricoClienteERP() {
+
+  const modal =
+    document.getElementById(
+      'modalHistoricoCliente'
+    );
+
+
+  if (modal) {
+
+    modal.classList.remove(
+      'aberto'
+    );
+
+  }
+
+
+  fecharDetalhesCompraClienteERP();
+
+}
+
+
+/* =====================================================
    CEP
 ===================================================== */
 
-async function consultarCepClienteERP() {
+async function buscarCepClienteERP() {
 
   const campoCep =
     document.getElementById(
       'clienteCep'
     );
 
-  const mensagem =
-    document.getElementById(
-      'mensagemCliente'
-    );
 
   const botao =
     document.getElementById(
@@ -696,26 +1646,40 @@ async function consultarCepClienteERP() {
     );
 
 
-  const cep =
-    somenteNumerosERP(
-      campoCep
-        ? campoCep.value
-        : ''
+  const mensagem =
+    document.getElementById(
+      'mensagemCliente'
     );
 
 
-  if (
-    cep.length !== 8
-  ) {
+  if (!campoCep) {
+    return;
+  }
+
+
+  const cep =
+    somenteNumerosClienteERP(
+      campoCep.value
+    );
+
+
+  if (cep.length !== 8) {
 
     if (mensagem) {
 
       mensagem.textContent =
-        'Informe um CEP válido com 8 dígitos.';
+        'Informe um CEP com 8 dígitos.';
 
     }
 
     return;
+
+  }
+
+
+  if (botao) {
+
+    botao.disabled = true;
 
   }
 
@@ -725,11 +1689,6 @@ async function consultarCepClienteERP() {
     mensagem.textContent =
       'Consultando CEP...';
 
-  }
-
-
-  if (botao) {
-    botao.disabled = true;
   }
 
 
@@ -744,7 +1703,7 @@ async function consultarCepClienteERP() {
 
     if (
       !resposta ||
-      !resposta.encontrado
+      resposta.encontrado === false
     ) {
 
       throw new Error(
@@ -759,58 +1718,43 @@ async function consultarCepClienteERP() {
 
     const endereco =
       resposta.endereco ||
-      {};
+      resposta;
 
 
-    preencherCampoClienteERP(
+    definirValorClienteERP(
       'clienteCep',
-      endereco.CEP ||
-      formatarCepVisualERP(cep)
+      endereco.CEP || cep
     );
 
-    preencherCampoClienteERP(
+
+    definirValorClienteERP(
       'clienteEndereco',
-      endereco.ENDERECO
+      endereco.ENDERECO || ''
     );
 
-    preencherCampoClienteERP(
+
+    definirValorClienteERP(
       'clienteBairro',
-      endereco.BAIRRO
+      endereco.BAIRRO || ''
     );
 
-    preencherCampoClienteERP(
+
+    definirValorClienteERP(
       'clienteCidade',
-      endereco.CIDADE
+      endereco.CIDADE || ''
     );
 
-    preencherCampoClienteERP(
+
+    definirValorClienteERP(
       'clienteUf',
-      endereco.UF
+      endereco.UF || ''
     );
-
-
-    const complemento =
-      document.getElementById(
-        'clienteComplemento'
-      );
-
-
-    if (
-      complemento &&
-      !complemento.value &&
-      endereco.COMPLEMENTO_CEP
-    ) {
-
-      complemento.value =
-        endereco.COMPLEMENTO_CEP;
-
-    }
 
 
     if (mensagem) {
 
       mensagem.textContent =
-        '✅ Endereço localizado automaticamente.';
+        'CEP encontrado.';
 
     }
 
@@ -822,7 +1766,9 @@ async function consultarCepClienteERP() {
 
 
     if (numero) {
+
       numero.focus();
+
     }
 
   }
@@ -830,7 +1776,7 @@ async function consultarCepClienteERP() {
   catch (erro) {
 
     console.error(
-      'CEP:',
+      'Erro CEP:',
       erro
     );
 
@@ -848,202 +1794,9 @@ async function consultarCepClienteERP() {
   finally {
 
     if (botao) {
+
       botao.disabled = false;
-    }
 
-  }
-
-}
-
-
-/* =====================================================
-   SALVAR
-===================================================== */
-
-async function salvarClienteERP() {
-
-  const mensagem =
-    document.getElementById(
-      'mensagemCliente'
-    );
-
-  const botao =
-    document.getElementById(
-      'btnSalvarCliente'
-    );
-
-
-  const dados = {
-
-    ID_CLIENTE:
-      valorCampoClienteERP(
-        'clienteId'
-      ),
-
-    NOME:
-      valorCampoClienteERP(
-        'clienteNome'
-      ),
-
-    TELEFONE:
-      valorCampoClienteERP(
-        'clienteTelefone'
-      ),
-
-    WHATSAPP:
-      valorCampoClienteERP(
-        'clienteWhatsapp'
-      ),
-
-    EMAIL:
-      valorCampoClienteERP(
-        'clienteEmail'
-      ),
-
-    DATA_NASCIMENTO:
-      formatarDataParaPlanilhaERP(
-        valorCampoClienteERP(
-          'clienteNascimento'
-        )
-      ),
-
-    CPF:
-      valorCampoClienteERP(
-        'clienteCpf'
-      ),
-
-    CEP:
-      valorCampoClienteERP(
-        'clienteCep'
-      ),
-
-    ENDERECO:
-      valorCampoClienteERP(
-        'clienteEndereco'
-      ),
-
-    NUMERO:
-      valorCampoClienteERP(
-        'clienteNumero'
-      ),
-
-    COMPLEMENTO:
-      valorCampoClienteERP(
-        'clienteComplemento'
-      ),
-
-    BAIRRO:
-      valorCampoClienteERP(
-        'clienteBairro'
-      ),
-
-    CIDADE:
-      valorCampoClienteERP(
-        'clienteCidade'
-      ),
-
-    UF:
-      valorCampoClienteERP(
-        'clienteUf'
-      ),
-
-    OBSERVACAO:
-      valorCampoClienteERP(
-        'clienteObservacao'
-      ),
-
-    ATIVO:
-      valorCampoClienteERP(
-        'clienteAtivo'
-      ) || 'SIM'
-
-  };
-
-
-  if (!dados.NOME) {
-
-    if (mensagem) {
-
-      mensagem.textContent =
-        'Informe o nome do cliente.';
-
-    }
-
-    return;
-
-  }
-
-
-  if (mensagem) {
-
-    mensagem.textContent =
-      'Salvando cliente...';
-
-  }
-
-
-  if (botao) {
-    botao.disabled = true;
-  }
-
-
-  try {
-
-    const resposta =
-      await VNNUS_API
-        .salvarCliente(
-          dados
-        );
-
-
-    if (mensagem) {
-
-      mensagem.textContent =
-        '✅ ' +
-        (
-          resposta.mensagem ||
-          'Cliente salvo com sucesso!'
-        );
-
-    }
-
-
-    await carregarClientesERP();
-
-
-    setTimeout(
-      function() {
-
-        fecharClienteERP();
-
-      },
-      900
-    );
-
-  }
-
-  catch (erro) {
-
-    console.error(
-      'Cliente:',
-      erro
-    );
-
-
-    if (mensagem) {
-
-      mensagem.textContent =
-        'Erro: ' +
-        erro.message;
-
-    }
-
-  }
-
-  finally {
-
-    if (botao) {
-      botao.disabled = false;
     }
 
   }
@@ -1064,15 +1817,17 @@ function abrirModalClienteERP() {
 
 
   if (modal) {
+
     modal.classList.add(
       'aberto'
     );
+
   }
 
 }
 
 
-function fecharClienteERP() {
+function fecharModalClienteERP() {
 
   const modal =
     document.getElementById(
@@ -1081,21 +1836,23 @@ function fecharClienteERP() {
 
 
   if (modal) {
+
     modal.classList.remove(
       'aberto'
     );
+
   }
 
 }
 
 
 /* =====================================================
-   FORMULÁRIO
+   LIMPAR FORMULÁRIO
 ===================================================== */
 
 function limparFormularioClienteERP() {
 
-  [
+  const campos = [
     'clienteId',
     'clienteNome',
     'clienteTelefone',
@@ -1111,11 +1868,13 @@ function limparFormularioClienteERP() {
     'clienteCidade',
     'clienteUf',
     'clienteObservacao'
-  ]
-  .forEach(
+  ];
+
+
+  campos.forEach(
     function(id) {
 
-      preencherCampoClienteERP(
+      definirValorClienteERP(
         id,
         ''
       );
@@ -1124,68 +1883,88 @@ function limparFormularioClienteERP() {
   );
 
 
-  preencherCampoClienteERP(
+  definirValorClienteERP(
     'clienteAtivo',
     'SIM'
   );
 
 
-  const mensagem =
-    document.getElementById(
-      'mensagemCliente'
-    );
-
-
-  if (mensagem) {
-    mensagem.textContent = '';
-  }
-
-}
-
-
-function preencherCampoClienteERP(
-  id,
-  valor
-) {
-
-  const campo =
-    document.getElementById(
-      id
-    );
-
-
-  if (campo) {
-    campo.value =
-      valor ?? '';
-  }
-
-}
-
-
-function valorCampoClienteERP(
-  id
-) {
-
-  const campo =
-    document.getElementById(
-      id
-    );
-
-
-  return campo
-    ? String(
-        campo.value || ''
-      ).trim()
-    : '';
+  definirTextoClienteERP(
+    'mensagemCliente',
+    ''
+  );
 
 }
 
 
 /* =====================================================
-   FORMATAÇÕES
+   UTILITÁRIOS
 ===================================================== */
 
-function somenteNumerosERP(
+function obterValorClienteERP(
+  id
+) {
+
+  const elemento =
+    document.getElementById(
+      id
+    );
+
+
+  return elemento
+    ? elemento.value
+    : '';
+
+}
+
+
+function definirValorClienteERP(
+  id,
+  valor
+) {
+
+  const elemento =
+    document.getElementById(
+      id
+    );
+
+
+  if (elemento) {
+
+    elemento.value =
+      valor == null
+        ? ''
+        : valor;
+
+  }
+
+}
+
+
+function definirTextoClienteERP(
+  id,
+  valor
+) {
+
+  const elemento =
+    document.getElementById(
+      id
+    );
+
+
+  if (elemento) {
+
+    elemento.textContent =
+      valor == null
+        ? ''
+        : valor;
+
+  }
+
+}
+
+
+function somenteNumerosClienteERP(
   valor
 ) {
 
@@ -1200,168 +1979,44 @@ function somenteNumerosERP(
 }
 
 
-function formatarCepVisualERP(
+function formatarMoedaClienteERP(
   valor
 ) {
 
-  const numeros =
-    somenteNumerosERP(
-      valor
-    )
-    .substring(
-      0,
-      8
-    );
+  return Number(
+    valor || 0
+  )
+  .toLocaleString(
+    'pt-BR',
+    {
+      style:
+        'currency',
 
-
-  if (
-    numeros.length <= 5
-  ) {
-    return numeros;
-  }
-
-
-  return (
-    numeros.substring(
-      0,
-      5
-    ) +
-    '-' +
-    numeros.substring(
-      5
-    )
+      currency:
+        'BRL'
+    }
   );
 
 }
 
 
-function formatarCpfVisualERP(
+function normalizarDataInputClienteERP(
   valor
 ) {
 
-  const n =
-    somenteNumerosERP(
-      valor
-    )
-    .substring(
-      0,
-      11
-    );
-
-
-  if (
-    n.length <= 3
-  ) {
-    return n;
-  }
-
-
-  if (
-    n.length <= 6
-  ) {
-
-    return (
-      n.substring(0, 3) +
-      '.' +
-      n.substring(3)
-    );
-
-  }
-
-
-  if (
-    n.length <= 9
-  ) {
-
-    return (
-      n.substring(0, 3) +
-      '.' +
-      n.substring(3, 6) +
-      '.' +
-      n.substring(6)
-    );
-
-  }
-
-
-  return (
-    n.substring(0, 3) +
-    '.' +
-    n.substring(3, 6) +
-    '.' +
-    n.substring(6, 9) +
-    '-' +
-    n.substring(9)
-  );
-
-}
-
-
-function formatarTelefoneVisualERP(
-  valor
-) {
-
-  const n =
-    somenteNumerosERP(
-      valor
-    );
-
-
-  if (
-    n.length === 11
-  ) {
-
-    return (
-      '(' +
-      n.substring(0, 2) +
-      ') ' +
-      n.substring(2, 7) +
-      '-' +
-      n.substring(7)
-    );
-
-  }
-
-
-  if (
-    n.length === 10
-  ) {
-
-    return (
-      '(' +
-      n.substring(0, 2) +
-      ') ' +
-      n.substring(2, 6) +
-      '-' +
-      n.substring(6)
-    );
-
-  }
-
-
-  return valor || '';
-
-}
-
-
-function converterDataParaInputERP(
-  valor
-) {
-
-  const texto =
-    String(
-      valor || ''
-    ).trim();
-
-
-  if (!texto) {
+  if (!valor) {
     return '';
   }
 
 
+  const texto =
+    String(valor)
+    .trim();
+
+
   if (
     /^\d{4}-\d{2}-\d{2}$/
-      .test(texto)
+    .test(texto)
   ) {
 
     return texto;
@@ -1369,20 +2024,20 @@ function converterDataParaInputERP(
   }
 
 
-  const partes =
-    texto.split('/');
+  const br =
+    texto.match(
+      /^(\d{2})\/(\d{2})\/(\d{4})$/
+    );
 
 
-  if (
-    partes.length === 3
-  ) {
+  if (br) {
 
     return (
-      partes[2] +
+      br[3] +
       '-' +
-      String(partes[1]).padStart(2, '0') +
+      br[2] +
       '-' +
-      String(partes[0]).padStart(2, '0')
+      br[1]
     );
 
   }
@@ -1393,61 +2048,35 @@ function converterDataParaInputERP(
 }
 
 
-function formatarDataParaPlanilhaERP(
-  valor
-) {
-
-  const texto =
-    String(
-      valor || ''
-    ).trim();
-
-
-  if (!texto) {
-    return '';
-  }
-
-
-  const partes =
-    texto.split('-');
-
-
-  if (
-    partes.length !== 3
-  ) {
-
-    return texto;
-
-  }
-
-
-  return (
-    partes[2] +
-    '/' +
-    partes[1] +
-    '/' +
-    partes[0]
-  );
-
-}
-
-
-/* =====================================================
-   ESCAPE
-===================================================== */
-
 function escaparHtmlClienteERP(
   valor
 ) {
 
   return String(
-    valor ?? ''
+    valor == null
+      ? ''
+      : valor
   )
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
+  .replace(
+    /&/g,
+    '&amp;'
+  )
+  .replace(
+    /</g,
+    '&lt;'
+  )
+  .replace(
+    />/g,
+    '&gt;'
+  )
+  .replace(
+    /"/g,
+    '&quot;'
+  )
+  .replace(
+    /'/g,
+    '&#039;'
+  );
 
 }
 
@@ -1457,9 +2086,25 @@ function escaparAtributoClienteERP(
 ) {
 
   return String(
-    valor ?? ''
+    valor == null
+      ? ''
+      : valor
   )
-    .replace(/\\/g, '\\\\')
-    .replace(/'/g, "\\'");
+  .replace(
+    /\\/g,
+    '\\\\'
+  )
+  .replace(
+    /'/g,
+    "\\'"
+  )
+  .replace(
+    /\r/g,
+    ''
+  )
+  .replace(
+    /\n/g,
+    ' '
+  );
 
 }
