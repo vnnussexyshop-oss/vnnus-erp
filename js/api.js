@@ -1030,7 +1030,6 @@ const VNNUS_API = {
       acao:
         'financeiro',
 
-
       tipo:
         filtros.tipo ||
         'MES'
@@ -1066,6 +1065,45 @@ const VNNUS_API = {
 
     return resposta;
 
+  },
+
+
+  /* =====================================================
+     CONFIGURAÇÕES 1.0
+  ===================================================== */
+
+  async configuracoes() {
+
+    return await this.jsonp({
+
+      acao:
+        'configuracoes'
+
+    });
+
+  },
+
+
+  /* =====================================================
+     SALVAR CONFIGURAÇÕES
+  ===================================================== */
+
+  async salvarConfiguracoes(
+    dadosConfiguracoes
+  ) {
+
+    return await this.jsonp({
+
+      acao:
+        'salvar_configuracoes',
+
+      dados:
+        JSON.stringify(
+          dadosConfiguracoes
+        )
+
+    });
+
   }
 
 };
@@ -1074,5 +1112,5 @@ const VNNUS_API = {
 /* =====================================================
    FIM
    VNNUS API FRONT-END
-   FINANCEIRO 2.0 + CLIENTES 3.6
+   FINANCEIRO 2.0 + CLIENTES 3.6 + CONFIGURAÇÕES 1.0
 ===================================================== */
