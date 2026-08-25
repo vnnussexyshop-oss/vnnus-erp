@@ -25,15 +25,213 @@ window.init_dashboard =
       }
 
 
-      const dados =
-        await VNNUS_API
-          .dashboard();
+      const resultados =
+  await Promise.all([
+
+    VNNUS_API.dashboard(),
+
+    VNNUS_API.resumoDespesas(
+      dataIsoDashboardHoje(),
+      dataIsoDashboardHoje()
+    )
+
+  ]);
+
+
+const dados =
+  resultados[0] || {};
+
+
+const despesas =
+  resultados[1] || {};
 
 
       preencherIndicadoresDashboard(
         dados || {}
       );
+preencherDespesasDashboard(
+  despesas
+);/* =====================================================
+   DESPESAS / RESULTADO LÍQUIDO
+===================================================== */
 
+function preencherDespesasDashboard(
+  despesas
+) {
+
+  despesas =
+    despesas || {};
+
+
+  const pagas =
+    Number(
+      despesas.pago ||
+      0
+    );
+
+
+  const pendentes =
+    Number(
+      despesas.pendente ||
+      0
+    );
+
+
+  const vencidas =
+    Number(
+      despesas.vencido ||
+      0
+    );
+
+
+  const lucroBrutoTexto =
+    document.getElementById(
+      'dashLucroHoje'
+    );
+
+
+  let lucroBruto =
+    0;
+
+
+  if (lucroBrutoTexto) {
+
+    lucroBruto =
+      numeroMoedaDashboard(
+        lucroBrutoTexto.textContent
+      );
+
+  }
+
+
+  const lucroLiquido =
+    lucroBruto -
+    pagas;
+
+
+  definirTextoDashboard(
+    'dashDespesasHoje',
+    moedaDashboard(
+      pagas
+    )
+  );
+
+
+  definirTextoDashboard(
+    'dashLucroLiquidoHoje',
+    moedaDashboard(
+      lucroLiquido
+    )
+  );
+
+
+  definirTextoDashboard(
+    'dashDespesasPendentes',
+    moedaDashboard(
+      pendentes
+    )
+  );
+
+
+  definirTextoDashboard(
+    'dashDespesasVencidas',
+    moedaDashboard(
+      vencidas
+    )
+  );
+
+}
+
+
+/* =====================================================
+   DATA DE HOJE EM ISO
+===================================================== */
+
+function dataIsoDashboardHoje() {
+
+  const agora =
+    new Date();
+
+
+  const ano =
+    agora.getFullYear();
+
+
+  const mes =
+    String(
+      agora.getMonth() + 1
+    )
+    .padStart(
+      2,
+      '0'
+    );
+
+
+  const dia =
+    String(
+      agora.getDate()
+    )
+    .padStart(
+      2,
+      '0'
+    );
+
+
+  return (
+    ano +
+    '-' +
+    mes +
+    '-' +
+    dia
+  );
+
+}
+
+
+/* =====================================================
+   CONVERTER TEXTO DE MOEDA
+===================================================== */
+
+function numeroMoedaDashboard(
+  valor
+) {
+
+  const texto =
+    String(
+      valor ||
+      ''
+    )
+    .replace(
+      /R\$/gi,
+      ''
+    )
+    .replace(
+      /\s/g,
+      ''
+    )
+    .replace(
+      /\./g,
+      ''
+    )
+    .replace(
+      ',',
+      '.'
+    );
+
+
+  const numero =
+    Number(
+      texto
+    );
+
+
+  return Number.isFinite(
+    numero
+  )
+    ? numero
+    : 0;
+
+}
 
       preencherProdutoMaisVendidoDashboard(
         dados &&
@@ -650,5 +848,5 @@ function escaparHtmlDashboard(
 
 /* =====================================================
    FIM
-   VNNUS DASHBOARD 2.0
+   VNNUS DASHBOARD 2.1
 ===================================================== */
