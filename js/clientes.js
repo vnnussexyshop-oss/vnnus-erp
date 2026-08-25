@@ -1,23 +1,23 @@
 /* =====================================================
-   VNNUS ERP 3.5
-   CLIENTES
+   VNNUS ERP 3.5.1
+   CLIENTES + HISTÓRICO DE COMPRAS
 ===================================================== */
 
 let clientesCarregadosERP = [];
-let eventosClientesERP = false;
 
 
 /* =====================================================
-   INICIALIZAÇÃO
+   INICIALIZAÇÃO CORRETA PARA O ROUTER
 ===================================================== */
 
-function initClientes() {
+window.init_clientes =
+  async function() {
 
-  configurarEventosClientesERP();
+    configurarEventosClientesERP();
 
-  carregarClientesERP();
+    await carregarClientesERP();
 
-}
+  };
 
 
 /* =====================================================
@@ -25,13 +25,6 @@ function initClientes() {
 ===================================================== */
 
 function configurarEventosClientesERP() {
-
-  if (eventosClientesERP) {
-    return;
-  }
-
-  eventosClientesERP = true;
-
 
   const btnNovo =
     document.getElementById(
@@ -78,6 +71,12 @@ function configurarEventosClientesERP() {
   const campoCep =
     document.getElementById(
       'clienteCep'
+    );
+
+
+  const campoCpf =
+    document.getElementById(
+      'clienteCpf'
     );
 
 
@@ -181,8 +180,18 @@ function configurarEventosClientesERP() {
 
   if (campoCep) {
 
-    campoCep.addEventListener(
-      'blur',
+    campoCep.oninput =
+      function() {
+
+        campoCep.value =
+          formatarCepVisualClienteERP(
+            campoCep.value
+          );
+
+      };
+
+
+    campoCep.onblur =
       function() {
 
         const cep =
@@ -190,14 +199,31 @@ function configurarEventosClientesERP() {
             campoCep.value
           );
 
-        if (cep.length === 8) {
+
+        if (
+          cep.length === 8
+        ) {
 
           buscarCepClienteERP();
 
         }
 
-      }
-    );
+      };
+
+  }
+
+
+  if (campoCpf) {
+
+    campoCpf.oninput =
+      function() {
+
+        campoCpf.value =
+          formatarCpfVisualClienteERP(
+            campoCpf.value
+          );
+
+      };
 
   }
 
@@ -222,17 +248,18 @@ async function carregarClientesERP() {
     );
 
 
-  if (tbody) {
-
-    tbody.innerHTML = `
-      <tr>
-        <td colspan="7">
-          Carregando clientes...
-        </td>
-      </tr>
-    `;
-
+  if (!tbody) {
+    return;
   }
+
+
+  tbody.innerHTML = `
+    <tr>
+      <td colspan="7">
+        Carregando clientes...
+      </td>
+    </tr>
+  `;
 
 
   if (status) {
@@ -246,11 +273,14 @@ async function carregarClientesERP() {
   try {
 
     const clientes =
-      await VNNUS_API.clientes();
+      await VNNUS_API
+        .clientes();
 
 
     clientesCarregadosERP =
-      Array.isArray(clientes)
+      Array.isArray(
+        clientes
+      )
         ? clientes
         : [];
 
@@ -284,17 +314,16 @@ async function carregarClientesERP() {
     clientesCarregadosERP = [];
 
 
-    if (tbody) {
-
-      tbody.innerHTML = `
-        <tr>
-          <td colspan="7">
-            Erro ao carregar clientes.
-          </td>
-        </tr>
-      `;
-
-    }
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="7">
+          Erro ao carregar clientes:
+          ${escaparHtmlClienteERP(
+            erro.message
+          )}
+        </td>
+      </tr>
+    `;
 
 
     if (status) {
@@ -384,13 +413,17 @@ function renderizarClientesERP(
 
             <td>
               ${escaparHtmlClienteERP(
-                cliente.WHATSAPP
+                formatarTelefoneVisualClienteERP(
+                  cliente.WHATSAPP
+                )
               )}
             </td>
 
             <td>
               ${escaparHtmlClienteERP(
-                cliente.TELEFONE
+                formatarTelefoneVisualClienteERP(
+                  cliente.TELEFONE
+                )
               )}
             </td>
 
@@ -401,6 +434,7 @@ function renderizarClientesERP(
             </td>
 
             <td>
+
               <span
                 class="status-badge ${
                   ativo === 'SIM'
@@ -410,24 +444,29 @@ function renderizarClientesERP(
 
                 ${
                   ativo === 'SIM'
-                    ? 'Ativo'
-                    : 'Inativo'
+                    ? 'ATIVO'
+                    : 'INATIVO'
                 }
 
               </span>
+
             </td>
 
             <td>
 
               <button
                 class="btn-secondary"
-                onclick="abrirHistoricoClienteERP('${escaparAtributoClienteERP(cliente.ID_CLIENTE)}')">
+                onclick="abrirHistoricoClienteERP('${escaparAtributoClienteERP(
+                  cliente.ID_CLIENTE
+                )}')">
                 Compras
               </button>
 
               <button
                 class="btn-secondary"
-                onclick="editarClienteERP('${escaparAtributoClienteERP(cliente.ID_CLIENTE)}')">
+                onclick="editarClienteERP('${escaparAtributoClienteERP(
+                  cliente.ID_CLIENTE
+                )}')">
                 Editar
               </button>
 
@@ -444,7 +483,7 @@ function renderizarClientesERP(
 
 
 /* =====================================================
-   RESUMO
+   RESUMO DOS CLIENTES
 ===================================================== */
 
 function atualizarResumoClientesERP() {
@@ -620,11 +659,36 @@ async function editarClienteERP(
 
   try {
 
-    const cliente =
+    const resposta =
       await VNNUS_API
         .clientePorId(
           idCliente
         );
+
+
+    /*
+      Compatível com os dois formatos:
+      1) resposta.cliente
+      2) cliente direto
+    */
+
+    const cliente =
+      resposta &&
+      resposta.cliente
+        ? resposta.cliente
+        : resposta;
+
+
+    if (
+      !cliente ||
+      !cliente.ID_CLIENTE
+    ) {
+
+      throw new Error(
+        'Cliente não encontrado.'
+      );
+
+    }
 
 
     preencherFormularioClienteERP(
@@ -680,13 +744,17 @@ function preencherFormularioClienteERP(
 
   definirValorClienteERP(
     'clienteTelefone',
-    cliente.TELEFONE
+    formatarTelefoneVisualClienteERP(
+      cliente.TELEFONE
+    )
   );
 
 
   definirValorClienteERP(
     'clienteWhatsapp',
-    cliente.WHATSAPP
+    formatarTelefoneVisualClienteERP(
+      cliente.WHATSAPP
+    )
   );
 
 
@@ -706,13 +774,17 @@ function preencherFormularioClienteERP(
 
   definirValorClienteERP(
     'clienteCpf',
-    cliente.CPF
+    formatarCpfVisualClienteERP(
+      cliente.CPF
+    )
   );
 
 
   definirValorClienteERP(
     'clienteCep',
-    cliente.CEP
+    formatarCepVisualClienteERP(
+      cliente.CEP
+    )
   );
 
 
@@ -812,8 +884,10 @@ async function salvarClienteERP() {
       ).trim(),
 
     DATA_NASCIMENTO:
-      obterValorClienteERP(
-        'clienteNascimento'
+      formatarDataPlanilhaClienteERP(
+        obterValorClienteERP(
+          'clienteNascimento'
+        )
       ),
 
     CPF:
@@ -1005,6 +1079,12 @@ async function abrirHistoricoClienteERP(
     );
 
 
+  const tbody =
+    document.getElementById(
+      'listaHistoricoCliente'
+    );
+
+
   definirTextoClienteERP(
     'tituloHistoricoCliente',
     'Compras • ' +
@@ -1026,12 +1106,6 @@ async function abrirHistoricoClienteERP(
     'statusHistoricoCliente',
     'Carregando histórico...'
   );
-
-
-  const tbody =
-    document.getElementById(
-      'listaHistoricoCliente'
-    );
 
 
   if (tbody) {
@@ -1132,7 +1206,7 @@ async function abrirHistoricoClienteERP(
 
 
 /* =====================================================
-   RESUMO HISTÓRICO
+   RESUMO DO HISTÓRICO
 ===================================================== */
 
 function zerarResumoHistoricoClienteERP() {
@@ -1170,7 +1244,7 @@ function renderizarResumoHistoricoClienteERP(
 
   const totalCompras =
     Number(
-      resumo.totalCompras ?? 0
+      resumo.totalCompras || 0
     );
 
 
@@ -1201,7 +1275,9 @@ function renderizarResumoHistoricoClienteERP(
 
   definirTextoClienteERP(
     'histTotalCompras',
-    String(totalCompras)
+    String(
+      totalCompras
+    )
   );
 
 
@@ -1232,7 +1308,7 @@ function renderizarResumoHistoricoClienteERP(
 
 
 /* =====================================================
-   LISTAR HISTÓRICO
+   LISTA DE VENDAS
 ===================================================== */
 
 function renderizarHistoricoClienteERP(
@@ -1302,6 +1378,11 @@ function renderizarHistoricoClienteERP(
           .toUpperCase();
 
 
+        const cancelada =
+          status ===
+          'CANCELADA';
+
+
         return `
           <tr>
 
@@ -1334,16 +1415,29 @@ function renderizarHistoricoClienteERP(
             </td>
 
             <td>
-              ${escaparHtmlClienteERP(
-                status || '-'
-              )}
+
+              <span
+                class="status-badge ${
+                  cancelada
+                    ? 'status-danger'
+                    : 'status-ok'
+                }">
+
+                ${escaparHtmlClienteERP(
+                  status || '-'
+                )}
+
+              </span>
+
             </td>
 
             <td>
 
               <button
                 class="btn-secondary"
-                onclick="abrirDetalhesCompraClienteERP('${escaparAtributoClienteERP(idVenda)}')">
+                onclick="abrirDetalhesCompraClienteERP('${escaparAtributoClienteERP(
+                  idVenda
+                )}')">
                 Ver itens
               </button>
 
@@ -1495,17 +1589,17 @@ async function abrirDetalhesCompraClienteERP(
 
           const unitario =
             Number(
+              item.VALOR_UNITARIO ||
               item.PRECO_UNITARIO ||
               item.PRECO ||
-              item.VALOR_UNITARIO ||
               0
             );
 
 
           const totalItem =
             Number(
-              item.TOTAL_ITEM ||
               item.TOTAL ||
+              item.TOTAL_ITEM ||
               (
                 quantidade *
                 unitario
@@ -1629,7 +1723,7 @@ function fecharHistoricoClienteERP() {
 
 
 /* =====================================================
-   CEP
+   BUSCAR CEP
 ===================================================== */
 
 async function buscarCepClienteERP() {
@@ -1663,7 +1757,9 @@ async function buscarCepClienteERP() {
     );
 
 
-  if (cep.length !== 8) {
+  if (
+    cep.length !== 8
+  ) {
 
     if (mensagem) {
 
@@ -1679,7 +1775,8 @@ async function buscarCepClienteERP() {
 
   if (botao) {
 
-    botao.disabled = true;
+    botao.disabled =
+      true;
 
   }
 
@@ -1703,7 +1800,8 @@ async function buscarCepClienteERP() {
 
     if (
       !resposta ||
-      resposta.encontrado === false
+      resposta.encontrado ===
+      false
     ) {
 
       throw new Error(
@@ -1723,7 +1821,10 @@ async function buscarCepClienteERP() {
 
     definirValorClienteERP(
       'clienteCep',
-      endereco.CEP || cep
+      endereco.CEP ||
+      formatarCepVisualClienteERP(
+        cep
+      )
     );
 
 
@@ -1751,10 +1852,28 @@ async function buscarCepClienteERP() {
     );
 
 
+    const complemento =
+      document.getElementById(
+        'clienteComplemento'
+      );
+
+
+    if (
+      complemento &&
+      !complemento.value &&
+      endereco.COMPLEMENTO_CEP
+    ) {
+
+      complemento.value =
+        endereco.COMPLEMENTO_CEP;
+
+    }
+
+
     if (mensagem) {
 
       mensagem.textContent =
-        'CEP encontrado.';
+        '✅ Endereço localizado automaticamente.';
 
     }
 
@@ -1795,7 +1914,8 @@ async function buscarCepClienteERP() {
 
     if (botao) {
 
-      botao.disabled = false;
+      botao.disabled =
+        false;
 
     }
 
@@ -1805,7 +1925,7 @@ async function buscarCepClienteERP() {
 
 
 /* =====================================================
-   MODAL
+   MODAL CLIENTE
 ===================================================== */
 
 function abrirModalClienteERP() {
@@ -1853,6 +1973,7 @@ function fecharModalClienteERP() {
 function limparFormularioClienteERP() {
 
   const campos = [
+
     'clienteId',
     'clienteNome',
     'clienteTelefone',
@@ -1868,6 +1989,7 @@ function limparFormularioClienteERP() {
     'clienteCidade',
     'clienteUf',
     'clienteObservacao'
+
   ];
 
 
@@ -1979,6 +2101,170 @@ function somenteNumerosClienteERP(
 }
 
 
+/* =====================================================
+   FORMATAR CEP
+===================================================== */
+
+function formatarCepVisualClienteERP(
+  valor
+) {
+
+  const numeros =
+    somenteNumerosClienteERP(
+      valor
+    )
+    .substring(
+      0,
+      8
+    );
+
+
+  if (
+    numeros.length <= 5
+  ) {
+
+    return numeros;
+
+  }
+
+
+  return (
+    numeros.substring(
+      0,
+      5
+    ) +
+    '-' +
+    numeros.substring(
+      5
+    )
+  );
+
+}
+
+
+/* =====================================================
+   FORMATAR CPF
+===================================================== */
+
+function formatarCpfVisualClienteERP(
+  valor
+) {
+
+  const n =
+    somenteNumerosClienteERP(
+      valor
+    )
+    .substring(
+      0,
+      11
+    );
+
+
+  if (
+    n.length <= 3
+  ) {
+
+    return n;
+
+  }
+
+
+  if (
+    n.length <= 6
+  ) {
+
+    return (
+      n.substring(0, 3) +
+      '.' +
+      n.substring(3)
+    );
+
+  }
+
+
+  if (
+    n.length <= 9
+  ) {
+
+    return (
+      n.substring(0, 3) +
+      '.' +
+      n.substring(3, 6) +
+      '.' +
+      n.substring(6)
+    );
+
+  }
+
+
+  return (
+    n.substring(0, 3) +
+    '.' +
+    n.substring(3, 6) +
+    '.' +
+    n.substring(6, 9) +
+    '-' +
+    n.substring(9)
+  );
+
+}
+
+
+/* =====================================================
+   FORMATAR TELEFONE
+===================================================== */
+
+function formatarTelefoneVisualClienteERP(
+  valor
+) {
+
+  const n =
+    somenteNumerosClienteERP(
+      valor
+    );
+
+
+  if (
+    n.length === 11
+  ) {
+
+    return (
+      '(' +
+      n.substring(0, 2) +
+      ') ' +
+      n.substring(2, 7) +
+      '-' +
+      n.substring(7)
+    );
+
+  }
+
+
+  if (
+    n.length === 10
+  ) {
+
+    return (
+      '(' +
+      n.substring(0, 2) +
+      ') ' +
+      n.substring(2, 6) +
+      '-' +
+      n.substring(6)
+    );
+
+  }
+
+
+  return valor || '';
+
+}
+
+
+/* =====================================================
+   MOEDA
+===================================================== */
+
 function formatarMoedaClienteERP(
   valor
 ) {
@@ -2000,6 +2286,10 @@ function formatarMoedaClienteERP(
 }
 
 
+/* =====================================================
+   DATA PARA INPUT
+===================================================== */
+
 function normalizarDataInputClienteERP(
   valor
 ) {
@@ -2010,13 +2300,17 @@ function normalizarDataInputClienteERP(
 
 
   const texto =
-    String(valor)
+    String(
+      valor
+    )
     .trim();
 
 
   if (
     /^\d{4}-\d{2}-\d{2}$/
-    .test(texto)
+    .test(
+      texto
+    )
   ) {
 
     return texto;
@@ -2047,6 +2341,58 @@ function normalizarDataInputClienteERP(
 
 }
 
+
+/* =====================================================
+   DATA PARA PLANILHA
+===================================================== */
+
+function formatarDataPlanilhaClienteERP(
+  valor
+) {
+
+  const texto =
+    String(
+      valor || ''
+    )
+    .trim();
+
+
+  if (!texto) {
+
+    return '';
+
+  }
+
+
+  const partes =
+    texto.split(
+      '-'
+    );
+
+
+  if (
+    partes.length !== 3
+  ) {
+
+    return texto;
+
+  }
+
+
+  return (
+    partes[2] +
+    '/' +
+    partes[1] +
+    '/' +
+    partes[0]
+  );
+
+}
+
+
+/* =====================================================
+   SEGURANÇA HTML
+===================================================== */
 
 function escaparHtmlClienteERP(
   valor
