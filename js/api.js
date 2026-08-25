@@ -524,7 +524,21 @@ const VNNUS_API = {
 
     });
 
-  },
+  },async historicoCliente(
+  idCliente
+) {
+
+  return await this.jsonp({
+
+    acao:
+      'historico_cliente',
+
+    idCliente:
+      idCliente
+
+  });
+
+},
 
   async consultarCep(
     cep
