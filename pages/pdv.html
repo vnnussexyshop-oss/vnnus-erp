@@ -1,28 +1,131 @@
 <section>
 
+  <!-- =================================================
+       CABEÇALHO
+  ================================================== -->
+
   <div class="page-header">
+
     <div>
+
       <h2>🛒 PDV</h2>
-      <p>Venda rápida por GTIN, scanner ou busca manual.</p>
+
+      <p>
+        Venda rápida por GTIN, scanner ou busca de produtos.
+      </p>
+
     </div>
+
 
     <button
       class="btn-secondary"
       id="pdvLimparVenda">
-      Limpar venda
+      🗑️ Limpar venda
     </button>
+
   </div>
 
 
+  <!-- =================================================
+       STATUS / CONFIGURAÇÃO
+  ================================================== -->
+
+  <div
+    class="card"
+    style="margin-bottom:18px;">
+
+    <div
+      style="
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:15px;
+        flex-wrap:wrap;
+      ">
+
+      <div>
+
+        <div
+          style="
+            color:var(--gold);
+            font-family:'Cinzel',serif;
+            font-weight:600;
+          ">
+          VNNUS • Frente de Caixa
+        </div>
+
+        <div
+          id="pdvStatus"
+          style="
+            color:var(--muted);
+            margin-top:5px;
+            font-size:13px;
+          ">
+          Preparando PDV...
+        </div>
+
+      </div>
+
+
+      <div
+        style="
+          display:flex;
+          gap:8px;
+          flex-wrap:wrap;
+        ">
+
+        <span
+          id="pdvConfigPagamentoBadge"
+          class="status-badge"
+          style="
+            border:1px solid rgba(212,168,77,.22);
+            color:var(--gold2);
+          ">
+          Pagamento: -
+        </span>
+
+
+        <span
+          id="pdvConfigEstoqueBadge"
+          class="status-badge"
+          style="
+            border:1px solid rgba(212,168,77,.22);
+            color:var(--gold2);
+          ">
+          Estoque: protegido
+        </span>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =================================================
+       LAYOUT PDV
+  ================================================== -->
+
   <div class="pdv-layout">
 
+
+    <!-- ===============================================
+         COLUNA ESQUERDA
+    ================================================ -->
+
     <div>
+
+
+      <!-- =============================================
+           ADICIONAR PRODUTO
+      ============================================== -->
 
       <div class="card">
 
         <h3 class="section-title">
-          Adicionar produto
+          ✨ Adicionar produto
         </h3>
+
 
         <div class="toolbar">
 
@@ -30,13 +133,16 @@
             class="input input-grow"
             type="text"
             id="pdvGTIN"
+            autocomplete="off"
             placeholder="Digite ou bipe o GTIN...">
+
 
           <button
             class="btn-secondary"
             id="pdvBuscar">
             🔎 Buscar
           </button>
+
 
           <button
             class="btn-primary"
@@ -46,22 +152,95 @@
 
         </div>
 
+
+        <!-- BUSCA MANUAL -->
+
         <div
-          id="pdvStatus"
-          style="color:var(--muted);">
-          Aguardando produto.
+          style="
+            margin-top:15px;
+            padding-top:15px;
+            border-top:1px solid rgba(212,168,77,.12);
+          ">
+
+          <label
+            style="
+              display:block;
+              color:#e1ca91;
+              font-size:12px;
+              font-weight:600;
+              margin-bottom:7px;
+            ">
+            Buscar produto pelo nome
+          </label>
+
+
+          <div class="toolbar">
+
+            <input
+              class="input input-grow"
+              type="text"
+              id="pdvBuscaProduto"
+              autocomplete="off"
+              placeholder="Digite parte do nome do produto...">
+
+
+            <button
+              class="btn-secondary"
+              id="pdvBuscarProdutoNome">
+              Pesquisar
+            </button>
+
+          </div>
+
+
+          <div
+            id="pdvResultadosBusca"
+            style="
+              display:none;
+              margin-top:12px;
+            ">
+          </div>
+
         </div>
 
       </div>
 
 
+      <!-- =============================================
+           CARRINHO
+      ============================================== -->
+
       <div
         class="card"
         style="margin-top:18px;">
 
-        <h3 class="section-title">
-          Carrinho
-        </h3>
+        <div
+          style="
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:12px;
+            margin-bottom:14px;
+          ">
+
+          <h3
+            class="section-title"
+            style="margin-bottom:0;">
+            🛍️ Carrinho
+          </h3>
+
+
+          <span
+            id="pdvQuantidadeItensCarrinho"
+            style="
+              color:var(--gold2);
+              font-size:12px;
+            ">
+            0 itens
+          </span>
+
+        </div>
+
 
         <div id="pdvCarrinho">
 
@@ -76,11 +255,32 @@
     </div>
 
 
+
+    <!-- ===============================================
+         COLUNA DIREITA
+    ================================================ -->
+
     <div>
+
 
       <div class="card total-box">
 
-        <div class="card-label">
+        <div
+          style="
+            color:var(--gold-soft);
+            font-size:11px;
+            text-transform:uppercase;
+            letter-spacing:.08em;
+          ">
+          Resumo da venda
+        </div>
+
+
+        <!-- SUBTOTAL -->
+
+        <div
+          class="card-label"
+          style="margin-top:18px;">
           SUBTOTAL
         </div>
 
@@ -91,17 +291,21 @@
         </div>
 
 
+        <!-- DESCONTO -->
+
         <div style="margin-top:20px;">
 
           <label
             style="
               display:block;
-              color:var(--muted);
+              color:#e1ca91;
               font-size:12px;
+              font-weight:600;
               margin-bottom:6px;
             ">
             Desconto geral (R$)
           </label>
+
 
           <input
             class="input"
@@ -112,13 +316,25 @@
             value="0"
             style="width:100%;">
 
+
+          <div
+            id="pdvLimiteDesconto"
+            style="
+              color:var(--muted);
+              font-size:11px;
+              margin-top:6px;
+            ">
+          </div>
+
         </div>
 
 
+        <!-- TOTAL -->
+
         <div
           style="
-            margin-top:20px;
-            border-top:1px solid var(--border);
+            margin-top:22px;
+            border-top:1px solid rgba(212,168,77,.16);
             padding-top:18px;
           ">
 
@@ -128,12 +344,18 @@
 
           <div
             class="card-value"
-            id="pdvTotal">
+            id="pdvTotal"
+            style="
+              color:var(--gold2);
+              font-size:30px;
+            ">
             R$ 0,00
           </div>
 
         </div>
 
+
+        <!-- FINALIZAR -->
 
         <button
           class="btn-primary"
@@ -156,22 +378,38 @@
   </div>
 
 
-  <!-- MODAL FINALIZAÇÃO -->
+
+  <!-- =================================================
+       MODAL FINALIZAÇÃO
+  ================================================== -->
 
   <div
     id="modalFinalizarVenda"
     class="modal">
 
-    <div class="modal-conteudo">
+    <div
+      class="modal-conteudo"
+      style="max-width:650px;">
+
 
       <div class="modal-topo">
 
         <div>
-          <h2>Finalizar Venda</h2>
-          <p style="color:#888;margin-top:5px;">
-            Revise os dados antes de confirmar.
+
+          <h2>
+            Finalizar Venda
+          </h2>
+
+          <p
+            style="
+              color:var(--muted);
+              margin-top:5px;
+            ">
+            Confirme cliente, pagamento e total.
           </p>
+
         </div>
+
 
         <button id="pdvFecharModal">
           ✕
@@ -180,23 +418,42 @@
       </div>
 
 
+      <!-- CLIENTE -->
+
       <div class="form-grid">
 
         <div class="campo campo-grande">
 
-          <label>Cliente</label>
+          <label>
+            Cliente
+          </label>
 
           <input
             id="pdvCliente"
             type="text"
-            placeholder="Consumidor Final">
+            autocomplete="off"
+            placeholder="Consumidor Final ou pesquise um cliente...">
+
+
+          <div
+            id="pdvClienteSelecionadoInfo"
+            style="
+              color:var(--muted);
+              font-size:11px;
+              margin-top:3px;
+            ">
+          </div>
 
         </div>
 
 
+        <!-- PAGAMENTO -->
+
         <div class="campo campo-grande">
 
-          <label>Forma de Pagamento *</label>
+          <label>
+            Forma de Pagamento *
+          </label>
 
           <select id="pdvPagamento">
 
@@ -225,9 +482,13 @@
         </div>
 
 
+        <!-- OBSERVAÇÃO -->
+
         <div class="campo campo-grande">
 
-          <label>Observação</label>
+          <label>
+            Observação
+          </label>
 
           <input
             id="pdvObservacao"
@@ -239,18 +500,75 @@
       </div>
 
 
+      <!-- RESUMO FINAL -->
+
       <div
         class="card"
-        style="margin-top:15px;">
-
-        <div class="card-label">
-          Total da venda
-        </div>
+        style="margin-top:18px;">
 
         <div
-          class="card-value"
-          id="pdvModalTotal">
-          R$ 0,00
+          style="
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:12px;
+          ">
+
+          <div>
+
+            <div class="card-label">
+              Subtotal
+            </div>
+
+            <div
+              id="pdvModalSubtotal"
+              style="
+                margin-top:5px;
+                font-weight:700;
+              ">
+              R$ 0,00
+            </div>
+
+          </div>
+
+
+          <div>
+
+            <div class="card-label">
+              Desconto
+            </div>
+
+            <div
+              id="pdvModalDesconto"
+              style="
+                margin-top:5px;
+                font-weight:700;
+              ">
+              R$ 0,00
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div
+          style="
+            margin-top:15px;
+            padding-top:15px;
+            border-top:1px solid rgba(212,168,77,.14);
+          ">
+
+          <div class="card-label">
+            Total da venda
+          </div>
+
+          <div
+            class="card-value"
+            id="pdvModalTotal"
+            style="color:var(--gold2);">
+            R$ 0,00
+          </div>
+
         </div>
 
       </div>
@@ -273,10 +591,11 @@
           Cancelar
         </button>
 
+
         <button
           class="btn-primary"
           id="pdvConfirmarVenda">
-          Confirmar Venda
+          ✅ Confirmar Venda
         </button>
 
       </div>
@@ -287,26 +606,44 @@
 
 
 
-  <!-- MODAL COMPROVANTE PDV 3.2 -->
+  <!-- =================================================
+       MODAL COMPROVANTE
+  ================================================== -->
 
   <div
     id="modalComprovanteVenda"
     class="modal">
 
-    <div class="modal-conteudo">
+    <div
+      class="modal-conteudo"
+      style="max-width:650px;">
+
 
       <div class="modal-topo">
+
         <div>
-          <h2>🧾 Comprovante de Venda</h2>
-          <p style="color:#888;margin-top:5px;">
+
+          <h2>
+            🧾 Comprovante
+          </h2>
+
+          <p
+            style="
+              color:var(--muted);
+              margin-top:5px;
+            ">
             Venda finalizada com sucesso.
           </p>
+
         </div>
+
 
         <button id="pdvFecharComprovante">
           ✕
         </button>
+
       </div>
+
 
       <div
         id="pdvComprovante"
@@ -318,6 +655,7 @@
         ">
       </div>
 
+
       <div
         id="pdvMensagemComprovante"
         style="
@@ -325,6 +663,7 @@
           color:var(--muted);
         ">
       </div>
+
 
       <div
         class="modal-rodape"
@@ -337,8 +676,9 @@
         <button
           class="btn-secondary"
           id="pdvCompartilharComprovante">
-          📤 Compartilhar comprovante
+          📤 Compartilhar
         </button>
+
 
         <button
           class="btn-primary"
