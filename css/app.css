@@ -1604,7 +1604,401 @@ textarea,
   }
 
 }
+/* =====================================================
+   VNNUS PDV 2.0
+   LUXURY UI
+===================================================== */
 
+
+/* RESULTADOS DA BUSCA */
+
+.pdv-busca-item{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:15px;
+
+  padding:14px;
+
+  margin-bottom:8px;
+
+  background:
+    linear-gradient(
+      145deg,
+      #151515,
+      #0c0c0c
+    );
+
+  border:
+    1px solid rgba(212,168,77,.18);
+
+  border-radius:12px;
+}
+
+
+.pdv-busca-item:last-child{
+  margin-bottom:0;
+}
+
+
+.pdv-busca-item strong{
+  color:#fff;
+  font-size:14px;
+}
+
+
+.pdv-busca-meta{
+  color:var(--muted);
+  font-size:11px;
+  margin-top:5px;
+}
+
+
+.pdv-busca-item button{
+  flex-shrink:0;
+}
+
+
+/* =====================================================
+   CARRINHO
+===================================================== */
+
+.pdv-cart-item{
+  display:grid;
+
+  grid-template-columns:
+    minmax(0,1fr)
+    auto;
+
+  gap:12px 18px;
+
+  align-items:center;
+
+  padding:16px 0;
+
+  border-bottom:
+    1px solid rgba(212,168,77,.13);
+}
+
+
+.pdv-cart-item:first-child{
+  padding-top:2px;
+}
+
+
+.pdv-cart-item:last-child{
+  border-bottom:none;
+  padding-bottom:2px;
+}
+
+
+.pdv-cart-main{
+  min-width:0;
+}
+
+
+.pdv-cart-title{
+  color:#fff;
+
+  font-size:14px;
+
+  font-weight:700;
+
+  line-height:1.35;
+}
+
+
+.pdv-cart-meta{
+  color:var(--muted);
+
+  font-size:11px;
+
+  margin-top:5px;
+
+  line-height:1.4;
+}
+
+
+.pdv-cart-total{
+  color:var(--gold2);
+
+  font-family:
+    'Cinzel',
+    serif;
+
+  font-weight:700;
+
+  text-align:right;
+
+  white-space:nowrap;
+}
+
+
+.pdv-cart-actions{
+  grid-column:
+    1 / -1;
+
+  display:flex;
+
+  align-items:center;
+
+  gap:7px;
+}
+
+
+.pdv-cart-actions button{
+  width:39px;
+
+  height:39px;
+
+  min-height:39px;
+
+  padding:0;
+
+  display:grid;
+
+  place-items:center;
+}
+
+
+.pdv-qtd-input{
+  width:68px !important;
+
+  min-height:39px !important;
+
+  height:39px;
+
+  padding:5px 7px !important;
+
+  text-align:center;
+
+  font-weight:700;
+}
+
+
+/* Remove setinhas exageradas em alguns navegadores */
+
+.pdv-qtd-input::-webkit-inner-spin-button,
+.pdv-qtd-input::-webkit-outer-spin-button{
+  opacity:.5;
+}
+
+
+/* =====================================================
+   RESUMO
+===================================================== */
+
+.total-box{
+  position:sticky;
+
+  top:112px;
+
+  background:
+    radial-gradient(
+      circle at right top,
+      rgba(130,0,18,.15),
+      transparent 45%
+    ),
+    linear-gradient(
+      145deg,
+      #171717,
+      #0d0d0d
+    );
+}
+
+
+/* =====================================================
+   MODAL DO PDV
+===================================================== */
+
+#modalFinalizarVenda .modal-conteudo,
+#modalComprovanteVenda .modal-conteudo{
+  border-color:
+    rgba(212,168,77,.30);
+
+  box-shadow:
+    0 25px 80px rgba(0,0,0,.65);
+}
+
+
+#pdvComprovante{
+  background:
+    linear-gradient(
+      145deg,
+      #151515,
+      #090909
+    );
+
+  border-color:
+    rgba(212,168,77,.25);
+}
+
+
+/* =====================================================
+   DESABILITADOS
+===================================================== */
+
+#pdvFinalizar:disabled,
+.pdv-busca-item button:disabled{
+  opacity:.42;
+
+  cursor:not-allowed;
+
+  filter:grayscale(.5);
+}
+
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media(max-width:760px){
+
+  .pdv-layout{
+    display:flex;
+
+    flex-direction:column;
+
+    gap:15px;
+  }
+
+
+  /* Resumo fica abaixo do carrinho */
+
+  .total-box{
+    position:static;
+
+    top:auto;
+  }
+
+
+  /* Busca */
+
+  .pdv-busca-item{
+    align-items:stretch;
+
+    flex-direction:column;
+
+    padding:13px;
+  }
+
+
+  .pdv-busca-item button{
+    width:100%;
+
+    min-height:40px;
+  }
+
+
+  /* Carrinho */
+
+  .pdv-cart-item{
+    grid-template-columns:
+      minmax(0,1fr)
+      auto;
+
+    gap:10px;
+  }
+
+
+  .pdv-cart-title{
+    font-size:13px;
+  }
+
+
+  .pdv-cart-total{
+    font-size:14px;
+  }
+
+
+  .pdv-cart-actions{
+    gap:6px;
+  }
+
+
+  .pdv-cart-actions button{
+    width:37px;
+
+    height:37px;
+
+    min-height:37px;
+  }
+
+
+  .pdv-qtd-input{
+    width:60px !important;
+
+    height:37px;
+
+    min-height:37px !important;
+  }
+
+
+  /* Total em destaque */
+
+  #pdvTotal{
+    font-size:27px !important;
+  }
+
+
+  /* Modal */
+
+  #modalFinalizarVenda .modal-conteudo,
+  #modalComprovanteVenda .modal-conteudo{
+    width:
+      calc(100% - 18px);
+
+    max-height:
+      calc(100vh - 18px);
+
+    overflow-y:auto;
+
+    margin:9px;
+  }
+
+
+  #modalFinalizarVenda .modal-rodape,
+  #modalComprovanteVenda .modal-rodape{
+    gap:8px;
+  }
+
+
+  #modalFinalizarVenda .modal-rodape button,
+  #modalComprovanteVenda .modal-rodape button{
+    flex:1;
+
+    min-width:120px;
+  }
+
+}
+
+
+/* =====================================================
+   CELULARES PEQUENOS
+===================================================== */
+
+@media(max-width:380px){
+
+  .pdv-cart-item{
+    grid-template-columns:1fr;
+  }
+
+
+  .pdv-cart-total{
+    text-align:left;
+  }
+
+
+  .pdv-cart-actions{
+    flex-wrap:wrap;
+  }
+
+}
+
+
+/* =====================================================
+   FIM — VNNUS PDV 2.0 LUXURY
+===================================================== */
 
 /* =====================================================
    FIM — VNNUS LUXURY 1.1
