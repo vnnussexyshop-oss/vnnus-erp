@@ -1088,7 +1088,7 @@ const VNNUS_API = {
      SALVAR CONFIGURAÇÕES
   ===================================================== */
 
-  async salvarConfiguracoes(
+    async salvarConfiguracoes(
     dadosConfiguracoes
   ) {
 
@@ -1103,6 +1103,188 @@ const VNNUS_API = {
         )
 
     });
+
+  },
+
+
+  /* =====================================================
+     DESPESAS 1.0
+  ===================================================== */
+
+  async despesas() {
+
+    const resposta =
+      await this.jsonp({
+
+        acao:
+          'despesas'
+
+      });
+
+
+    return (
+      resposta.despesas ||
+      []
+    );
+
+  },
+
+
+  /* =====================================================
+     DESPESA POR ID
+  ===================================================== */
+
+  async despesaPorId(
+    idDespesa
+  ) {
+
+    return await this.jsonp({
+
+      acao:
+        'despesa_id',
+
+      idDespesa:
+        idDespesa
+
+    });
+
+  },
+
+
+  /* =====================================================
+     SALVAR DESPESA
+  ===================================================== */
+
+  async salvarDespesa(
+    dadosDespesa
+  ) {
+
+    return await this.jsonp({
+
+      acao:
+        'salvar_despesa',
+
+      dados:
+        JSON.stringify(
+          dadosDespesa
+        )
+
+    });
+
+  },
+
+
+  /* =====================================================
+     PAGAR DESPESA
+  ===================================================== */
+
+  async pagarDespesa(
+    idDespesa,
+    formaPagamento
+  ) {
+
+    return await this.jsonp({
+
+      acao:
+        'pagar_despesa',
+
+      idDespesa:
+        idDespesa,
+
+      formaPagamento:
+        formaPagamento ||
+        ''
+
+    });
+
+  },
+
+
+  /* =====================================================
+     CANCELAR DESPESA
+  ===================================================== */
+
+  async cancelarDespesa(
+    idDespesa
+  ) {
+
+    return await this.jsonp({
+
+      acao:
+        'cancelar_despesa',
+
+      idDespesa:
+        idDespesa
+
+    });
+
+  },
+
+
+  /* =====================================================
+     REABRIR DESPESA
+  ===================================================== */
+
+  async reabrirDespesa(
+    idDespesa
+  ) {
+
+    return await this.jsonp({
+
+      acao:
+        'reabrir_despesa',
+
+      idDespesa:
+        idDespesa
+
+    });
+
+  },
+
+
+  /* =====================================================
+     RESUMO DE DESPESAS
+  ===================================================== */
+
+  async resumoDespesas(
+    dataInicio,
+    dataFim
+  ) {
+
+    const parametros = {
+
+      acao:
+        'resumo_despesas'
+
+    };
+
+
+    if (dataInicio) {
+
+      parametros.dataInicio =
+        dataInicio;
+
+    }
+
+
+    if (dataFim) {
+
+      parametros.dataFim =
+        dataFim;
+
+    }
+
+
+    const resposta =
+      await this.jsonp(
+        parametros
+      );
+
+
+    return (
+      resposta.resumo ||
+      {}
+    );
 
   }
 
