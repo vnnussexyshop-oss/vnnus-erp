@@ -1,5 +1,5 @@
 /* =====================================================
-   VNNUS ERP 3.5.1
+   VNNUS ERP 3.6
    CLIENTES + HISTÓRICO DE COMPRAS
 ===================================================== */
 
@@ -541,10 +541,7 @@ function atualizarResumoClientesERP() {
     whatsapp
   );
 
-}
-
-
-/* =====================================================
+}/* =====================================================
    PESQUISA
 ===================================================== */
 
@@ -665,12 +662,6 @@ async function editarClienteERP(
           idCliente
         );
 
-
-    /*
-      Compatível com os dois formatos:
-      1) resposta.cliente
-      2) cliente direto
-    */
 
     const cliente =
       resposta &&
@@ -1062,43 +1053,24 @@ async function abrirHistoricoClienteERP(
     );
 
 
-  if (!cliente) {
-
-    alert(
-      'Cliente não encontrado.'
-    );
-
-    return;
-
-  }
-
-
-  const modal =
-    document.getElementById(
-      'modalHistoricoCliente'
-    );
-
-
-  const tbody =
-    document.getElementById(
-      'listaHistoricoCliente'
-    );
-
-
   definirTextoClienteERP(
     'tituloHistoricoCliente',
-    'Compras • ' +
-    (
-      cliente.NOME ||
-      cliente.ID_CLIENTE
-    )
+    cliente && cliente.NOME
+      ? cliente.NOME
+      : 'Histórico do Cliente'
   );
 
 
   definirTextoClienteERP(
     'subtituloHistoricoCliente',
-    cliente.ID_CLIENTE +
-    ' • Histórico vinculado pelo ID do cliente'
+    cliente
+      ? (
+          'Compras vinculadas ao cliente ' +
+          cliente.ID_CLIENTE
+        )
+      : (
+          'Compras vinculadas ao cadastro.'
+        )
   );
 
 
@@ -1106,6 +1078,15 @@ async function abrirHistoricoClienteERP(
     'statusHistoricoCliente',
     'Carregando histórico...'
   );
+
+
+  zerarResumoHistoricoClienteERP();
+
+
+  const tbody =
+    document.getElementById(
+      'listaHistoricoCliente'
+    );
 
 
   if (tbody) {
@@ -1121,18 +1102,10 @@ async function abrirHistoricoClienteERP(
   }
 
 
-  zerarResumoHistoricoClienteERP();
-
   fecharDetalhesCompraClienteERP();
 
 
-  if (modal) {
-
-    modal.classList.add(
-      'aberto'
-    );
-
-  }
+  abrirModalHistoricoClienteERP();
 
 
   try {
@@ -1140,8 +1113,27 @@ async function abrirHistoricoClienteERP(
     const resposta =
       await VNNUS_API
         .historicoCliente(
-          cliente.ID_CLIENTE
+          idCliente
         );
+
+
+    if (
+      !resposta ||
+      resposta.sucesso === false
+    ) {
+
+      throw new Error(
+        resposta && resposta.erro
+          ? resposta.erro
+          : 'Não foi possível carregar o histórico.'
+      );
+
+    }
+
+
+    const resumo =
+      resposta.resumo ||
+      {};
 
 
     const vendas =
@@ -1153,7 +1145,7 @@ async function abrirHistoricoClienteERP(
 
 
     renderizarResumoHistoricoClienteERP(
-      resposta.resumo || {},
+      resumo,
       vendas
     );
 
@@ -1166,9 +1158,13 @@ async function abrirHistoricoClienteERP(
     definirTextoClienteERP(
       'statusHistoricoCliente',
       vendas.length
-        ? vendas.length +
-          ' venda(s) vinculada(s) ao cliente.'
-        : 'Este cliente ainda não possui compras vinculadas.'
+        ? (
+            vendas.length +
+            ' venda(s) vinculada(s) ao cliente.'
+          )
+        : (
+            'Este cliente ainda não possui compras.'
+          )
     );
 
   }
@@ -1176,14 +1172,14 @@ async function abrirHistoricoClienteERP(
   catch (erro) {
 
     console.error(
-      'Histórico do cliente:',
+      'Erro ao carregar histórico do cliente:',
       erro
     );
 
 
     definirTextoClienteERP(
       'statusHistoricoCliente',
-      'Erro ao carregar histórico: ' +
+      'Erro: ' +
       erro.message
     );
 
@@ -1193,7 +1189,7 @@ async function abrirHistoricoClienteERP(
       tbody.innerHTML = `
         <tr>
           <td colspan="6">
-            Erro ao carregar histórico.
+            Não foi possível carregar o histórico.
           </td>
         </tr>
       `;
@@ -1202,17 +1198,20 @@ async function abrirHistoricoClienteERP(
 
   }
 
-}
-
-
-/* =====================================================
-   RESUMO DO HISTÓRICO
+}/* =====================================================
+   ZERAR RESUMO DO HISTÓRICO
 ===================================================== */
 
 function zerarResumoHistoricoClienteERP() {
 
   definirTextoClienteERP(
     'histTotalCompras',
+    '0'
+  );
+
+
+  definirTextoClienteERP(
+    'histTotalItens',
     '0'
   );
 
@@ -1230,6 +1229,24 @@ function zerarResumoHistoricoClienteERP() {
 
 
   definirTextoClienteERP(
+    'histProdutoFavorito',
+    '-'
+  );
+
+
+  definirTextoClienteERP(
+    'histProdutoFavoritoQtd',
+    ''
+  );
+
+
+  definirTextoClienteERP(
+    'histPrimeiraCompra',
+    '-'
+  );
+
+
+  definirTextoClienteERP(
     'histUltimaCompra',
     '-'
   );
@@ -1237,14 +1254,35 @@ function zerarResumoHistoricoClienteERP() {
 }
 
 
+/* =====================================================
+   RENDERIZAR RESUMO DO HISTÓRICO
+   API 1.7
+===================================================== */
+
 function renderizarResumoHistoricoClienteERP(
   resumo,
   vendas
 ) {
 
+  resumo =
+    resumo || {};
+
+
+  vendas =
+    Array.isArray(vendas)
+      ? vendas
+      : [];
+
+
   const totalCompras =
     Number(
       resumo.totalCompras || 0
+    );
+
+
+  const totalItens =
+    Number(
+      resumo.totalItens || 0
     );
 
 
@@ -1260,23 +1298,89 @@ function renderizarResumoHistoricoClienteERP(
     );
 
 
-  const ultimaCompra =
-    resumo.ultimaCompra ||
-    (
-      vendas.length
-        ? (
-            vendas[0].DATA ||
-            vendas[0].DATA_HORA ||
-            '-'
-          )
-        : '-'
+  const produtoFavorito =
+    resumo.produtoFavorito ||
+    {};
+
+
+  const nomeProdutoFavorito =
+    produtoFavorito.produto ||
+    produtoFavorito.PRODUTO ||
+    '-';
+
+
+  const quantidadeProdutoFavorito =
+    Number(
+      produtoFavorito.quantidade ||
+      produtoFavorito.QUANTIDADE ||
+      0
     );
+
+
+  let primeiraCompra =
+    resumo.primeiraCompra ||
+    '-';
+
+
+  let ultimaCompra =
+    resumo.ultimaCompra ||
+    '-';
+
+
+  /*
+     FALLBACK:
+     caso a API não envie uma das datas,
+     usamos as vendas retornadas.
+  */
+
+  if (
+    primeiraCompra === '-' &&
+    vendas.length
+  ) {
+
+    const vendaMaisAntiga =
+      vendas[
+        vendas.length - 1
+      ];
+
+
+    primeiraCompra =
+      vendaMaisAntiga.DATA ||
+      vendaMaisAntiga.DATA_HORA ||
+      '-';
+
+  }
+
+
+  if (
+    ultimaCompra === '-' &&
+    vendas.length
+  ) {
+
+    const vendaMaisRecente =
+      vendas[0];
+
+
+    ultimaCompra =
+      vendaMaisRecente.DATA ||
+      vendaMaisRecente.DATA_HORA ||
+      '-';
+
+  }
 
 
   definirTextoClienteERP(
     'histTotalCompras',
     String(
       totalCompras
+    )
+  );
+
+
+  definirTextoClienteERP(
+    'histTotalItens',
+    String(
+      totalItens
     )
   );
 
@@ -1298,6 +1402,37 @@ function renderizarResumoHistoricoClienteERP(
 
 
   definirTextoClienteERP(
+    'histProdutoFavorito',
+    String(
+      nomeProdutoFavorito
+    )
+  );
+
+
+  definirTextoClienteERP(
+    'histProdutoFavoritoQtd',
+    quantidadeProdutoFavorito > 0
+      ? (
+          quantidadeProdutoFavorito +
+          (
+            quantidadeProdutoFavorito === 1
+              ? ' unidade comprada'
+              : ' unidades compradas'
+          )
+        )
+      : ''
+  );
+
+
+  definirTextoClienteERP(
+    'histPrimeiraCompra',
+    String(
+      primeiraCompra || '-'
+    )
+  );
+
+
+  definirTextoClienteERP(
     'histUltimaCompra',
     String(
       ultimaCompra || '-'
@@ -1308,7 +1443,7 @@ function renderizarResumoHistoricoClienteERP(
 
 
 /* =====================================================
-   LISTA DE VENDAS
+   RENDERIZAR HISTÓRICO DE VENDAS
 ===================================================== */
 
 function renderizarHistoricoClienteERP(
@@ -1326,12 +1461,15 @@ function renderizarHistoricoClienteERP(
   }
 
 
-  if (!vendas.length) {
+  if (
+    !Array.isArray(vendas) ||
+    !vendas.length
+  ) {
 
     tbody.innerHTML = `
       <tr>
         <td colspan="6">
-          Nenhuma compra vinculada a este cliente.
+          Nenhuma compra encontrada.
         </td>
       </tr>
     `;
@@ -1347,14 +1485,13 @@ function renderizarHistoricoClienteERP(
 
         const idVenda =
           venda.ID_VENDA ||
-          venda.ID ||
+          venda.idVenda ||
           '';
 
 
         const data =
           venda.DATA ||
           venda.DATA_HORA ||
-          venda.DATA_VENDA ||
           '-';
 
 
@@ -1366,21 +1503,29 @@ function renderizarHistoricoClienteERP(
 
         const total =
           Number(
-            venda.TOTAL || 0
+            venda.TOTAL ||
+            venda.VALOR_TOTAL ||
+            0
           );
 
 
         const status =
           String(
-            venda.STATUS || ''
+            venda.STATUS ||
+            ''
           )
           .trim()
           .toUpperCase();
 
 
-        const cancelada =
-          status ===
-          'CANCELADA';
+        const classeStatus =
+          status === 'FINALIZADA'
+            ? 'status-ok'
+            : (
+                status === 'CANCELADA'
+                  ? 'status-danger'
+                  : ''
+              );
 
 
         return `
@@ -1417,11 +1562,7 @@ function renderizarHistoricoClienteERP(
             <td>
 
               <span
-                class="status-badge ${
-                  cancelada
-                    ? 'status-danger'
-                    : 'status-ok'
-                }">
+                class="status-badge ${classeStatus}">
 
                 ${escaparHtmlClienteERP(
                   status || '-'
@@ -1438,7 +1579,9 @@ function renderizarHistoricoClienteERP(
                 onclick="abrirDetalhesCompraClienteERP('${escaparAtributoClienteERP(
                   idVenda
                 )}')">
+
                 Ver itens
+
               </button>
 
             </td>
@@ -1454,17 +1597,12 @@ function renderizarHistoricoClienteERP(
 
 
 /* =====================================================
-   DETALHES DA COMPRA
+   ABRIR DETALHES DA COMPRA
 ===================================================== */
 
 async function abrirDetalhesCompraClienteERP(
   idVenda
 ) {
-
-  if (!idVenda) {
-    return;
-  }
-
 
   const area =
     document.getElementById(
@@ -1495,7 +1633,7 @@ async function abrirDetalhesCompraClienteERP(
 
   definirTextoClienteERP(
     'resumoDetalhesCompraCliente',
-    'Carregando detalhes...'
+    'Carregando itens da venda...'
   );
 
 
@@ -1514,7 +1652,7 @@ async function abrirDetalhesCompraClienteERP(
 
   try {
 
-    const detalhes =
+    const resposta =
       await VNNUS_API
         .detalhesVenda(
           idVenda
@@ -1522,138 +1660,98 @@ async function abrirDetalhesCompraClienteERP(
 
 
     const venda =
-      detalhes.venda || {};
+      resposta.venda ||
+      {};
 
 
     const itens =
       Array.isArray(
-        detalhes.itens
+        resposta.itens
       )
-        ? detalhes.itens
+        ? resposta.itens
         : [];
+
+
+    renderizarItensCompraClienteERP(
+      itens
+    );
+
+
+    const partesResumo = [];
+
+
+    if (
+      venda.DATA ||
+      venda.DATA_HORA
+    ) {
+
+      partesResumo.push(
+        venda.DATA ||
+        venda.DATA_HORA
+      );
+
+    }
+
+
+    if (
+      venda.FORMA_PAGAMENTO ||
+      venda.PAGAMENTO
+    ) {
+
+      partesResumo.push(
+        venda.FORMA_PAGAMENTO ||
+        venda.PAGAMENTO
+      );
+
+    }
+
+
+    const total =
+      Number(
+        venda.TOTAL ||
+        venda.VALOR_TOTAL ||
+        0
+      );
+
+
+    if (total) {
+
+      partesResumo.push(
+        formatarMoedaClienteERP(
+          total
+        )
+      );
+
+    }
 
 
     definirTextoClienteERP(
       'resumoDetalhesCompraCliente',
-      [
-        venda.DATA ||
-        venda.DATA_HORA ||
-        '',
-
-        venda.FORMA_PAGAMENTO ||
-        venda.PAGAMENTO ||
-        '',
-
-        formatarMoedaClienteERP(
-          Number(
-            venda.TOTAL || 0
-          )
-        )
-      ]
-      .filter(Boolean)
-      .join(' • ')
+      partesResumo.join(
+        ' • '
+      ) ||
+      (
+        itens.length +
+        ' item(ns)'
+      )
     );
 
 
-    if (!tbody) {
-      return;
-    }
+    if (area) {
 
-
-    if (!itens.length) {
-
-      tbody.innerHTML = `
-        <tr>
-          <td colspan="4">
-            Nenhum item encontrado.
-          </td>
-        </tr>
-      `;
-
-      return;
+      area.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      });
 
     }
-
-
-    tbody.innerHTML =
-      itens.map(
-        function(item) {
-
-          const quantidade =
-            Number(
-              item.QUANTIDADE ||
-              item.QTD ||
-              0
-            );
-
-
-          const unitario =
-            Number(
-              item.VALOR_UNITARIO ||
-              item.PRECO_UNITARIO ||
-              item.PRECO ||
-              0
-            );
-
-
-          const totalItem =
-            Number(
-              item.TOTAL ||
-              item.TOTAL_ITEM ||
-              (
-                quantidade *
-                unitario
-              )
-            );
-
-
-          return `
-            <tr>
-
-              <td>
-                ${escaparHtmlClienteERP(
-                  item.PRODUTO ||
-                  item.DESCRICAO ||
-                  item.NOME ||
-                  '-'
-                )}
-              </td>
-
-              <td>
-                ${escaparHtmlClienteERP(
-                  quantidade
-                )}
-              </td>
-
-              <td>
-                ${escaparHtmlClienteERP(
-                  formatarMoedaClienteERP(
-                    unitario
-                  )
-                )}
-              </td>
-
-              <td>
-                ${escaparHtmlClienteERP(
-                  formatarMoedaClienteERP(
-                    totalItem
-                  )
-                )}
-              </td>
-
-            </tr>
-          `;
-
-        }
-      )
-      .join('');
 
   }
 
   catch (erro) {
 
     console.error(
-      'Detalhes da compra:',
+      'Erro ao carregar itens da venda:',
       erro
     );
 
@@ -1682,6 +1780,136 @@ async function abrirDetalhesCompraClienteERP(
 }
 
 
+/* =====================================================
+   RENDERIZAR ITENS DA COMPRA
+===================================================== */
+
+function renderizarItensCompraClienteERP(
+  itens
+) {
+
+  const tbody =
+    document.getElementById(
+      'listaItensCompraCliente'
+    );
+
+
+  if (!tbody) {
+    return;
+  }
+
+
+  if (
+    !Array.isArray(itens) ||
+    !itens.length
+  ) {
+
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="4">
+          Nenhum item encontrado nesta venda.
+        </td>
+      </tr>
+    `;
+
+    return;
+
+  }
+
+
+  tbody.innerHTML =
+    itens.map(
+      function(item) {
+
+        const produto =
+          item.PRODUTO ||
+          item.DESCRICAO ||
+          '-';
+
+
+        const quantidade =
+          Number(
+            item.QUANTIDADE ||
+            item.QTD ||
+            0
+          );
+
+
+        const unitario =
+          Number(
+            item.PRECO_UNITARIO ||
+            item.VALOR_UNITARIO ||
+            item.PRECO ||
+            0
+          );
+
+
+        let total =
+          Number(
+            item.TOTAL ||
+            item.SUBTOTAL ||
+            item.VALOR_TOTAL ||
+            0
+          );
+
+
+        if (
+          !total &&
+          quantidade &&
+          unitario
+        ) {
+
+          total =
+            quantidade *
+            unitario;
+
+        }
+
+
+        return `
+          <tr>
+
+            <td>
+              ${escaparHtmlClienteERP(
+                produto
+              )}
+            </td>
+
+            <td>
+              ${escaparHtmlClienteERP(
+                quantidade
+              )}
+            </td>
+
+            <td>
+              ${escaparHtmlClienteERP(
+                formatarMoedaClienteERP(
+                  unitario
+                )
+              )}
+            </td>
+
+            <td>
+              <strong>
+                ${escaparHtmlClienteERP(
+                  formatarMoedaClienteERP(
+                    total
+                  )
+                )}
+              </strong>
+            </td>
+
+          </tr>
+        `;
+
+      }
+    )
+    .join('');
+
+}/* =====================================================
+   FECHAR DETALHES DA COMPRA
+===================================================== */
+
 function fecharDetalhesCompraClienteERP() {
 
   const area =
@@ -1697,8 +1925,60 @@ function fecharDetalhesCompraClienteERP() {
 
   }
 
+
+  definirTextoClienteERP(
+    'tituloDetalhesCompraCliente',
+    'Itens da venda'
+  );
+
+
+  definirTextoClienteERP(
+    'resumoDetalhesCompraCliente',
+    ''
+  );
+
+
+  const tbody =
+    document.getElementById(
+      'listaItensCompraCliente'
+    );
+
+
+  if (tbody) {
+
+    tbody.innerHTML = '';
+
+  }
+
 }
 
+
+/* =====================================================
+   ABRIR MODAL HISTÓRICO
+===================================================== */
+
+function abrirModalHistoricoClienteERP() {
+
+  const modal =
+    document.getElementById(
+      'modalHistoricoCliente'
+    );
+
+
+  if (modal) {
+
+    modal.classList.add(
+      'aberto'
+    );
+
+  }
+
+}
+
+
+/* =====================================================
+   FECHAR HISTÓRICO
+===================================================== */
 
 function fecharHistoricoClienteERP() {
 
@@ -1925,7 +2205,7 @@ async function buscarCepClienteERP() {
 
 
 /* =====================================================
-   MODAL CLIENTE
+   ABRIR MODAL CLIENTE
 ===================================================== */
 
 function abrirModalClienteERP() {
@@ -1946,6 +2226,10 @@ function abrirModalClienteERP() {
 
 }
 
+
+/* =====================================================
+   FECHAR MODAL CLIENTE
+===================================================== */
 
 function fecharModalClienteERP() {
 
@@ -2020,7 +2304,7 @@ function limparFormularioClienteERP() {
 
 
 /* =====================================================
-   UTILITÁRIOS
+   OBTER VALOR DE CAMPO
 ===================================================== */
 
 function obterValorClienteERP(
@@ -2039,6 +2323,10 @@ function obterValorClienteERP(
 
 }
 
+
+/* =====================================================
+   DEFINIR VALOR DE CAMPO
+===================================================== */
 
 function definirValorClienteERP(
   id,
@@ -2063,6 +2351,10 @@ function definirValorClienteERP(
 }
 
 
+/* =====================================================
+   DEFINIR TEXTO
+===================================================== */
+
 function definirTextoClienteERP(
   id,
   valor
@@ -2085,6 +2377,10 @@ function definirTextoClienteERP(
 
 }
 
+
+/* =====================================================
+   SOMENTE NÚMEROS
+===================================================== */
 
 function somenteNumerosClienteERP(
   valor
@@ -2174,9 +2470,14 @@ function formatarCpfVisualClienteERP(
   ) {
 
     return (
-      n.substring(0, 3) +
+      n.substring(
+        0,
+        3
+      ) +
       '.' +
-      n.substring(3)
+      n.substring(
+        3
+      )
     );
 
   }
@@ -2187,99 +2488,175 @@ function formatarCpfVisualClienteERP(
   ) {
 
     return (
-      n.substring(0, 3) +
+      n.substring(
+        0,
+        3
+      ) +
       '.' +
-      n.substring(3, 6) +
+      n.substring(
+        3,
+        6
+      ) +
       '.' +
-      n.substring(6)
+      n.substring(
+        6
+      )
     );
 
   }
 
 
   return (
-    n.substring(0, 3) +
+    n.substring(
+      0,
+      3
+    ) +
     '.' +
-    n.substring(3, 6) +
+    n.substring(
+      3,
+      6
+    ) +
     '.' +
-    n.substring(6, 9) +
+    n.substring(
+      6,
+      9
+    ) +
     '-' +
-    n.substring(9)
+    n.substring(
+      9
+    )
   );
 
-}
-
-
-/* =====================================================
-   FORMATAR TELEFONE
+}/* =====================================================
+   FORMATAR TELEFONE / WHATSAPP
 ===================================================== */
 
 function formatarTelefoneVisualClienteERP(
   valor
 ) {
 
-  const n =
+  const numeros =
     somenteNumerosClienteERP(
       valor
+    )
+    .substring(
+      0,
+      11
     );
 
 
+  if (!numeros) {
+
+    return '';
+
+  }
+
+
   if (
-    n.length === 11
+    numeros.length <= 2
   ) {
 
     return (
       '(' +
-      n.substring(0, 2) +
-      ') ' +
-      n.substring(2, 7) +
-      '-' +
-      n.substring(7)
+      numeros
     );
 
   }
 
 
   if (
-    n.length === 10
+    numeros.length <= 6
   ) {
 
     return (
       '(' +
-      n.substring(0, 2) +
+      numeros.substring(
+        0,
+        2
+      ) +
       ') ' +
-      n.substring(2, 6) +
-      '-' +
-      n.substring(6)
+      numeros.substring(
+        2
+      )
     );
 
   }
 
 
-  return valor || '';
+  if (
+    numeros.length <= 10
+  ) {
+
+    return (
+      '(' +
+      numeros.substring(
+        0,
+        2
+      ) +
+      ') ' +
+      numeros.substring(
+        2,
+        6
+      ) +
+      '-' +
+      numeros.substring(
+        6
+      )
+    );
+
+  }
+
+
+  return (
+    '(' +
+    numeros.substring(
+      0,
+      2
+    ) +
+    ') ' +
+    numeros.substring(
+      2,
+      7
+    ) +
+    '-' +
+    numeros.substring(
+      7
+    )
+  );
 
 }
 
 
 /* =====================================================
-   MOEDA
+   FORMATAR MOEDA
 ===================================================== */
 
 function formatarMoedaClienteERP(
   valor
 ) {
 
-  return Number(
-    valor || 0
-  )
-  .toLocaleString(
+  let numero =
+    Number(
+      valor || 0
+    );
+
+
+  if (
+    !Number.isFinite(
+      numero
+    )
+  ) {
+
+    numero = 0;
+
+  }
+
+
+  return numero.toLocaleString(
     'pt-BR',
     {
-      style:
-        'currency',
-
-      currency:
-        'BRL'
+      style: 'currency',
+      currency: 'BRL'
     }
   );
 
@@ -2287,7 +2664,8 @@ function formatarMoedaClienteERP(
 
 
 /* =====================================================
-   DATA PARA INPUT
+   NORMALIZAR DATA PARA INPUT
+   dd/MM/yyyy -> yyyy-MM-dd
 ===================================================== */
 
 function normalizarDataInputClienteERP(
@@ -2295,7 +2673,9 @@ function normalizarDataInputClienteERP(
 ) {
 
   if (!valor) {
+
     return '';
+
   }
 
 
@@ -2306,9 +2686,13 @@ function normalizarDataInputClienteERP(
     .trim();
 
 
+  /*
+     Se já estiver no padrão
+     yyyy-MM-dd
+  */
+
   if (
-    /^\d{4}-\d{2}-\d{2}$/
-    .test(
+    /^\d{4}-\d{2}-\d{2}$/.test(
       texto
     )
   ) {
@@ -2318,20 +2702,47 @@ function normalizarDataInputClienteERP(
   }
 
 
-  const br =
+  /*
+     dd/MM/yyyy
+  */
+
+  const brasileiro =
     texto.match(
       /^(\d{2})\/(\d{2})\/(\d{4})$/
     );
 
 
-  if (br) {
+  if (brasileiro) {
 
     return (
-      br[3] +
+      brasileiro[3] +
       '-' +
-      br[2] +
+      brasileiro[2] +
       '-' +
-      br[1]
+      brasileiro[1]
+    );
+
+  }
+
+
+  /*
+     Tenta interpretar ISO com horário
+  */
+
+  const iso =
+    texto.match(
+      /^(\d{4})-(\d{2})-(\d{2})/
+    );
+
+
+  if (iso) {
+
+    return (
+      iso[1] +
+      '-' +
+      iso[2] +
+      '-' +
+      iso[3]
     );
 
   }
@@ -2343,25 +2754,26 @@ function normalizarDataInputClienteERP(
 
 
 /* =====================================================
-   DATA PARA PLANILHA
+   FORMATAR DATA PARA PLANILHA
+   yyyy-MM-dd -> dd/MM/yyyy
 ===================================================== */
 
 function formatarDataPlanilhaClienteERP(
   valor
 ) {
 
-  const texto =
-    String(
-      valor || ''
-    )
-    .trim();
-
-
-  if (!texto) {
+  if (!valor) {
 
     return '';
 
   }
+
+
+  const texto =
+    String(
+      valor
+    )
+    .trim();
 
 
   const partes =
@@ -2391,7 +2803,7 @@ function formatarDataPlanilhaClienteERP(
 
 
 /* =====================================================
-   SEGURANÇA HTML
+   ESCAPAR HTML
 ===================================================== */
 
 function escaparHtmlClienteERP(
@@ -2427,6 +2839,10 @@ function escaparHtmlClienteERP(
 }
 
 
+/* =====================================================
+   ESCAPAR ATRIBUTO / JAVASCRIPT INLINE
+===================================================== */
+
 function escaparAtributoClienteERP(
   valor
 ) {
@@ -2445,12 +2861,39 @@ function escaparAtributoClienteERP(
     "\\'"
   )
   .replace(
+    /"/g,
+    '&quot;'
+  )
+  .replace(
     /\r/g,
     ''
   )
   .replace(
     /\n/g,
-    ' '
+    ''
   );
 
 }
+
+
+/* =====================================================
+   EXPOR FUNÇÕES UTILIZADAS PELOS BOTÕES DA TABELA
+===================================================== */
+
+window.editarClienteERP =
+  editarClienteERP;
+
+
+window.abrirHistoricoClienteERP =
+  abrirHistoricoClienteERP;
+
+
+window.abrirDetalhesCompraClienteERP =
+  abrirDetalhesCompraClienteERP;
+
+
+/* =====================================================
+   FIM
+   VNNUS ERP 3.6
+   CLIENTES + HISTÓRICO DE COMPRAS
+===================================================== */
