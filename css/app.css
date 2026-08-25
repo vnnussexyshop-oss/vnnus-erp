@@ -1228,3 +1228,384 @@ tbody tr:hover{
   }
 
 }
+/* =====================================================
+   VNNUS LUXURY 1.1
+   REFINAMENTO GLOBAL + MOBILE
+===================================================== */
+
+
+/* Títulos mais refinados */
+
+.page-header h2{
+  line-height:1.2;
+}
+
+.section-title{
+  line-height:1.3;
+}
+
+
+/* Labels mais legíveis */
+
+.campo label{
+  color:#e0c98f;
+}
+
+
+/* Botão principal VNNUS */
+
+.btn-primary{
+  background:
+    linear-gradient(
+      135deg,
+      #d00020 0%,
+      #a80014 48%,
+      #65000c 100%
+    );
+
+  border:
+    1px solid rgba(242,207,120,.42);
+
+  box-shadow:
+    0 7px 20px rgba(120,0,15,.22),
+    inset 0 1px 0 rgba(255,255,255,.08);
+}
+
+.btn-primary:active{
+  transform:scale(.985);
+}
+
+
+/* Campos mais sofisticados */
+
+input,
+select,
+textarea,
+.input,
+.select{
+  background:
+    linear-gradient(
+      180deg,
+      #121212,
+      #090909
+    );
+
+  border-color:
+    rgba(212,168,77,.28);
+
+  box-shadow:
+    inset 0 1px 3px rgba(0,0,0,.35);
+}
+
+
+/* Cards */
+
+.card{
+  border-color:
+    rgba(212,168,77,.20);
+
+  box-shadow:
+    0 10px 30px rgba(0,0,0,.30),
+    inset 0 1px 0 rgba(255,255,255,.015);
+}
+
+
+/* =====================================================
+   MOBILE VNNUS
+===================================================== */
+
+@media(max-width:760px){
+
+  /* Topo */
+
+  .topbar{
+    min-height:72px;
+
+    padding:
+      10px 10px;
+
+    gap:8px;
+  }
+
+
+  .topbar > div:nth-child(2){
+    min-width:0;
+
+    flex:1;
+  }
+
+
+  .topbar h1{
+    font-size:16px;
+
+    line-height:1.15;
+
+    letter-spacing:.025em;
+
+    white-space:nowrap;
+
+    overflow:hidden;
+
+    text-overflow:ellipsis;
+  }
+
+
+  .topbar p{
+    font-size:10px;
+
+    line-height:1.25;
+
+    margin-top:3px;
+
+    max-width:120px;
+  }
+
+
+  /* Botões do topo */
+
+  .mobile-menu-btn,
+  .icon-btn{
+    width:38px;
+
+    min-width:38px;
+
+    height:38px;
+
+    border-radius:10px;
+  }
+
+
+  .topbar-actions{
+    gap:7px;
+
+    flex-shrink:0;
+  }
+
+
+  /* Usuário */
+
+  .user-chip{
+    padding:4px;
+
+    flex-shrink:0;
+
+    border-color:
+      rgba(212,168,77,.38);
+  }
+
+
+  .user-avatar{
+    width:34px;
+
+    height:34px;
+
+    font-size:13px;
+  }
+
+
+  /* Conteúdo */
+
+  .content{
+    padding:
+      13px 10px 28px;
+  }
+
+
+  /* Cabeçalho das páginas */
+
+  .page-header{
+    gap:12px;
+
+    margin-bottom:18px;
+  }
+
+
+  .page-header h2{
+    font-size:19px;
+
+    line-height:1.2;
+
+    letter-spacing:.015em;
+  }
+
+
+  .page-header p{
+    font-size:13px;
+
+    line-height:1.35;
+
+    margin-top:5px;
+  }
+
+
+  /* Seções */
+
+  .section-title{
+    font-size:16px;
+
+    line-height:1.25;
+  }
+
+
+  /* Cards */
+
+  .cards{
+    gap:13px;
+  }
+
+
+  .card{
+    padding:16px;
+
+    border-radius:14px;
+  }
+
+
+  .card-icon{
+    font-size:22px;
+  }
+
+
+  .card-label{
+    margin-top:9px;
+
+    font-size:12px;
+  }
+
+
+  .card-value{
+    margin-top:5px;
+
+    font-size:22px;
+  }
+
+
+  /* Formulários */
+
+  .form-grid{
+    gap:13px;
+  }
+
+
+  .campo{
+    gap:6px;
+  }
+
+
+  .campo label{
+    font-size:11px;
+
+    color:#e1ca91;
+  }
+
+
+  input,
+  select,
+  textarea,
+  .input,
+  .select{
+    min-height:42px;
+
+    padding:
+      9px 11px;
+
+    font-size:13px;
+
+    border-radius:9px;
+  }
+
+
+  textarea{
+    min-height:85px;
+  }
+
+
+  /* Botões */
+
+  .btn-primary,
+  .btn-secondary{
+    min-height:42px;
+
+    padding:
+      10px 14px;
+
+    font-size:13px;
+
+    border-radius:9px;
+  }
+
+
+  /* Tabelas */
+
+  th,
+  td{
+    padding:
+      12px 13px;
+  }
+
+
+  /* Evita elementos escapando da tela */
+
+  .page-header,
+  .toolbar,
+  .card,
+  .grid-2,
+  .form-grid{
+    max-width:100%;
+  }
+
+}
+
+
+/* =====================================================
+   CELULARES MUITO ESTREITOS
+===================================================== */
+
+@media(max-width:380px){
+
+  .topbar{
+    padding-left:8px;
+
+    padding-right:8px;
+  }
+
+
+  .topbar h1{
+    font-size:15px;
+  }
+
+
+  .topbar p{
+    max-width:100px;
+  }
+
+
+  .mobile-menu-btn,
+  .icon-btn{
+    width:36px;
+
+    min-width:36px;
+
+    height:36px;
+  }
+
+
+  .user-avatar{
+    width:32px;
+
+    height:32px;
+  }
+
+
+  .content{
+    padding-left:9px;
+
+    padding-right:9px;
+  }
+
+}
+
+
+/* =====================================================
+   FIM — VNNUS LUXURY 1.1
+===================================================== */
