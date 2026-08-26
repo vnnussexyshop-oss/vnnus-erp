@@ -1,6 +1,7 @@
 /* =====================================================
    VNNUS ERP
-   ROUTER 2.2
+   ROUTER 2.3
+   ROTAS + CONTROLE DE ACESSO
 ===================================================== */
 
 const VNNUS_ROUTES = {
@@ -75,6 +76,17 @@ const VNNUS_ROUTES = {
     init: "init_despesas"
   },
 
+  colaboradores: {
+    file: "pages/colaboradores.html",
+    title: "Colaboradores",
+    subtitle: "Usuários, acessos e permissões",
+    init: "init_colaboradores",
+
+    perfisPermitidos: [
+      "ADMINISTRADOR"
+    ]
+  },
+
   configuracoes: {
     file: "pages/configuracoes.html",
     title: "Configurações",
@@ -86,15 +98,173 @@ const VNNUS_ROUTES = {
 
 
 /* =====================================================
+   VERIFICAR PERMISSÃO DA ROTA
+===================================================== */
+
+function usuarioPodeAcessarRotaVnnus(
+  rota
+) {
+
+  if (
+    !rota ||
+    !Array.isArray(
+      rota.perfisPermitidos
+    ) ||
+    rota.perfisPermitidos.length === 0
+  ) {
+
+    return true;
+
+  }
+
+
+  if (
+    !window.VNNUS_API
+  ) {
+
+    return false;
+
+  }
+
+
+  const colaborador =
+    window.VNNUS_API
+      .obterUsuarioSessao();
+
+
+  if (!colaborador) {
+
+    return false;
+
+  }
+
+
+  const perfil =
+    String(
+      colaborador.perfil ||
+      ""
+    )
+    .trim()
+    .toUpperCase();
+
+
+  return rota.perfisPermitidos
+    .includes(
+      perfil
+    );
+
+}
+
+
+/* =====================================================
    NAVEGAR
 ===================================================== */
 
-async function navigateTo(pageName) {
+async function navigateTo(
+  pageName
+) {
 
-  const rota =
-    VNNUS_ROUTES[pageName] ||
-    VNNUS_ROUTES.dashboard;
+  let rota =
+    VNNUS_ROUTES[
+      pageName
+    ];
 
+
+  /*
+    Rota inexistente
+  */
+
+  if (!rota) {
+
+    pageName =
+      "dashboard";
+
+    rota =
+      VNNUS_ROUTES.dashboard;
+
+  }
+
+
+  /*
+    Proteção por perfil.
+
+    Mesmo digitando #colaboradores
+    manualmente, usuário sem autorização
+    não consegue carregar a página.
+  */
+
+  if (
+    !usuarioPodeAcessarRotaVnnus(
+      rota
+    )
+  ) {
+
+    console.warn(
+      "Acesso negado à rota:",
+      pageName
+    );
+
+
+    pageName =
+      "dashboard";
+
+    rota =
+      VNNUS_ROUTES.dashboard;
+
+
+    const conteudo =
+      document.getElementById(
+        "appContent"
+      );
+
+
+    if (conteudo) {
+
+      conteudo.innerHTML = `
+        <div class="empty-state">
+
+          <strong>
+            Acesso não autorizado
+          </strong>
+
+          <p style="margin-top:8px">
+            Seu perfil não possui permissão
+            para acessar este módulo.
+          </p>
+
+        </div>
+      `;
+
+    }
+
+
+    history.replaceState(
+      null,
+      "",
+      "#dashboard"
+    );
+
+
+    setTimeout(
+      function() {
+
+        navigateTo(
+          "dashboard"
+        );
+
+      },
+      1200
+    );
+
+
+    return;
+
+  }
+
+
+  /* ===================================================
+     TÍTULO
+  =================================================== */
 
   const pageTitle =
     document.getElementById(
@@ -124,6 +294,10 @@ async function navigateTo(pageName) {
   }
 
 
+  /* ===================================================
+     MENU ATIVO
+  =================================================== */
+
   document
     .querySelectorAll(
       ".menu-item"
@@ -140,6 +314,10 @@ async function navigateTo(pageName) {
       }
     );
 
+
+  /* ===================================================
+     CONTEÚDO
+  =================================================== */
 
   const conteudo =
     document.getElementById(
@@ -196,29 +374,29 @@ async function navigateTo(pageName) {
         "script"
       )
     ]
-      .forEach(
-        function(script) {
+    .forEach(
+      function(script) {
 
-          const novoScript =
-            document.createElement(
-              "script"
-            );
-
-
-          novoScript.textContent =
-            script.textContent;
+        const novoScript =
+          document.createElement(
+            "script"
+          );
 
 
-          document.body
-            .appendChild(
-              novoScript
-            );
+        novoScript.textContent =
+          script.textContent;
 
 
-          novoScript.remove();
+        document.body
+          .appendChild(
+            novoScript
+          );
 
-        }
-      );
+
+        novoScript.remove();
+
+      }
+    );
 
 
     /* ===============================================
@@ -229,11 +407,13 @@ async function navigateTo(pageName) {
       rota.init ||
       (
         "init_" +
-        String(pageName)
-          .replace(
-            /-/g,
-            "_"
-          )
+        String(
+          pageName
+        )
+        .replace(
+          /-/g,
+          "_"
+        )
       );
 
 
@@ -260,12 +440,20 @@ async function navigateTo(pageName) {
     }
 
 
+    /* ===============================================
+       ATUALIZAR HASH
+    =============================================== */
+
     history.replaceState(
       null,
       "",
       "#" + pageName
     );
 
+
+    /* ===============================================
+       FECHAR MENU MOBILE
+    =============================================== */
 
     if (
       typeof closeMobileMenu ===
@@ -310,5 +498,5 @@ async function navigateTo(pageName) {
 
 /* =====================================================
    FIM
-   ROUTER 2.2
+   ROUTER 2.3
 ===================================================== */
