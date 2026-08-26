@@ -1,17 +1,19 @@
 /* =====================================================
    VNNUS ERP
-   CONTAS A RECEBER 1.0
+   CONTAS A RECEBER 1.1
    FRONT-END
 ===================================================== */
 
 window.VNNUS_CONTAS_RECEBER = {
+
   contas: [],
   filtradas: []
+
 };
 
 
 /* =====================================================
-   INICIALIZAÇÃO
+   INICIALIZAR
 ===================================================== */
 
 async function init_contas_receber() {
@@ -21,73 +23,72 @@ async function init_contas_receber() {
       'receberStatus'
     );
 
+
   if (status) {
+
     status.textContent =
       'Carregando contas...';
+
   }
 
 
   try {
 
-    const resposta =
-      await apiGet(
-        'contas_receber'
-      );
-
-
     if (
-      !resposta ||
-      resposta.sucesso !== true
+      !window.VNNUS_API ||
+      typeof window.VNNUS_API.contasReceber !==
+      'function'
     ) {
 
       throw new Error(
-        resposta &&
-        resposta.erro
-          ? resposta.erro
-          : 'Não foi possível carregar as contas.'
+        'API de Contas a Receber não disponível.'
       );
 
     }
 
 
     const contas =
-      Array.isArray(
-        resposta.contas
-      )
-        ? resposta.contas
+      await window
+        .VNNUS_API
+        .contasReceber();
+
+
+    const lista =
+      Array.isArray(contas)
+        ? contas
         : [];
 
 
     window
       .VNNUS_CONTAS_RECEBER
       .contas =
-        contas;
+        lista;
 
 
     window
       .VNNUS_CONTAS_RECEBER
       .filtradas =
-        contas.slice();
+        lista.slice();
 
 
     atualizarResumoContasReceber(
-      contas
+      lista
     );
 
 
     renderizarTabelaContasReceber(
-      contas
+      lista
     );
 
 
     if (status) {
 
       status.textContent =
-        contas.length
+        lista.length
           ? (
-              contas.length +
+              lista.length +
               (
-                contas.length === 1
+                lista.length === 1
                   ? ' parcela encontrada.'
                   : ' parcelas encontradas.'
               )
@@ -159,7 +160,7 @@ function atualizarResumoContasReceber(
   let totalAberto = 0;
   let pendente = 0;
   let vencido = 0;
-  let pago = 0;
+  let recebido = 0;
 
 
   contas.forEach(
@@ -167,22 +168,19 @@ function atualizarResumoContasReceber(
 
       const saldo =
         numeroContaReceber(
-          conta.SALDO ??
-          conta.saldo
+          conta.SALDO
         );
 
 
-      const recebido =
+      const valorRecebido =
         numeroContaReceber(
-          conta.VALOR_RECEBIDO ??
-          conta.valorRecebido
+          conta.VALOR_RECEBIDO
         );
 
 
       const status =
         String(
-          conta.STATUS ??
-          conta.status ??
+          conta.STATUS ||
           ''
         )
         .trim()
@@ -220,8 +218,8 @@ function atualizarResumoContasReceber(
       }
 
 
-      pago +=
-        recebido;
+      recebido +=
+        valorRecebido;
 
     }
   );
@@ -254,7 +252,7 @@ function atualizarResumoContasReceber(
   preencherTextoContaReceber(
     'receberPago',
     moedaContaReceber(
-      pago
+      recebido
     )
   );
 
@@ -276,7 +274,9 @@ function renderizarTabelaContasReceber(
 
 
   if (!tabela) {
+
     return;
+
   }
 
 
@@ -308,67 +308,58 @@ function renderizarTabelaContasReceber(
 
           const id =
             String(
-              conta.ID_CONTA ??
-              conta.idConta ??
+              conta.ID_CONTA ||
               ''
             );
 
 
           const cliente =
             String(
-              conta.CLIENTE ??
-              conta.cliente ??
+              conta.CLIENTE ||
               'Consumidor Final'
             );
 
 
           const parcela =
             numeroContaReceber(
-              conta.PARCELA ??
-              conta.parcela
+              conta.PARCELA
             );
 
 
           const totalParcelas =
             numeroContaReceber(
-              conta.TOTAL_PARCELAS ??
-              conta.totalParcelas
+              conta.TOTAL_PARCELAS
             );
 
 
           const vencimento =
             String(
-              conta.VENCIMENTO ??
-              conta.vencimento ??
+              conta.VENCIMENTO ||
               ''
             );
 
 
           const valor =
             numeroContaReceber(
-              conta.VALOR_PARCELA ??
-              conta.valorParcela
+              conta.VALOR_PARCELA
             );
 
 
-          const recebido =
+          const valorRecebido =
             numeroContaReceber(
-              conta.VALOR_RECEBIDO ??
-              conta.valorRecebido
+              conta.VALOR_RECEBIDO
             );
 
 
           const saldo =
             numeroContaReceber(
-              conta.SALDO ??
-              conta.saldo
+              conta.SALDO
             );
 
 
           const status =
             String(
-              conta.STATUS ??
-              conta.status ??
+              conta.STATUS ||
               'PENDENTE'
             )
             .trim()
@@ -406,7 +397,7 @@ function renderizarTabelaContasReceber(
               </td>
 
               <td>
-                ${moedaContaReceber(recebido)}
+                ${moedaContaReceber(valorRecebido)}
               </td>
 
               <td>
@@ -427,9 +418,7 @@ function renderizarTabelaContasReceber(
                       <button
                         class="btn-primary"
                         type="button"
-                        onclick='abrirModalContaReceber(
-                          ${JSON.stringify(id)}
-                        )'>
+                        onclick="abrirModalContaReceber('${escapeContaReceber(id)}')">
                         Receber
                       </button>
                     `
@@ -457,7 +446,7 @@ function renderizarTabelaContasReceber(
 
 
 /* =====================================================
-   FILTROS
+   FILTRAR
 ===================================================== */
 
 function filtrarContasReceber() {
@@ -468,7 +457,8 @@ function filtrarContasReceber() {
         .getElementById(
           'receberFiltroCliente'
         )
-        ?.value || ''
+        ?.value ||
+      ''
     )
     .trim()
     .toLowerCase();
@@ -480,7 +470,8 @@ function filtrarContasReceber() {
         .getElementById(
           'receberFiltroStatus'
         )
-        ?.value || ''
+        ?.value ||
+      ''
     )
     .trim()
     .toUpperCase();
@@ -492,7 +483,8 @@ function filtrarContasReceber() {
         .getElementById(
           'receberFiltroVenda'
         )
-        ?.value || ''
+        ?.value ||
+      ''
     )
     .trim()
     .toLowerCase();
@@ -501,7 +493,8 @@ function filtrarContasReceber() {
   const contas =
     window
       .VNNUS_CONTAS_RECEBER
-      .contas || [];
+      .contas ||
+    [];
 
 
   const filtradas =
@@ -510,8 +503,7 @@ function filtrarContasReceber() {
 
         const contaCliente =
           String(
-            conta.CLIENTE ??
-            conta.cliente ??
+            conta.CLIENTE ||
             ''
           )
           .toLowerCase();
@@ -519,8 +511,7 @@ function filtrarContasReceber() {
 
         const contaStatus =
           String(
-            conta.STATUS ??
-            conta.status ??
+            conta.STATUS ||
             ''
           )
           .trim()
@@ -529,8 +520,7 @@ function filtrarContasReceber() {
 
         const contaVenda =
           String(
-            conta.ID_VENDA ??
-            conta.idVenda ??
+            conta.ID_VENDA ||
             ''
           )
           .toLowerCase();
@@ -550,7 +540,8 @@ function filtrarContasReceber() {
 
         if (
           status &&
-          contaStatus !== status
+          contaStatus !==
+          status
         ) {
 
           return false;
@@ -619,14 +610,12 @@ function filtrarContasReceber() {
 
 function limparFiltrosContasReceber() {
 
-  const ids = [
+  [
     'receberFiltroCliente',
     'receberFiltroStatus',
     'receberFiltroVenda'
-  ];
-
-
-  ids.forEach(
+  ]
+  .forEach(
     function(id) {
 
       const campo =
@@ -636,7 +625,9 @@ function limparFiltrosContasReceber() {
 
 
       if (campo) {
+
         campo.value = '';
+
       }
 
     }
@@ -646,7 +637,8 @@ function limparFiltrosContasReceber() {
   const contas =
     window
       .VNNUS_CONTAS_RECEBER
-      .contas || [];
+      .contas ||
+    [];
 
 
   window
@@ -664,6 +656,25 @@ function limparFiltrosContasReceber() {
     contas
   );
 
+
+  const status =
+    document.getElementById(
+      'receberStatus'
+    );
+
+
+  if (status) {
+
+    status.textContent =
+      contas.length +
+      (
+        contas.length === 1
+          ? ' parcela encontrada.'
+          : ' parcelas encontradas.'
+      );
+
+  }
+
 }
 
 
@@ -678,19 +689,21 @@ function abrirModalContaReceber(
   const contas =
     window
       .VNNUS_CONTAS_RECEBER
-      .contas || [];
+      .contas ||
+    [];
 
 
   const conta =
     contas.find(
       function(item) {
 
-        return String(
-          item.ID_CONTA ??
-          item.idConta ??
-          ''
-        ) ===
-        String(idConta);
+        return (
+          String(
+            item.ID_CONTA ||
+            ''
+          ) ===
+          String(idConta)
+        );
 
       }
     );
@@ -709,8 +722,7 @@ function abrirModalContaReceber(
 
   const saldo =
     numeroContaReceber(
-      conta.SALDO ??
-      conta.saldo
+      conta.SALDO
     );
 
 
@@ -751,8 +763,10 @@ function abrirModalContaReceber(
 
 
   if (campoId) {
+
     campoId.value =
       String(idConta);
+
   }
 
 
@@ -762,8 +776,7 @@ function abrirModalContaReceber(
       String(idConta) +
       ' • ' +
       String(
-        conta.CLIENTE ??
-        conta.cliente ??
+        conta.CLIENTE ||
         'Consumidor Final'
       );
 
@@ -792,12 +805,16 @@ function abrirModalContaReceber(
 
 
   if (campoForma) {
+
     campoForma.value = '';
+
   }
 
 
   if (campoObs) {
+
     campoObs.value = '';
+
   }
 
 
@@ -851,7 +868,8 @@ async function salvarPagamentoContaReceber() {
         .getElementById(
           'receberModalIdConta'
         )
-        ?.value || ''
+        ?.value ||
+      ''
     )
     .trim();
 
@@ -872,7 +890,8 @@ async function salvarPagamentoContaReceber() {
         .getElementById(
           'receberModalForma'
         )
-        ?.value || ''
+        ?.value ||
+      ''
     )
     .trim();
 
@@ -883,7 +902,8 @@ async function salvarPagamentoContaReceber() {
         .getElementById(
           'receberModalObservacao'
         )
-        ?.value || ''
+        ?.value ||
+      ''
     )
     .trim();
 
@@ -905,7 +925,7 @@ async function salvarPagamentoContaReceber() {
   ) {
 
     alert(
-      'Informe um valor de pagamento válido.'
+      'Informe um valor válido.'
     );
 
     return;
@@ -924,6 +944,21 @@ async function salvarPagamentoContaReceber() {
   }
 
 
+  if (
+    !window.VNNUS_API ||
+    typeof window.VNNUS_API.baixarContaReceber !==
+    'function'
+  ) {
+
+    alert(
+      'API de baixa não disponível.'
+    );
+
+    return;
+
+  }
+
+
   const botao =
     document.getElementById(
       'receberBtnSalvar'
@@ -932,7 +967,8 @@ async function salvarPagamentoContaReceber() {
 
   if (botao) {
 
-    botao.disabled = true;
+    botao.disabled =
+      true;
 
     botao.textContent =
       'Registrando...';
@@ -943,37 +979,14 @@ async function salvarPagamentoContaReceber() {
   try {
 
     const resposta =
-      await apiGet(
-        'baixar_conta_receber',
-        {
-          idConta:
-            idConta,
-
-          valor:
-            valor,
-
-          formaPagamento:
-            forma,
-
-          observacao:
-            observacao
-        }
-      );
-
-
-    if (
-      !resposta ||
-      resposta.sucesso !== true
-    ) {
-
-      throw new Error(
-        resposta &&
-        resposta.erro
-          ? resposta.erro
-          : 'Não foi possível registrar o pagamento.'
-      );
-
-    }
+      await window
+        .VNNUS_API
+        .baixarContaReceber(
+          idConta,
+          valor,
+          forma,
+          observacao
+        );
 
 
     fecharModalContaReceber();
@@ -992,7 +1005,7 @@ async function salvarPagamentoContaReceber() {
   catch (erro) {
 
     console.error(
-      'Baixa de conta:',
+      'Baixa Conta a Receber:',
       erro
     );
 
@@ -1011,7 +1024,8 @@ async function salvarPagamentoContaReceber() {
 
     if (botao) {
 
-      botao.disabled = false;
+      botao.disabled =
+        false;
 
       botao.textContent =
         'Registrar pagamento';
@@ -1033,33 +1047,44 @@ function badgeStatusContaReceber(
 
   status =
     String(
-      status || ''
+      status ||
+      ''
     )
     .trim()
     .toUpperCase();
 
 
-  let simbolo = '⏳';
+  let simbolo =
+    '⏳';
 
 
   if (
     status === 'PAGO'
   ) {
-    simbolo = '✅';
+
+    simbolo =
+      '✅';
+
   }
 
 
   else if (
     status === 'VENCIDO'
   ) {
-    simbolo = '🚨';
+
+    simbolo =
+      '🚨';
+
   }
 
 
   else if (
     status === 'PARCIAL'
   ) {
-    simbolo = '◐';
+
+    simbolo =
+      '◐';
+
   }
 
 
@@ -1073,8 +1098,11 @@ function badgeStatusContaReceber(
         font-weight:700;
         font-size:12px;
       ">
+
       ${simbolo}
+
       ${escapeContaReceber(status)}
+
     </span>
   `;
 
@@ -1098,11 +1126,13 @@ function moedaContaReceber(
   return valor.toLocaleString(
     'pt-BR',
     {
+
       style:
         'currency',
 
       currency:
         'BRL'
+
     }
   );
 
@@ -1143,16 +1173,18 @@ function numeroContaReceber(
 
 
   let texto =
-    String(valor)
-      .trim()
-      .replace(
-        /R\$/gi,
-        ''
-      )
-      .replace(
-        /\s/g,
-        ''
-      );
+    String(
+      valor
+    )
+    .trim()
+    .replace(
+      /R\$/gi,
+      ''
+    )
+    .replace(
+      /\s/g,
+      ''
+    );
 
 
   if (
@@ -1174,7 +1206,9 @@ function numeroContaReceber(
 
 
   const numero =
-    Number(texto);
+    Number(
+      texto
+    );
 
 
   return Number.isFinite(
@@ -1220,7 +1254,8 @@ function escapeContaReceber(
 ) {
 
   return String(
-    valor ?? ''
+    valor ??
+    ''
   )
     .replace(
       /&/g,
@@ -1248,5 +1283,5 @@ function escapeContaReceber(
 
 /* =====================================================
    FIM
-   CONTAS A RECEBER 1.0
+   CONTAS A RECEBER 1.1
 ===================================================== */
