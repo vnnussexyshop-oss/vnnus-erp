@@ -1,6 +1,113 @@
 window.VNNUS_API = {
 
   /* =====================================================
+     AUTENTICAÇÃO FRONT-END 2.6
+  ===================================================== */
+
+  CHAVE_TOKEN: 'vnnus_auth_token',
+  CHAVE_EXPIRA: 'vnnus_auth_expira',
+  CHAVE_USUARIO: 'vnnus_auth_usuario',
+
+  obterToken() {
+    return String(
+      localStorage.getItem(this.CHAVE_TOKEN) || ''
+    ).trim();
+  },
+
+  salvarSessao(resposta = {}) {
+    const token = String(resposta.token || '').trim();
+
+    if (!token) {
+      throw new Error('Token de sessão não recebido.');
+    }
+
+    localStorage.setItem(this.CHAVE_TOKEN, token);
+    localStorage.setItem(
+      this.CHAVE_EXPIRA,
+      String(resposta.expiraEm || '')
+    );
+    localStorage.setItem(
+      this.CHAVE_USUARIO,
+      JSON.stringify(resposta.colaborador || {})
+    );
+
+    return resposta;
+  },
+
+  limparSessao() {
+    localStorage.removeItem(this.CHAVE_TOKEN);
+    localStorage.removeItem(this.CHAVE_EXPIRA);
+    localStorage.removeItem(this.CHAVE_USUARIO);
+  },
+
+  obterUsuarioSessao() {
+    try {
+      return JSON.parse(
+        localStorage.getItem(this.CHAVE_USUARIO) || 'null'
+      );
+    } catch (erro) {
+      return null;
+    }
+  },
+
+  async trocarCodigoAuth(codigo) {
+    const resposta = await this.jsonp({
+      acao: 'trocar_codigo_auth',
+      codigo: String(codigo || '').trim()
+    });
+
+    return this.salvarSessao(resposta);
+  },
+
+  async validarSessao() {
+    const token = this.obterToken();
+
+    if (!token) {
+      return {
+        sucesso: true,
+        autenticado: false
+      };
+    }
+
+    const resposta = await this.jsonp({
+      acao: 'validar_sessao',
+      token: token
+    });
+
+    if (!resposta.autenticado) {
+      this.limparSessao();
+    } else {
+      localStorage.setItem(
+        this.CHAVE_EXPIRA,
+        String(resposta.expiraEm || '')
+      );
+      localStorage.setItem(
+        this.CHAVE_USUARIO,
+        JSON.stringify(resposta.colaborador || {})
+      );
+    }
+
+    return resposta;
+  },
+
+  async logout() {
+    const token = this.obterToken();
+
+    try {
+      if (token) {
+        await this.jsonp({
+          acao: 'logout',
+          token: token
+        });
+      }
+    } finally {
+      this.limparSessao();
+    }
+
+    return { sucesso: true };
+  },
+
+  /* =====================================================
      JSONP
   ===================================================== */
 
@@ -50,6 +157,36 @@ window.VNNUS_API = {
           'api',
           '1'
         );
+
+
+        /*
+          Todas as ações protegidas recebem o token
+          automaticamente. As ações públicas de autenticação
+          continuam funcionando sem sessão.
+        */
+
+        const acaoAtual =
+          String(parametros.acao || '')
+            .trim()
+            .toLowerCase();
+
+        const acoesPublicas = [
+          'ping',
+          'trocar_codigo_auth',
+          'validar_sessao',
+          'logout'
+        ];
+
+        if (!acoesPublicas.includes(acaoAtual)) {
+          const tokenAtual = this.obterToken();
+
+          if (tokenAtual && !parametros.token) {
+            parametros = {
+              ...parametros,
+              token: tokenAtual
+            };
+          }
+        }
 
 
         Object.keys(
@@ -259,7 +396,7 @@ window.VNNUS_API = {
             script
           );
 
-      }
+      }.bind(this)
     );
 
   },
@@ -392,10 +529,7 @@ window.VNNUS_API = {
       []
     );
 
-  },
-
-
-  /* =====================================================
+  },  /* =====================================================
      PRODUTOS + ESTOQUE
   ===================================================== */
 
@@ -537,7 +671,10 @@ window.VNNUS_API = {
       null
     );
 
-  },  /* =====================================================
+  },
+
+
+  /* =====================================================
      DASHBOARD
   ===================================================== */
 
@@ -1395,6 +1532,65 @@ window.VNNUS_API = {
 
     });
 
+  },  /* =====================================================
+     CAPTURAR CÓDIGO TEMPORÁRIO DO LOGIN
+  ===================================================== */
+
+  capturarCodigoAuthDaUrl() {
+
+    const hash =
+      String(
+        window.location.hash ||
+        ''
+      )
+      .replace(
+        /^#/,
+        ''
+      )
+      .trim();
+
+
+    if (!hash) {
+
+      return '';
+
+    }
+
+
+    const parametros =
+      new URLSearchParams(
+        hash
+      );
+
+
+    return String(
+      parametros.get(
+        'auth'
+      ) ||
+      ''
+    )
+    .trim();
+
+  },
+
+
+  /* =====================================================
+     REMOVER CÓDIGO DA BARRA
+  ===================================================== */
+
+  removerCodigoAuthDaUrl() {
+
+    const url =
+      window.location.pathname +
+      window.location.search;
+
+
+    history.replaceState(
+      null,
+      '',
+      url
+    );
+
   }
 
 };
@@ -1402,7 +1598,8 @@ window.VNNUS_API = {
 
 /* =====================================================
    FIM
-   VNNUS API FRONT-END 2.5
+   VNNUS API FRONT-END 2.6
+   AUTENTICAÇÃO 1.1
    DASHBOARD 2.3
    FINANCEIRO 2.3
    CLIENTES 3.6
