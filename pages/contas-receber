@@ -1,0 +1,536 @@
+<section>
+
+  <!-- =================================================
+       CABEÇALHO
+  ================================================== -->
+
+  <div class="page-header">
+
+    <div>
+
+      <h2>
+        Contas a Receber
+      </h2>
+
+      <p>
+        Controle de parcelas, recebimentos e valores pendentes.
+      </p>
+
+    </div>
+
+    <button
+      class="btn-secondary"
+      type="button"
+      onclick="init_contas_receber()">
+      ↻ Atualizar
+    </button>
+
+  </div>
+
+
+  <div
+    id="receberStatus"
+    style="
+      color:var(--muted);
+      margin-bottom:15px;
+    ">
+    Carregando contas...
+  </div>
+
+
+  <!-- =================================================
+       INDICADORES
+  ================================================== -->
+
+  <div class="cards">
+
+    <div class="card card-accent">
+
+      <div class="card-icon">
+        💰
+      </div>
+
+      <div class="card-label">
+        Total a Receber
+      </div>
+
+      <div
+        class="card-value"
+        id="receberTotalAberto">
+        R$ 0,00
+      </div>
+
+    </div>
+
+
+    <div class="card">
+
+      <div class="card-icon">
+        ⏳
+      </div>
+
+      <div class="card-label">
+        Pendente
+      </div>
+
+      <div
+        class="card-value"
+        id="receberPendente">
+        R$ 0,00
+      </div>
+
+    </div>
+
+
+    <div class="card">
+
+      <div class="card-icon">
+        🚨
+      </div>
+
+      <div class="card-label">
+        Vencido
+      </div>
+
+      <div
+        class="card-value"
+        id="receberVencido">
+        R$ 0,00
+      </div>
+
+    </div>
+
+
+    <div class="card">
+
+      <div class="card-icon">
+        ✅
+      </div>
+
+      <div class="card-label">
+        Recebido
+      </div>
+
+      <div
+        class="card-value"
+        id="receberPago">
+        R$ 0,00
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =================================================
+       FILTROS
+  ================================================== -->
+
+  <div
+    class="card"
+    style="margin-top:18px;">
+
+    <h3
+      class="section-title">
+      🔎 Filtros
+    </h3>
+
+
+    <div
+      style="
+        display:grid;
+        grid-template-columns:
+          repeat(
+            auto-fit,
+            minmax(180px,1fr)
+          );
+        gap:12px;
+      ">
+
+      <div>
+
+        <label>
+          Cliente
+        </label>
+
+        <input
+          id="receberFiltroCliente"
+          type="text"
+          placeholder="Nome do cliente">
+
+      </div>
+
+
+      <div>
+
+        <label>
+          Status
+        </label>
+
+        <select
+          id="receberFiltroStatus">
+
+          <option value="">
+            Todos
+          </option>
+
+          <option value="PENDENTE">
+            Pendente
+          </option>
+
+          <option value="PARCIAL">
+            Parcial
+          </option>
+
+          <option value="VENCIDO">
+            Vencido
+          </option>
+
+          <option value="PAGO">
+            Pago
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <div>
+
+        <label>
+          Venda
+        </label>
+
+        <input
+          id="receberFiltroVenda"
+          type="text"
+          placeholder="Ex.: VEN0000001">
+
+      </div>
+
+
+      <div
+        style="
+          display:flex;
+          align-items:end;
+          gap:8px;
+        ">
+
+        <button
+          class="btn-primary"
+          type="button"
+          onclick="filtrarContasReceber()">
+          Aplicar
+        </button>
+
+        <button
+          class="btn-secondary"
+          type="button"
+          onclick="limparFiltrosContasReceber()">
+          Limpar
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =================================================
+       TABELA
+  ================================================== -->
+
+  <div
+    class="card"
+    style="margin-top:18px;">
+
+    <div
+      class="page-header"
+      style="margin-bottom:14px;">
+
+      <div>
+
+        <h3>
+          📋 Parcelas
+        </h3>
+
+        <p>
+          Acompanhe vencimentos e registre recebimentos.
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <div class="table-wrap">
+
+      <table>
+
+        <thead>
+
+          <tr>
+
+            <th>
+              Conta
+            </th>
+
+            <th>
+              Cliente
+            </th>
+
+            <th>
+              Parcela
+            </th>
+
+            <th>
+              Vencimento
+            </th>
+
+            <th>
+              Valor
+            </th>
+
+            <th>
+              Recebido
+            </th>
+
+            <th>
+              Saldo
+            </th>
+
+            <th>
+              Status
+            </th>
+
+            <th>
+              Ação
+            </th>
+
+          </tr>
+
+        </thead>
+
+
+        <tbody
+          id="receberTabela">
+
+          <tr>
+
+            <td
+              colspan="9">
+              Carregando...
+            </td>
+
+          </tr>
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
+
+  <!-- =================================================
+       MODAL PAGAMENTO
+  ================================================== -->
+
+  <div
+    id="receberModal"
+    style="
+      display:none;
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,.75);
+      z-index:9999;
+      align-items:center;
+      justify-content:center;
+      padding:20px;
+    ">
+
+    <div
+      class="card"
+      style="
+        width:100%;
+        max-width:480px;
+      ">
+
+      <div
+        style="
+          display:flex;
+          justify-content:space-between;
+          align-items:center;
+          gap:12px;
+          margin-bottom:15px;
+        ">
+
+        <h3
+          class="section-title"
+          style="margin:0;">
+          💵 Registrar pagamento
+        </h3>
+
+        <button
+          class="btn-secondary"
+          type="button"
+          onclick="fecharModalContaReceber()">
+          ✕
+        </button>
+
+      </div>
+
+
+      <input
+        id="receberModalIdConta"
+        type="hidden">
+
+
+      <div
+        style="
+          display:grid;
+          gap:12px;
+        ">
+
+        <div>
+
+          <label>
+            Conta
+          </label>
+
+          <div
+            id="receberModalContaTexto"
+            style="
+              color:#fff;
+              font-weight:700;
+              margin-top:5px;
+            ">
+            -
+          </div>
+
+        </div>
+
+
+        <div>
+
+          <label>
+            Saldo atual
+          </label>
+
+          <div
+            id="receberModalSaldo"
+            style="
+              color:var(--gold2);
+              font-size:22px;
+              font-weight:800;
+              margin-top:5px;
+            ">
+            R$ 0,00
+          </div>
+
+        </div>
+
+
+        <div>
+
+          <label>
+            Valor recebido
+          </label>
+
+          <input
+            id="receberModalValor"
+            type="number"
+            min="0"
+            step="0.01"
+            placeholder="0,00">
+
+        </div>
+
+
+        <div>
+
+          <label>
+            Forma de pagamento
+          </label>
+
+          <select
+            id="receberModalForma">
+
+            <option value="">
+              Selecione
+            </option>
+
+            <option value="PIX">
+              PIX
+            </option>
+
+            <option value="DINHEIRO">
+              Dinheiro
+            </option>
+
+            <option value="CRÉDITO">
+              Crédito
+            </option>
+
+            <option value="DÉBITO">
+              Débito
+            </option>
+
+            <option value="TRANSFERÊNCIA">
+              Transferência
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <div>
+
+          <label>
+            Observação
+          </label>
+
+          <textarea
+            id="receberModalObservacao"
+            rows="3"
+            placeholder="Opcional">
+          </textarea>
+
+        </div>
+
+
+        <div
+          style="
+            display:flex;
+            justify-content:flex-end;
+            gap:8px;
+            margin-top:5px;
+          ">
+
+          <button
+            class="btn-secondary"
+            type="button"
+            onclick="fecharModalContaReceber()">
+            Cancelar
+          </button>
+
+          <button
+            class="btn-primary"
+            type="button"
+            id="receberBtnSalvar"
+            onclick="salvarPagamentoContaReceber()">
+            Registrar pagamento
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
