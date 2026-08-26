@@ -1,7 +1,7 @@
 /* =====================================================
    VNNUS ERP
-   CONTAS A RECEBER 1.2
-   FRONT-END RESPONSIVO
+   CONTAS A RECEBER 1.3
+   FRONT-END RESPONSIVO + STATUS VISUAL
 ===================================================== */
 
 window.VNNUS_CONTAS_RECEBER = {
@@ -86,21 +86,9 @@ async function init_contas_receber() {
     );
 
 
-    if (status) {
-
-      status.textContent =
-        lista.length
-          ? (
-              lista.length +
-              (
-                lista.length === 1
-                  ? ' parcela encontrada.'
-                  : ' parcelas encontradas.'
-              )
-            )
-          : 'Nenhuma parcela encontrada.';
-
-    }
+    atualizarTextoQuantidadeContasReceber(
+      lista.length
+    );
 
   }
 
@@ -154,8 +142,17 @@ async function init_contas_receber() {
 
       mobile.innerHTML = `
         <div class="receber-mobile-card">
-          Não foi possível carregar
-          as contas a receber.
+
+          <div
+            style="
+              color:var(--muted);
+              text-align:center;
+              padding:12px;
+            ">
+            Não foi possível carregar
+            as contas a receber.
+          </div>
+
         </div>
       `;
 
@@ -566,7 +563,7 @@ function renderizarMobileContasReceber(
 
 
 /* =====================================================
-   NORMALIZAR DADOS VISUAIS
+   NORMALIZAR DADOS
 ===================================================== */
 
 function dadosVisuaisContaReceber(
@@ -700,9 +697,13 @@ function botaoReceberContaHtml(
   return `
     <span
       style="
-        color:var(--muted);
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        gap:6px;
+        color:#8ee7a5;
         font-size:12px;
-        font-weight:700;
+        font-weight:800;
       ">
       ✅ Quitado
     </span>
@@ -1337,7 +1338,7 @@ async function salvarPagamentoContaReceber() {
 
 
 /* =====================================================
-   BADGE STATUS
+   BADGE STATUS 1.3
 ===================================================== */
 
 function badgeStatusContaReceber(
@@ -1356,6 +1357,15 @@ function badgeStatusContaReceber(
   let simbolo =
     '⏳';
 
+  let cor =
+    '#f2cf63';
+
+  let fundo =
+    'rgba(242,207,99,.10)';
+
+  let borda =
+    'rgba(242,207,99,.30)';
+
 
   if (
     status === 'PAGO'
@@ -1364,15 +1374,14 @@ function badgeStatusContaReceber(
     simbolo =
       '✅';
 
-  }
+    cor =
+      '#79e39a';
 
+    fundo =
+      'rgba(46,204,113,.10)';
 
-  else if (
-    status === 'VENCIDO'
-  ) {
-
-    simbolo =
-      '🚨';
+    borda =
+      'rgba(46,204,113,.30)';
 
   }
 
@@ -1384,6 +1393,53 @@ function badgeStatusContaReceber(
     simbolo =
       '◐';
 
+    cor =
+      '#f2c75c';
+
+    fundo =
+      'rgba(212,175,55,.12)';
+
+    borda =
+      'rgba(212,175,55,.36)';
+
+  }
+
+
+  else if (
+    status === 'VENCIDO'
+  ) {
+
+    simbolo =
+      '🚨';
+
+    cor =
+      '#ff6b6b';
+
+    fundo =
+      'rgba(220,38,38,.12)';
+
+    borda =
+      'rgba(220,38,38,.38)';
+
+  }
+
+
+  else if (
+    status === 'PENDENTE'
+  ) {
+
+    simbolo =
+      '⏳';
+
+    cor =
+      '#e8d98a';
+
+    fundo =
+      'rgba(232,217,138,.08)';
+
+    borda =
+      'rgba(232,217,138,.22)';
+
   }
 
 
@@ -1392,15 +1448,39 @@ function badgeStatusContaReceber(
       style="
         display:inline-flex;
         align-items:center;
-        gap:5px;
+        justify-content:center;
+        gap:6px;
+
+        padding:6px 9px;
+
+        border-radius:999px;
+
+        border:
+          1px solid
+          ${borda};
+
+        background:
+          ${fundo};
+
+        color:
+          ${cor};
+
         white-space:nowrap;
-        font-weight:700;
-        font-size:12px;
+
+        font-weight:800;
+
+        font-size:11px;
+
+        letter-spacing:.02em;
       ">
 
-      ${simbolo}
+      <span>
+        ${simbolo}
+      </span>
 
-      ${escapeContaReceber(status)}
+      <span>
+        ${escapeContaReceber(status)}
+      </span>
 
     </span>
   `;
@@ -1582,5 +1662,5 @@ function escapeContaReceber(
 
 /* =====================================================
    FIM
-   CONTAS A RECEBER 1.2
+   CONTAS A RECEBER 1.3
 ===================================================== */
