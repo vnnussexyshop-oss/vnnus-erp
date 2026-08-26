@@ -1324,10 +1324,35 @@ const VNNUS_API = {
     );
 
   }
+/* =====================================================
+   COMPARAÇÃO DO DASHBOARD
+   DASHBOARD 2.3
+===================================================== */
 
+async comparacaoDashboard() {
+
+  const resposta =
+    await this.jsonp({
+
+      acao:
+        'comparacao_dashboard'
+
+    });
+
+
+  return (
+    resposta.comparacao ||
+    {}
+  );
+
+}
 };
 /* =====================================================
    FIM
-   VNNUS API FRONT-END
-   FINANCEIRO 2.0 + CLIENTES 3.6 + CONFIGURAÇÕES 1.0
+   VNNUS API FRONT-END 2.2
+   DASHBOARD 2.3
+   FINANCEIRO 2.3
+   CLIENTES 3.6
+   CONFIGURAÇÕES 1.0
+   DESPESAS 1.0
 ===================================================== */
