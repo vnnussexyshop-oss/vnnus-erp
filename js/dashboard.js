@@ -1,7 +1,7 @@
 /* =====================================================
    VNNUS ERP
-   DASHBOARD 2.2
-   INDICADORES + DESPESAS + EVOLUÇÃO FINANCEIRA
+   DASHBOARD 2.3
+   INDICADORES + DESPESAS + EVOLUÇÃO + COMPARAÇÃO
 ===================================================== */
 
 
@@ -35,13 +35,17 @@ window.init_dashboard =
       }
 
 
-      /* =================================================
-         DASHBOARD + DESPESAS DE HOJE
-      ================================================= */
-
       const hojeIso =
         dataIsoDashboardHoje();
 
+
+      /*
+        Carregamos em paralelo:
+
+        1) Dashboard
+        2) Despesas de hoje
+        3) Comparação hoje x ontem
+      */
 
       const resultados =
         await Promise.all([
@@ -51,7 +55,9 @@ window.init_dashboard =
           VNNUS_API.resumoDespesas(
             hojeIso,
             hojeIso
-          )
+          ),
+
+          VNNUS_API.comparacaoDashboard()
 
         ]);
 
@@ -66,16 +72,34 @@ window.init_dashboard =
         {};
 
 
+      const comparacao =
+        resultados[2] ||
+        {};
+
+
+      /* INDICADORES */
+
       preencherIndicadoresDashboard(
         dados
       );
 
+
+      /* DESPESAS / RESULTADO */
 
       preencherDespesasDashboard(
         despesas,
         dados
       );
 
+
+      /* COMPARAÇÃO */
+
+      preencherComparacaoDashboard(
+        comparacao
+      );
+
+
+      /* PRODUTO DESTAQUE */
 
       preencherProdutoMaisVendidoDashboard(
         dados &&
@@ -84,6 +108,8 @@ window.init_dashboard =
           : {}
       );
 
+
+      /* ÚLTIMAS VENDAS */
 
       preencherUltimasVendasDashboard(
         dados &&
@@ -95,9 +121,7 @@ window.init_dashboard =
       );
 
 
-      /* =================================================
-         GRÁFICO
-      ================================================= */
+      /* GRÁFICO */
 
       configurarGraficoDashboard();
 
@@ -254,7 +278,7 @@ function dataIsoDashboardHoje() {
 
 
 /* =====================================================
-   INDICADORES
+   INDICADORES PRINCIPAIS
 ===================================================== */
 
 function preencherIndicadoresDashboard(
@@ -266,66 +290,90 @@ function preencherIndicadoresDashboard(
 
 
   definirTextoDashboard(
+
     'dashVendasHoje',
+
     moedaDashboard(
       dados.vendasHoje
     )
+
   );
 
 
   definirTextoDashboard(
+
     'dashPedidosHoje',
+
     numeroDashboard(
       dados.pedidosHoje
     )
+
   );
 
 
   definirTextoDashboard(
+
     'dashProdutos',
+
     numeroDashboard(
       dados.produtos
     )
+
   );
 
 
   definirTextoDashboard(
+
     'dashEstoqueCritico',
+
     numeroDashboard(
       dados.estoqueCritico
     )
+
   );
 
 
   definirTextoDashboard(
+
     'dashLucroHoje',
+
     moedaDashboard(
       dados.lucroHoje
     )
+
   );
 
 
   definirTextoDashboard(
+
     'dashTicketMedio',
+
     moedaDashboard(
       dados.ticketMedio
     )
+
   );
 
 
   definirTextoDashboard(
+
     'dashItensVendidos',
+
     numeroDashboard(
       dados.itensVendidos
     )
+
   );
 
 
   definirTextoDashboard(
+
     'dashSemEstoque',
+
     numeroDashboard(
       dados.semEstoque
     )
+
   );
 
 }
@@ -416,6 +464,209 @@ function preencherDespesasDashboard(
 
 
 /* =====================================================
+   COMPARAÇÃO HOJE X ONTEM
+===================================================== */
+
+function preencherComparacaoDashboard(
+  comparacao
+) {
+
+  comparacao =
+    comparacao || {};
+
+
+  const variacao =
+    comparacao.variacao ||
+    {};
+
+
+  renderizarComparativoDashboard(
+    'dashCompFaturamento',
+    variacao.faturamento
+  );
+
+
+  renderizarComparativoDashboard(
+    'dashCompPedidos',
+    variacao.pedidos
+  );
+
+
+  renderizarComparativoDashboard(
+    'dashCompLucro',
+    variacao.lucroBruto
+  );
+
+
+  renderizarComparativoDashboard(
+    'dashCompItens',
+    variacao.itensVendidos
+  );
+
+}
+
+
+/* =====================================================
+   RENDERIZAR UMA VARIAÇÃO
+===================================================== */
+
+function renderizarComparativoDashboard(
+  id,
+  variacao
+) {
+
+  const elemento =
+    document.getElementById(
+      id
+    );
+
+
+  if (!elemento) {
+
+    return;
+
+  }
+
+
+  variacao =
+    variacao || {};
+
+
+  const direcao =
+    String(
+      variacao.direcao ||
+      'IGUAL'
+    )
+    .toUpperCase();
+
+
+  const comparavel =
+    variacao.comparavel !==
+    false;
+
+
+  /* ================================================
+     NOVO MOVIMENTO
+  ================================================= */
+
+  if (
+    direcao ===
+    'NOVO'
+  ) {
+
+    elemento.textContent =
+      '✦ Novo movimento hoje';
+
+    elemento.style.color =
+      'var(--gold2)';
+
+    return;
+
+  }
+
+
+  /* ================================================
+     SEM BASE DE COMPARAÇÃO
+  ================================================= */
+
+  if (!comparavel) {
+
+    elemento.textContent =
+      'Sem base para comparação';
+
+    elemento.style.color =
+      'var(--muted)';
+
+    return;
+
+  }
+
+
+  const percentual =
+    Number(
+      variacao.percentual ||
+      0
+    );
+
+
+  const percentualTexto =
+    Math.abs(
+      percentual
+    )
+    .toLocaleString(
+      'pt-BR',
+      {
+        minimumFractionDigits:
+          1,
+
+        maximumFractionDigits:
+          1
+      }
+    ) +
+    '%';
+
+
+  /* ================================================
+     ALTA
+  ================================================= */
+
+  if (
+    direcao ===
+    'ALTA'
+  ) {
+
+    elemento.textContent =
+      '↑ ' +
+      percentualTexto +
+      ' vs ontem';
+
+
+    elemento.style.color =
+      '#78e498';
+
+    return;
+
+  }
+
+
+  /* ================================================
+     BAIXA
+  ================================================= */
+
+  if (
+    direcao ===
+    'BAIXA'
+  ) {
+
+    elemento.textContent =
+      '↓ ' +
+      percentualTexto +
+      ' vs ontem';
+
+
+    elemento.style.color =
+      '#ff8c8c';
+
+    return;
+
+  }
+
+
+  /* ================================================
+     IGUAL
+  ================================================= */
+
+  elemento.textContent =
+    '→ Sem alteração vs ontem';
+
+
+  elemento.style.color =
+    'var(--muted)';
+
+}
+
+
+/* =====================================================
    PRODUTO MAIS VENDIDO
 ===================================================== */
 
@@ -449,6 +700,7 @@ function preencherProdutoMaisVendidoDashboard(
 
 
   definirTextoDashboard(
+
     'dashMaisVendidoQtd',
 
     quantidade > 0
@@ -461,6 +713,7 @@ function preencherProdutoMaisVendidoDashboard(
           )
         )
       : ''
+
   );
 
 }
@@ -1127,7 +1380,8 @@ function desenharGraficoFinanceiroDashboard(
 
   const intervalo =
     maiorValor -
-    menorValor || 1;
+    menorValor ||
+    1;
 
 
   function x(indice) {
@@ -1202,10 +1456,6 @@ function desenharGraficoFinanceiroDashboard(
   }
 
 
-  /* =================================================
-     GRADE
-  ================================================= */
-
   let linhasGrade =
     '';
 
@@ -1248,20 +1498,18 @@ function desenharGraficoFinanceiroDashboard(
         text-anchor="end"
         fill="#8f8f8f"
         font-size="10">
+
         ${escaparHtmlDashboard(
           formatarValorEixoDashboard(
             valor
           )
         )}
+
       </text>
     `;
 
   }
 
-
-  /* =================================================
-     LINHA ZERO
-  ================================================= */
 
   let linhaZero =
     '';
@@ -1286,10 +1534,6 @@ function desenharGraficoFinanceiroDashboard(
 
   }
 
-
-  /* =================================================
-     DATAS
-  ================================================= */
 
   let labelsDatas =
     '';
@@ -1322,20 +1566,18 @@ function desenharGraficoFinanceiroDashboard(
           text-anchor="middle"
           fill="#8f8f8f"
           font-size="10">
+
           ${escaparHtmlDashboard(
             item.data ||
             ''
           )}
+
         </text>
       `;
 
     }
   );
 
-
-  /* =================================================
-     PONTOS
-  ================================================= */
 
   let pontosInterativos =
     '';
@@ -1387,10 +1629,6 @@ function desenharGraficoFinanceiroDashboard(
     }
   );
 
-
-  /* =================================================
-     SVG FINAL
-  ================================================= */
 
   area.innerHTML = `
 
@@ -1508,9 +1746,11 @@ function criarPontoGraficoDashboard(
       stroke="#0f0f0f"
       stroke-width="2">
 
-      <title>${escaparHtmlDashboard(
-        texto
-      )}</title>
+      <title>
+        ${escaparHtmlDashboard(
+          texto
+        )}
+      </title>
 
     </circle>
   `;
@@ -1712,5 +1952,5 @@ function escaparHtmlDashboard(
 
 /* =====================================================
    FIM
-   VNNUS DASHBOARD 2.2
+   VNNUS DASHBOARD 2.3
 ===================================================== */
