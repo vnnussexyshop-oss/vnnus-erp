@@ -1,4 +1,140 @@
-<section>
+<section class="contas-receber-page">
+
+  <style>
+
+    .receber-desktop {
+      display: block;
+    }
+
+    .receber-mobile {
+      display: none;
+    }
+
+    .receber-mobile-lista {
+      display: grid;
+      gap: 12px;
+    }
+
+    .receber-mobile-card {
+      border: 1px solid rgba(212, 175, 55, .22);
+      background:
+        linear-gradient(
+          180deg,
+          rgba(255,255,255,.025),
+          rgba(255,255,255,.01)
+        );
+      border-radius: 16px;
+      padding: 14px;
+    }
+
+    .receber-mobile-topo {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .receber-mobile-conta {
+      font-size: 12px;
+      color: var(--muted);
+      word-break: break-word;
+    }
+
+    .receber-mobile-cliente {
+      margin-top: 4px;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .receber-mobile-grid {
+      display: grid;
+      grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .receber-mobile-item {
+      padding: 10px;
+      border-radius: 12px;
+      background: rgba(255,255,255,.025);
+      border: 1px solid rgba(255,255,255,.05);
+    }
+
+    .receber-mobile-label {
+      display: block;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .receber-mobile-valor {
+      font-weight: 800;
+      color: #fff;
+      word-break: break-word;
+    }
+
+    .receber-mobile-saldo {
+      color: var(--gold2);
+    }
+
+    .receber-mobile-acao {
+      margin-top: 12px;
+    }
+
+    .receber-mobile-acao button {
+      width: 100%;
+    }
+
+
+    @media (max-width: 700px) {
+
+      .receber-desktop {
+        display: none;
+      }
+
+      .receber-mobile {
+        display: block;
+      }
+
+      .contas-receber-page .page-header {
+        align-items: stretch;
+        gap: 12px;
+      }
+
+      .contas-receber-page .page-header > button {
+        width: 100%;
+      }
+
+      .contas-receber-page .cards {
+        grid-template-columns: 1fr;
+      }
+
+      .contas-receber-page input,
+      .contas-receber-page select,
+      .contas-receber-page textarea {
+        width: 100%;
+      }
+
+      #receberModal {
+        align-items: flex-end !important;
+        padding: 10px !important;
+      }
+
+      #receberModal > .card {
+        max-width: none !important;
+        border-radius: 18px 18px 8px 8px;
+        max-height: 92vh;
+        overflow-y: auto;
+      }
+
+    }
+
+  </style>
+
 
   <!-- =================================================
        CABEÇALHO
@@ -130,8 +266,7 @@
     class="card"
     style="margin-top:18px;">
 
-    <h3
-      class="section-title">
+    <h3 class="section-title">
       🔎 Filtros
     </h3>
 
@@ -238,11 +373,11 @@
 
 
   <!-- =================================================
-       TABELA
+       DESKTOP
   ================================================== -->
 
   <div
-    class="card"
+    class="card receber-desktop"
     style="margin-top:18px;">
 
     <div
@@ -272,54 +407,26 @@
 
           <tr>
 
-            <th>
-              Conta
-            </th>
-
-            <th>
-              Cliente
-            </th>
-
-            <th>
-              Parcela
-            </th>
-
-            <th>
-              Vencimento
-            </th>
-
-            <th>
-              Valor
-            </th>
-
-            <th>
-              Recebido
-            </th>
-
-            <th>
-              Saldo
-            </th>
-
-            <th>
-              Status
-            </th>
-
-            <th>
-              Ação
-            </th>
+            <th>Conta</th>
+            <th>Cliente</th>
+            <th>Parcela</th>
+            <th>Vencimento</th>
+            <th>Valor</th>
+            <th>Recebido</th>
+            <th>Saldo</th>
+            <th>Status</th>
+            <th>Ação</th>
 
           </tr>
 
         </thead>
 
 
-        <tbody
-          id="receberTabela">
+        <tbody id="receberTabela">
 
           <tr>
 
-            <td
-              colspan="9">
+            <td colspan="9">
               Carregando...
             </td>
 
@@ -328,6 +435,46 @@
         </tbody>
 
       </table>
+
+    </div>
+
+  </div>
+
+
+  <!-- =================================================
+       MOBILE
+  ================================================== -->
+
+  <div
+    class="card receber-mobile"
+    style="margin-top:18px;">
+
+    <div
+      class="page-header"
+      style="margin-bottom:14px;">
+
+      <div>
+
+        <h3>
+          📋 Parcelas
+        </h3>
+
+        <p>
+          Acompanhe vencimentos e registre recebimentos.
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <div
+      id="receberMobileLista"
+      class="receber-mobile-lista">
+
+      <div class="receber-mobile-card">
+        Carregando...
+      </div>
 
     </div>
 
