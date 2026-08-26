@@ -151,99 +151,9 @@
   ================================================== -->
 
   <div class="cards">
-<!-- =================================================
-     RESULTADO FINANCEIRO DE HOJE
-================================================== -->
 
-<div
-  class="cards"
-  style="margin-top:18px;">
+    <!-- FATURAMENTO -->
 
-  <div class="card">
-
-    <div class="card-icon">
-      💸
-    </div>
-
-    <div class="card-label">
-      Despesas Pagas Hoje
-    </div>
-
-    <div
-      class="card-value"
-      id="dashDespesasHoje">
-      R$ 0,00
-    </div>
-
-  </div>
-
-
-  <div class="card card-accent">
-
-    <div class="card-icon">
-      💰
-    </div>
-
-    <div class="card-label">
-      Lucro Líquido Hoje
-    </div>
-
-    <div
-      class="card-value"
-      id="dashLucroLiquidoHoje">
-      R$ 0,00
-    </div>
-
-    <div
-      style="
-        color:var(--muted);
-        font-size:11px;
-        margin-top:7px;
-      ">
-      Lucro bruto − despesas pagas
-    </div>
-
-  </div>
-
-
-  <div class="card">
-
-    <div class="card-icon">
-      ⏳
-    </div>
-
-    <div class="card-label">
-      Contas a Pagar
-    </div>
-
-    <div
-      class="card-value"
-      id="dashDespesasPendentes">
-      R$ 0,00
-    </div>
-
-  </div>
-
-
-  <div class="card">
-
-    <div class="card-icon">
-      🚨
-    </div>
-
-    <div class="card-label">
-      Contas Vencidas
-    </div>
-
-    <div
-      class="card-value"
-      id="dashDespesasVencidas">
-      R$ 0,00
-    </div>
-
-  </div>
-
-</div>
     <div class="card card-accent">
 
       <div class="card-icon">
@@ -260,8 +170,20 @@
         R$ 0,00
       </div>
 
+      <div
+        id="dashCompFaturamento"
+        style="
+          color:var(--muted);
+          font-size:11px;
+          margin-top:7px;
+          min-height:16px;
+        ">
+      </div>
+
     </div>
 
+
+    <!-- PEDIDOS -->
 
     <div class="card">
 
@@ -279,8 +201,20 @@
         0
       </div>
 
+      <div
+        id="dashCompPedidos"
+        style="
+          color:var(--muted);
+          font-size:11px;
+          margin-top:7px;
+          min-height:16px;
+        ">
+      </div>
+
     </div>
 
+
+    <!-- LUCRO BRUTO -->
 
     <div class="card">
 
@@ -288,9 +222,9 @@
         💎
       </div>
 
-    <div class="card-label">
-  Lucro Bruto Hoje
-</div>
+      <div class="card-label">
+        Lucro Bruto Hoje
+      </div>
 
       <div
         class="card-value"
@@ -298,8 +232,20 @@
         R$ 0,00
       </div>
 
+      <div
+        id="dashCompLucro"
+        style="
+          color:var(--muted);
+          font-size:11px;
+          margin-top:7px;
+          min-height:16px;
+        ">
+      </div>
+
     </div>
 
+
+    <!-- ESTOQUE -->
 
     <div class="card card-accent">
 
@@ -323,12 +269,109 @@
 
 
   <!-- =================================================
+       RESULTADO FINANCEIRO DE HOJE
+  ================================================== -->
+
+  <div
+    class="cards"
+    style="margin-top:18px;">
+
+    <div class="card">
+
+      <div class="card-icon">
+        💸
+      </div>
+
+      <div class="card-label">
+        Despesas Pagas Hoje
+      </div>
+
+      <div
+        class="card-value"
+        id="dashDespesasHoje">
+        R$ 0,00
+      </div>
+
+    </div>
+
+
+    <div class="card card-accent">
+
+      <div class="card-icon">
+        💰
+      </div>
+
+      <div class="card-label">
+        Lucro Líquido Hoje
+      </div>
+
+      <div
+        class="card-value"
+        id="dashLucroLiquidoHoje">
+        R$ 0,00
+      </div>
+
+      <div
+        style="
+          color:var(--muted);
+          font-size:11px;
+          margin-top:7px;
+        ">
+        Lucro bruto − despesas pagas
+      </div>
+
+    </div>
+
+
+    <div class="card">
+
+      <div class="card-icon">
+        ⏳
+      </div>
+
+      <div class="card-label">
+        Contas a Pagar
+      </div>
+
+      <div
+        class="card-value"
+        id="dashDespesasPendentes">
+        R$ 0,00
+      </div>
+
+    </div>
+
+
+    <div class="card">
+
+      <div class="card-icon">
+        🚨
+      </div>
+
+      <div class="card-label">
+        Contas Vencidas
+      </div>
+
+      <div
+        class="card-value"
+        id="dashDespesasVencidas">
+        R$ 0,00
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =================================================
        INDICADORES SECUNDÁRIOS
   ================================================== -->
 
   <div
     class="cards"
     style="margin-top:18px;">
+
+    <!-- TICKET MÉDIO -->
 
     <div class="card">
 
@@ -349,6 +392,8 @@
     </div>
 
 
+    <!-- ITENS -->
+
     <div class="card">
 
       <div class="card-icon">
@@ -365,8 +410,20 @@
         0
       </div>
 
+      <div
+        id="dashCompItens"
+        style="
+          color:var(--muted);
+          font-size:11px;
+          margin-top:7px;
+          min-height:16px;
+        ">
+      </div>
+
     </div>
 
+
+    <!-- PRODUTOS -->
 
     <div class="card">
 
@@ -387,6 +444,8 @@
     </div>
 
 
+    <!-- SEM ESTOQUE -->
+
     <div class="card">
 
       <div class="card-icon">
@@ -406,147 +465,149 @@
     </div>
 
   </div>
-<!-- =================================================
-     EVOLUÇÃO FINANCEIRA
-================================================== -->
 
-<div
-  class="card"
-  style="margin-top:18px;">
+
+  <!-- =================================================
+       EVOLUÇÃO FINANCEIRA
+  ================================================== -->
 
   <div
-    style="
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:15px;
-      flex-wrap:wrap;
-      margin-bottom:20px;
-    ">
+    class="card"
+    style="margin-top:18px;">
 
-    <div>
+    <div
+      style="
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:15px;
+        flex-wrap:wrap;
+        margin-bottom:20px;
+      ">
 
-      <h3 class="section-title"
+      <div>
+
+        <h3
+          class="section-title"
           style="margin-bottom:5px;">
-        📈 Evolução Financeira
-      </h3>
+          📈 Evolução Financeira
+        </h3>
 
-      <p
+        <p
+          style="
+            color:var(--muted);
+            font-size:12px;
+          ">
+          Acompanhe faturamento, lucro e despesas da VNNUS.
+        </p>
+
+      </div>
+
+
+      <div
         style="
-          color:var(--muted);
-          font-size:12px;
+          display:flex;
+          gap:8px;
         ">
-        Acompanhe o desempenho financeiro da VNNUS.
-      </p>
+
+        <button
+          class="btn-primary"
+          id="dashGrafico7"
+          type="button">
+          7 dias
+        </button>
+
+        <button
+          class="btn-secondary"
+          id="dashGrafico30"
+          type="button">
+          30 dias
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <!-- LEGENDA -->
+
+    <div
+      style="
+        display:flex;
+        gap:18px;
+        flex-wrap:wrap;
+        margin-bottom:18px;
+        font-size:11px;
+        color:var(--muted);
+      ">
+
+      <span>
+        💰 Faturamento
+      </span>
+
+      <span>
+        💎 Lucro bruto
+      </span>
+
+      <span>
+        💸 Despesas
+      </span>
+
+      <span>
+        ✨ Lucro líquido
+      </span>
 
     </div>
 
 
     <div
+      id="dashGraficoStatus"
       style="
-        display:flex;
-        gap:8px;
+        color:var(--muted);
+        font-size:12px;
+        margin-bottom:12px;
+      ">
+      Carregando evolução financeira...
+    </div>
+
+
+    <div
+      id="dashGraficoFinanceiro"
+      style="
+        width:100%;
+        min-height:310px;
+        overflow-x:auto;
       ">
 
-      <button
-        class="btn-primary"
-        id="dashGrafico7"
-        type="button">
-        7 dias
-      </button>
+      <div class="loading-card">
+        Preparando gráfico...
+      </div>
 
-      <button
-        class="btn-secondary"
-        id="dashGrafico30"
-        type="button">
-        30 dias
-      </button>
+    </div>
 
+
+    <div
+      id="dashGraficoPeriodo"
+      style="
+        margin-top:13px;
+        padding-top:12px;
+        border-top:1px solid rgba(212,168,77,.12);
+        color:var(--muted);
+        font-size:11px;
+        text-align:right;
+      ">
     </div>
 
   </div>
 
-
-  <!-- LEGENDA -->
-
-  <div
-    style="
-      display:flex;
-      gap:18px;
-      flex-wrap:wrap;
-      margin-bottom:18px;
-      font-size:11px;
-      color:var(--muted);
-    ">
-
-    <span>
-      💰 Faturamento
-    </span>
-
-    <span>
-      💎 Lucro bruto
-    </span>
-
-    <span>
-      💸 Despesas
-    </span>
-
-    <span>
-      ✨ Lucro líquido
-    </span>
-
-  </div>
-
-
-  <!-- ÁREA DO GRÁFICO -->
-
-  <div
-    id="dashGraficoStatus"
-    style="
-      color:var(--muted);
-      font-size:12px;
-      margin-bottom:12px;
-    ">
-    Carregando evolução financeira...
-  </div>
-
-
-  <div
-    id="dashGraficoFinanceiro"
-    style="
-      width:100%;
-      min-height:310px;
-      overflow-x:auto;
-    ">
-
-    <div class="loading-card">
-      Preparando gráfico...
-    </div>
-
-  </div>
-
-
-  <!-- PERÍODO -->
-
-  <div
-    id="dashGraficoPeriodo"
-    style="
-      margin-top:13px;
-      padding-top:12px;
-      border-top:1px solid rgba(212,168,77,.12);
-      color:var(--muted);
-      font-size:11px;
-      text-align:right;
-    ">
-  </div>
-
-</div>
 
   <!-- =================================================
        DESTAQUES
   ================================================== -->
 
   <div class="grid-2">
+
+    <!-- PRODUTO MAIS VENDIDO -->
 
     <div class="card">
 
@@ -574,6 +635,8 @@
 
     </div>
 
+
+    <!-- AÇÕES RÁPIDAS -->
 
     <div class="card">
 
@@ -611,11 +674,13 @@
           onclick="abrirPagina('financeiro')">
           💰 Financeiro
         </button>
-<button
-  class="btn-secondary"
-  onclick="abrirPagina('despesas')">
-  💳 Despesas
-</button>
+
+        <button
+          class="btn-secondary"
+          onclick="abrirPagina('despesas')">
+          💳 Despesas
+        </button>
+
       </div>
 
     </div>
@@ -700,5 +765,6 @@
     </div>
 
   </div>
+
 
 </section>
