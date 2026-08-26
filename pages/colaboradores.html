@@ -1,0 +1,1052 @@
+<section id="colaboradoresPage">
+
+  <!-- =================================================
+       CABEÇALHO
+  ================================================== -->
+
+  <div class="page-header">
+
+    <div>
+
+      <h2>
+        Colaboradores
+      </h2>
+
+      <p>
+        Gerencie usuários, perfis e acessos ao VNNUS ERP.
+      </p>
+
+    </div>
+
+    <button
+      class="btn-primary"
+      type="button"
+      id="colaboradorNovoBtn"
+      onclick="abrirModalNovoColaborador()">
+      ＋ Novo colaborador
+    </button>
+
+  </div>
+
+
+  <!-- =================================================
+       STATUS
+  ================================================== -->
+
+  <div
+    id="colaboradoresStatus"
+    style="
+      color:var(--muted);
+      margin-bottom:15px;
+    ">
+    Carregando colaboradores...
+  </div>
+
+
+  <!-- =================================================
+       INDICADORES
+  ================================================== -->
+
+  <div class="cards">
+
+    <div class="card card-accent">
+
+      <div class="card-icon">
+        👥
+      </div>
+
+      <div class="card-label">
+        Colaboradores
+      </div>
+
+      <div
+        class="card-value"
+        id="colaboradoresTotal">
+        0
+      </div>
+
+    </div>
+
+
+    <div class="card">
+
+      <div class="card-icon">
+        ✅
+      </div>
+
+      <div class="card-label">
+        Ativos
+      </div>
+
+      <div
+        class="card-value"
+        id="colaboradoresAtivos">
+        0
+      </div>
+
+    </div>
+
+
+    <div class="card">
+
+      <div class="card-icon">
+        👑
+      </div>
+
+      <div class="card-label">
+        Administradores
+      </div>
+
+      <div
+        class="card-value"
+        id="colaboradoresAdministradores">
+        0
+      </div>
+
+    </div>
+
+
+    <div class="card">
+
+      <div class="card-icon">
+        🚫
+      </div>
+
+      <div class="card-label">
+        Inativos
+      </div>
+
+      <div
+        class="card-value"
+        id="colaboradoresInativos">
+        0
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =================================================
+       FILTROS
+  ================================================== -->
+
+  <div
+    class="card"
+    style="margin-top:18px;">
+
+    <h3 class="section-title">
+      🔎 Filtros
+    </h3>
+
+
+    <div
+      style="
+        display:grid;
+        grid-template-columns:
+          repeat(auto-fit,minmax(170px,1fr));
+        gap:12px;
+      ">
+
+      <div class="campo">
+
+        <label>
+          Nome ou usuário
+        </label>
+
+        <input
+          id="colaboradorFiltroBusca"
+          type="text"
+          placeholder="Digite para pesquisar">
+
+      </div>
+
+
+      <div class="campo">
+
+        <label>
+          Perfil
+        </label>
+
+        <select
+          id="colaboradorFiltroPerfil">
+
+          <option value="">
+            Todos
+          </option>
+
+          <option value="ADMINISTRADOR">
+            Administrador
+          </option>
+
+          <option value="VENDEDOR">
+            Vendedor
+          </option>
+
+          <option value="ESTOQUE">
+            Estoque
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <div class="campo">
+
+        <label>
+          Status
+        </label>
+
+        <select
+          id="colaboradorFiltroStatus">
+
+          <option value="">
+            Todos
+          </option>
+
+          <option value="SIM">
+            Ativo
+          </option>
+
+          <option value="NAO">
+            Inativo
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <div
+        style="
+          display:flex;
+          align-items:end;
+          gap:8px;
+          flex-wrap:wrap;
+        ">
+
+        <button
+          class="btn-primary"
+          type="button"
+          onclick="filtrarColaboradoresVnnus()">
+          Aplicar
+        </button>
+
+        <button
+          class="btn-secondary"
+          type="button"
+          onclick="limparFiltrosColaboradoresVnnus()">
+          Limpar
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =================================================
+       LISTAGEM
+  ================================================== -->
+
+  <div
+    class="card"
+    style="margin-top:18px;">
+
+    <div
+      class="page-header"
+      style="margin-bottom:14px;">
+
+      <div>
+
+        <h3>
+          👥 Usuários do sistema
+        </h3>
+
+        <p>
+          Administradores podem cadastrar e gerenciar acessos.
+        </p>
+
+      </div>
+
+      <button
+        class="btn-secondary"
+        type="button"
+        onclick="carregarColaboradoresVnnus()">
+        ↻ Atualizar
+      </button>
+
+    </div>
+
+
+    <!-- ===============================================
+         DESKTOP / TABLET
+    ================================================ -->
+
+    <div
+      class="table-wrap colaboradores-tabela-desktop">
+
+      <table>
+
+        <thead>
+
+          <tr>
+
+            <th>
+              Colaborador
+            </th>
+
+            <th>
+              Usuário
+            </th>
+
+            <th>
+              Perfil
+            </th>
+
+            <th>
+              Status
+            </th>
+
+            <th>
+              Último login
+            </th>
+
+            <th>
+              Ações
+            </th>
+
+          </tr>
+
+        </thead>
+
+
+        <tbody
+          id="colaboradoresTabela">
+
+          <tr>
+
+            <td colspan="6">
+              Carregando...
+            </td>
+
+          </tr>
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+
+    <!-- ===============================================
+         MOBILE
+    ================================================ -->
+
+    <div
+      id="colaboradoresCardsMobile"
+      class="colaboradores-cards-mobile">
+
+      <div class="loading-card">
+        Carregando...
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =================================================
+       MODAL CADASTRAR / EDITAR
+  ================================================== -->
+
+  <div
+    class="modal"
+    id="colaboradorModal">
+
+    <div class="modal-conteudo">
+
+      <div class="modal-topo">
+
+        <h2
+          id="colaboradorModalTitulo">
+          Novo colaborador
+        </h2>
+
+        <button
+          type="button"
+          onclick="fecharModalColaborador()">
+          ✕
+        </button>
+
+      </div>
+
+
+      <input
+        id="colaboradorId"
+        type="hidden">
+
+
+      <div class="form-grid">
+
+        <div class="campo">
+
+          <label>
+            Nome
+          </label>
+
+          <input
+            id="colaboradorNome"
+            type="text"
+            maxlength="100"
+            placeholder="Nome do colaborador">
+
+        </div>
+
+
+        <div class="campo">
+
+          <label>
+            Usuário
+          </label>
+
+          <input
+            id="colaboradorUsuario"
+            type="text"
+            maxlength="60"
+            autocomplete="off"
+            placeholder="Ex.: maria">
+
+        </div>
+
+
+        <div class="campo">
+
+          <label>
+            E-mail
+          </label>
+
+          <input
+            id="colaboradorEmail"
+            type="email"
+            maxlength="120"
+            autocomplete="off"
+            placeholder="Opcional">
+
+        </div>
+
+
+        <div class="campo">
+
+          <label>
+            Perfil
+          </label>
+
+          <select
+            id="colaboradorPerfil">
+
+            <option value="">
+              Selecione
+            </option>
+
+            <option value="ADMINISTRADOR">
+              Administrador
+            </option>
+
+            <option value="VENDEDOR">
+              Vendedor
+            </option>
+
+            <option value="ESTOQUE">
+              Estoque
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <div
+          class="campo"
+          id="colaboradorSenhaCampo">
+
+          <label>
+            Senha inicial
+          </label>
+
+          <input
+            id="colaboradorSenha"
+            type="password"
+            minlength="8"
+            maxlength="150"
+            autocomplete="new-password"
+            placeholder="Mínimo 8 caracteres">
+
+        </div>
+
+
+        <div
+          class="campo campo-grande">
+
+          <label>
+            Observação
+          </label>
+
+          <textarea
+            id="colaboradorObservacao"
+            rows="3"
+            maxlength="500"
+            placeholder="Opcional"></textarea>
+
+        </div>
+
+      </div>
+
+
+      <div
+        id="colaboradorModalMensagem"
+        style="
+          display:none;
+          margin:0 17px 12px;
+        ">
+      </div>
+
+
+      <div class="modal-rodape">
+
+        <button
+          class="btn-secondary"
+          type="button"
+          onclick="fecharModalColaborador()">
+          Cancelar
+        </button>
+
+        <button
+          class="btn-primary"
+          id="colaboradorSalvarBtn"
+          type="button"
+          onclick="salvarColaboradorVnnus()">
+          Salvar colaborador
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =================================================
+       MODAL REDEFINIR SENHA
+  ================================================== -->
+
+  <div
+    class="modal"
+    id="colaboradorSenhaModal">
+
+    <div
+      class="modal-conteudo"
+      style="max-width:480px;">
+
+      <div class="modal-topo">
+
+        <h2>
+          🔐 Redefinir senha
+        </h2>
+
+        <button
+          type="button"
+          onclick="fecharModalSenhaColaborador()">
+          ✕
+        </button>
+
+      </div>
+
+
+      <input
+        id="colaboradorSenhaId"
+        type="hidden">
+
+
+      <div
+        style="
+          padding:17px;
+          display:grid;
+          gap:14px;
+        ">
+
+        <div>
+
+          <div
+            style="
+              color:var(--muted);
+              font-size:12px;
+            ">
+            Colaborador
+          </div>
+
+          <div
+            id="colaboradorSenhaNome"
+            style="
+              color:#fff;
+              font-weight:700;
+              margin-top:4px;
+            ">
+            -
+          </div>
+
+        </div>
+
+
+        <div class="campo">
+
+          <label>
+            Nova senha
+          </label>
+
+          <input
+            id="colaboradorNovaSenha"
+            type="password"
+            minlength="8"
+            maxlength="150"
+            autocomplete="new-password"
+            placeholder="Mínimo 8 caracteres">
+
+        </div>
+
+
+        <div class="campo">
+
+          <label>
+            Confirmar nova senha
+          </label>
+
+          <input
+            id="colaboradorConfirmarSenha"
+            type="password"
+            minlength="8"
+            maxlength="150"
+            autocomplete="new-password"
+            placeholder="Digite novamente">
+
+        </div>
+
+
+        <div
+          id="colaboradorSenhaMensagem"
+          style="display:none;">
+        </div>
+
+      </div>
+
+
+      <div class="modal-rodape">
+
+        <button
+          class="btn-secondary"
+          type="button"
+          onclick="fecharModalSenhaColaborador()">
+          Cancelar
+        </button>
+
+        <button
+          class="btn-primary"
+          id="colaboradorSenhaSalvarBtn"
+          type="button"
+          onclick="confirmarNovaSenhaColaboradorVnnus()">
+          Redefinir senha
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =================================================
+       MODAL ATIVAR / DESATIVAR
+  ================================================== -->
+
+  <div
+    class="modal"
+    id="colaboradorStatusModal">
+
+    <div
+      class="modal-conteudo"
+      style="max-width:480px;">
+
+      <div class="modal-topo">
+
+        <h2
+          id="colaboradorStatusTitulo">
+          Alterar acesso
+        </h2>
+
+        <button
+          type="button"
+          onclick="fecharModalStatusColaborador()">
+          ✕
+        </button>
+
+      </div>
+
+
+      <input
+        id="colaboradorStatusId"
+        type="hidden">
+
+      <input
+        id="colaboradorStatusNovo"
+        type="hidden">
+
+
+      <div
+        style="
+          padding:20px 17px;
+        ">
+
+        <p
+          id="colaboradorStatusTexto"
+          style="
+            color:var(--muted);
+            line-height:1.55;
+          ">
+          -
+        </p>
+
+
+        <div
+          id="colaboradorStatusMensagem"
+          style="
+            display:none;
+            margin-top:15px;
+          ">
+        </div>
+
+      </div>
+
+
+      <div class="modal-rodape">
+
+        <button
+          class="btn-secondary"
+          type="button"
+          onclick="fecharModalStatusColaborador()">
+          Cancelar
+        </button>
+
+        <button
+          class="btn-primary"
+          id="colaboradorStatusConfirmarBtn"
+          type="button"
+          onclick="confirmarStatusColaboradorVnnus()">
+          Confirmar
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =================================================
+       ESTILO ESPECÍFICO DO MÓDULO
+  ================================================== -->
+
+  <style>
+
+    .colaboradores-cards-mobile{
+      display:none;
+    }
+
+
+    .colaborador-identidade{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      min-width:0;
+    }
+
+
+    .colaborador-avatar-lista{
+      width:38px;
+      min-width:38px;
+      height:38px;
+
+      display:grid;
+      place-items:center;
+
+      border-radius:50%;
+
+      border:
+        1px solid
+        rgba(212,168,77,.40);
+
+      background:
+        radial-gradient(
+          circle at 40% 30%,
+          #74111c,
+          #2f0006 72%
+        );
+
+      color:
+        var(--gold2);
+
+      font-family:
+        "Cinzel",
+        serif;
+
+      font-weight:700;
+    }
+
+
+    .colaborador-nome{
+      color:#fff;
+      font-weight:700;
+      line-height:1.3;
+    }
+
+
+    .colaborador-email{
+      color:var(--muted);
+      font-size:11px;
+      margin-top:3px;
+      overflow-wrap:anywhere;
+    }
+
+
+    .colaborador-perfil{
+      display:inline-flex;
+      align-items:center;
+      gap:5px;
+
+      padding:
+        5px 9px;
+
+      border-radius:999px;
+
+      font-size:10px;
+      font-weight:800;
+
+      border:
+        1px solid
+        rgba(212,168,77,.18);
+
+      background:
+        rgba(212,168,77,.07);
+
+      color:
+        var(--gold2);
+    }
+
+
+    .colaborador-status{
+      display:inline-flex;
+      align-items:center;
+      gap:5px;
+
+      padding:
+        5px 9px;
+
+      border-radius:999px;
+
+      font-size:10px;
+      font-weight:800;
+    }
+
+
+    .colaborador-status.ativo{
+      color:#78e498;
+
+      border:
+        1px solid
+        rgba(84,197,122,.18);
+
+      background:
+        rgba(84,197,122,.10);
+    }
+
+
+    .colaborador-status.inativo{
+      color:#ff8c8c;
+
+      border:
+        1px solid
+        rgba(255,102,102,.16);
+
+      background:
+        rgba(255,102,102,.09);
+    }
+
+
+    .colaborador-acoes{
+      display:flex;
+      gap:6px;
+      flex-wrap:wrap;
+    }
+
+
+    .colaborador-acao-btn{
+      min-height:34px;
+
+      padding:
+        7px 9px;
+
+      border-radius:8px;
+
+      border:
+        1px solid
+        rgba(212,168,77,.18);
+
+      background:#141414;
+
+      color:#eee;
+
+      font-size:11px;
+      font-weight:700;
+    }
+
+
+    .colaborador-acao-btn:hover{
+      border-color:
+        var(--gold);
+
+      color:
+        var(--gold2);
+    }
+
+
+    @media(max-width:760px){
+
+      .colaboradores-tabela-desktop{
+        display:none;
+      }
+
+
+      .colaboradores-cards-mobile{
+        display:grid;
+        gap:10px;
+      }
+
+
+      .colaborador-mobile-card{
+        min-width:0;
+
+        padding:14px;
+
+        border-radius:13px;
+
+        border:
+          1px solid
+          rgba(212,168,77,.18);
+
+        background:
+          linear-gradient(
+            145deg,
+            #151515,
+            #0c0c0c
+          );
+      }
+
+
+      .colaborador-mobile-topo{
+        display:flex;
+        align-items:flex-start;
+        justify-content:space-between;
+        gap:10px;
+      }
+
+
+      .colaborador-mobile-grid{
+        display:grid;
+
+        grid-template-columns:
+          1fr 1fr;
+
+        gap:8px;
+
+        margin-top:13px;
+      }
+
+
+      .colaborador-mobile-info{
+        min-width:0;
+
+        padding:9px;
+
+        border-radius:9px;
+
+        background:
+          rgba(255,255,255,.025);
+
+        border:
+          1px solid
+          rgba(255,255,255,.04);
+      }
+
+
+      .colaborador-mobile-info span{
+        display:block;
+
+        color:var(--muted);
+
+        font-size:9px;
+
+        text-transform:uppercase;
+
+        letter-spacing:.05em;
+      }
+
+
+      .colaborador-mobile-info strong{
+        display:block;
+
+        margin-top:4px;
+
+        color:#fff;
+
+        font-size:12px;
+
+        overflow-wrap:anywhere;
+      }
+
+
+      .colaborador-mobile-acoes{
+        display:grid;
+
+        grid-template-columns:
+          repeat(2,minmax(0,1fr));
+
+        gap:7px;
+
+        margin-top:12px;
+      }
+
+
+      .colaborador-mobile-acoes button{
+        width:100%;
+      }
+
+    }
+
+
+    @media(max-width:380px){
+
+      .colaborador-mobile-grid{
+        grid-template-columns:1fr;
+      }
+
+
+      .colaborador-mobile-acoes{
+        grid-template-columns:1fr;
+      }
+
+    }
+
+  </style>
+
+</section>
