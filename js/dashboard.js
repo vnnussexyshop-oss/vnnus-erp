@@ -1,6 +1,6 @@
 /* =====================================================
    VNNUS ERP
-   DASHBOARD 2.3
+   DASHBOARD 2.4
    INDICADORES + DESPESAS + EVOLUÇÃO + COMPARAÇÃO
 ===================================================== */
 
@@ -502,7 +502,16 @@ function preencherComparacaoDashboard(
     'dashCompItens',
     variacao.itensVendidos
   );
+renderizarComparativoDashboard(
+  'dashCompDespesas',
+  variacao.despesasPagas
+);
 
+
+renderizarComparativoDashboard(
+  'dashCompLucroLiquido',
+  variacao.lucroLiquido
+);
 }
 
 
@@ -1952,5 +1961,5 @@ function escaparHtmlDashboard(
 
 /* =====================================================
    FIM
-   VNNUS DASHBOARD 2.3
+   VNNUS DASHBOARD 2.4
 ===================================================== */
