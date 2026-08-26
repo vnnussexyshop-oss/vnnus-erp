@@ -1323,7 +1323,7 @@ window.VNNUS_API = {
       }
     );
 
-  }
+  },
 /* =====================================================
    COMPARAÇÃO DO DASHBOARD
    DASHBOARD 2.3
