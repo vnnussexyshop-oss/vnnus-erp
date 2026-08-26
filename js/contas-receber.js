@@ -1,7 +1,7 @@
 /* =====================================================
    VNNUS ERP
-   CONTAS A RECEBER 1.1
-   FRONT-END
+   CONTAS A RECEBER 1.2
+   FRONT-END RESPONSIVO
 ===================================================== */
 
 window.VNNUS_CONTAS_RECEBER = {
@@ -81,6 +81,11 @@ async function init_contas_receber() {
     );
 
 
+    renderizarMobileContasReceber(
+      lista
+    );
+
+
     if (status) {
 
       status.textContent =
@@ -134,6 +139,24 @@ async function init_contas_receber() {
             as contas a receber.
           </td>
         </tr>
+      `;
+
+    }
+
+
+    const mobile =
+      document.getElementById(
+        'receberMobileLista'
+      );
+
+
+    if (mobile) {
+
+      mobile.innerHTML = `
+        <div class="receber-mobile-card">
+          Não foi possível carregar
+          as contas a receber.
+        </div>
       `;
 
     }
@@ -260,7 +283,7 @@ function atualizarResumoContasReceber(
 
 
 /* =====================================================
-   TABELA
+   TABELA DESKTOP
 ===================================================== */
 
 function renderizarTabelaContasReceber(
@@ -306,133 +329,53 @@ function renderizarTabelaContasReceber(
       .map(
         function(conta) {
 
-          const id =
-            String(
-              conta.ID_CONTA ||
-              ''
+          const dados =
+            dadosVisuaisContaReceber(
+              conta
             );
-
-
-          const cliente =
-            String(
-              conta.CLIENTE ||
-              'Consumidor Final'
-            );
-
-
-          const parcela =
-            numeroContaReceber(
-              conta.PARCELA
-            );
-
-
-          const totalParcelas =
-            numeroContaReceber(
-              conta.TOTAL_PARCELAS
-            );
-
-
-          const vencimento =
-            String(
-              conta.VENCIMENTO ||
-              ''
-            );
-
-
-          const valor =
-            numeroContaReceber(
-              conta.VALOR_PARCELA
-            );
-
-
-          const valorRecebido =
-            numeroContaReceber(
-              conta.VALOR_RECEBIDO
-            );
-
-
-          const saldo =
-            numeroContaReceber(
-              conta.SALDO
-            );
-
-
-          const status =
-            String(
-              conta.STATUS ||
-              'PENDENTE'
-            )
-            .trim()
-            .toUpperCase();
-
-
-          const podeReceber =
-            status !== 'PAGO' &&
-            saldo > 0;
 
 
           return `
             <tr>
 
               <td>
-                ${escapeContaReceber(id)}
+                ${escapeContaReceber(dados.id)}
               </td>
 
               <td>
                 <strong>
-                  ${escapeContaReceber(cliente)}
+                  ${escapeContaReceber(dados.cliente)}
                 </strong>
               </td>
 
               <td>
-                ${parcela}/${totalParcelas}
+                ${dados.parcela}/${dados.totalParcelas}
               </td>
 
               <td>
-                ${escapeContaReceber(vencimento)}
+                ${escapeContaReceber(dados.vencimento)}
               </td>
 
               <td>
-                ${moedaContaReceber(valor)}
+                ${moedaContaReceber(dados.valor)}
               </td>
 
               <td>
-                ${moedaContaReceber(valorRecebido)}
+                ${moedaContaReceber(dados.valorRecebido)}
               </td>
 
               <td>
                 <strong>
-                  ${moedaContaReceber(saldo)}
+                  ${moedaContaReceber(dados.saldo)}
                 </strong>
               </td>
 
               <td>
-                ${badgeStatusContaReceber(status)}
+                ${badgeStatusContaReceber(dados.status)}
               </td>
 
               <td>
-
-                ${
-                  podeReceber
-                    ? `
-                      <button
-                        class="btn-primary"
-                        type="button"
-                        onclick="abrirModalContaReceber('${escapeContaReceber(id)}')">
-                        Receber
-                      </button>
-                    `
-                    : `
-                      <span
-                        style="
-                          color:var(--muted);
-                          font-size:12px;
-                        ">
-                        Quitado
-                      </span>
-                    `
-                }
-
+                ${botaoReceberContaHtml(dados)}
               </td>
 
             </tr>
@@ -441,6 +384,329 @@ function renderizarTabelaContasReceber(
         }
       )
       .join('');
+
+}
+
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+function renderizarMobileContasReceber(
+  contas
+) {
+
+  const container =
+    document.getElementById(
+      'receberMobileLista'
+    );
+
+
+  if (!container) {
+
+    return;
+
+  }
+
+
+  contas =
+    Array.isArray(contas)
+      ? contas
+      : [];
+
+
+  if (!contas.length) {
+
+    container.innerHTML = `
+      <div class="receber-mobile-card">
+
+        <div
+          style="
+            color:var(--muted);
+            text-align:center;
+            padding:12px 0;
+          ">
+          Nenhuma conta encontrada.
+        </div>
+
+      </div>
+    `;
+
+    return;
+
+  }
+
+
+  container.innerHTML =
+    contas
+      .map(
+        function(conta) {
+
+          const dados =
+            dadosVisuaisContaReceber(
+              conta
+            );
+
+
+          return `
+            <div class="receber-mobile-card">
+
+              <div class="receber-mobile-topo">
+
+                <div>
+
+                  <div class="receber-mobile-conta">
+                    ${escapeContaReceber(dados.id)}
+                  </div>
+
+                  <div class="receber-mobile-cliente">
+                    ${escapeContaReceber(dados.cliente)}
+                  </div>
+
+                </div>
+
+                <div>
+                  ${badgeStatusContaReceber(dados.status)}
+                </div>
+
+              </div>
+
+
+              <div class="receber-mobile-grid">
+
+                <div class="receber-mobile-item">
+
+                  <span class="receber-mobile-label">
+                    Parcela
+                  </span>
+
+                  <span class="receber-mobile-valor">
+                    ${dados.parcela}/${dados.totalParcelas}
+                  </span>
+
+                </div>
+
+
+                <div class="receber-mobile-item">
+
+                  <span class="receber-mobile-label">
+                    Vencimento
+                  </span>
+
+                  <span class="receber-mobile-valor">
+                    ${escapeContaReceber(dados.vencimento)}
+                  </span>
+
+                </div>
+
+
+                <div class="receber-mobile-item">
+
+                  <span class="receber-mobile-label">
+                    Valor
+                  </span>
+
+                  <span class="receber-mobile-valor">
+                    ${moedaContaReceber(dados.valor)}
+                  </span>
+
+                </div>
+
+
+                <div class="receber-mobile-item">
+
+                  <span class="receber-mobile-label">
+                    Recebido
+                  </span>
+
+                  <span class="receber-mobile-valor">
+                    ${moedaContaReceber(dados.valorRecebido)}
+                  </span>
+
+                </div>
+
+
+                <div
+                  class="receber-mobile-item"
+                  style="
+                    grid-column:1 / -1;
+                  ">
+
+                  <span class="receber-mobile-label">
+                    Saldo
+                  </span>
+
+                  <span
+                    class="
+                      receber-mobile-valor
+                      receber-mobile-saldo
+                    ">
+                    ${moedaContaReceber(dados.saldo)}
+                  </span>
+
+                </div>
+
+              </div>
+
+
+              <div class="receber-mobile-acao">
+
+                ${botaoReceberContaHtml(dados)}
+
+              </div>
+
+            </div>
+          `;
+
+        }
+      )
+      .join('');
+
+}
+
+
+/* =====================================================
+   NORMALIZAR DADOS VISUAIS
+===================================================== */
+
+function dadosVisuaisContaReceber(
+  conta
+) {
+
+  const id =
+    String(
+      conta.ID_CONTA ||
+      ''
+    );
+
+
+  const cliente =
+    String(
+      conta.CLIENTE ||
+      'Consumidor Final'
+    );
+
+
+  const parcela =
+    numeroContaReceber(
+      conta.PARCELA
+    );
+
+
+  const totalParcelas =
+    numeroContaReceber(
+      conta.TOTAL_PARCELAS
+    );
+
+
+  const vencimento =
+    String(
+      conta.VENCIMENTO ||
+      ''
+    );
+
+
+  const valor =
+    numeroContaReceber(
+      conta.VALOR_PARCELA
+    );
+
+
+  const valorRecebido =
+    numeroContaReceber(
+      conta.VALOR_RECEBIDO
+    );
+
+
+  const saldo =
+    numeroContaReceber(
+      conta.SALDO
+    );
+
+
+  const status =
+    String(
+      conta.STATUS ||
+      'PENDENTE'
+    )
+    .trim()
+    .toUpperCase();
+
+
+  return {
+
+    id:
+      id,
+
+    cliente:
+      cliente,
+
+    parcela:
+      parcela,
+
+    totalParcelas:
+      totalParcelas,
+
+    vencimento:
+      vencimento,
+
+    valor:
+      valor,
+
+    valorRecebido:
+      valorRecebido,
+
+    saldo:
+      saldo,
+
+    status:
+      status,
+
+    podeReceber:
+      (
+        status !== 'PAGO' &&
+        saldo > 0
+      )
+
+  };
+
+}
+
+
+/* =====================================================
+   BOTÃO RECEBER
+===================================================== */
+
+function botaoReceberContaHtml(
+  dados
+) {
+
+  if (
+    dados.podeReceber
+  ) {
+
+    return `
+      <button
+        class="btn-primary"
+        type="button"
+        onclick="abrirModalContaReceber('${escapeContaReceber(dados.id)}')">
+        💵 Receber
+      </button>
+    `;
+
+  }
+
+
+  return `
+    <span
+      style="
+        color:var(--muted);
+        font-size:12px;
+        font-weight:700;
+      ">
+      ✅ Quitado
+    </span>
+  `;
 
 }
 
@@ -583,23 +849,14 @@ function filtrarContasReceber() {
   );
 
 
-  const statusTexto =
-    document.getElementById(
-      'receberStatus'
-    );
+  renderizarMobileContasReceber(
+    filtradas
+  );
 
 
-  if (statusTexto) {
-
-    statusTexto.textContent =
-      filtradas.length +
-      (
-        filtradas.length === 1
-          ? ' parcela encontrada.'
-          : ' parcelas encontradas.'
-      );
-
-  }
+  atualizarTextoQuantidadeContasReceber(
+    filtradas.length
+  );
 
 }
 
@@ -657,23 +914,65 @@ function limparFiltrosContasReceber() {
   );
 
 
+  renderizarMobileContasReceber(
+    contas
+  );
+
+
+  atualizarTextoQuantidadeContasReceber(
+    contas.length
+  );
+
+}
+
+
+/* =====================================================
+   QUANTIDADE
+===================================================== */
+
+function atualizarTextoQuantidadeContasReceber(
+  quantidade
+) {
+
   const status =
     document.getElementById(
       'receberStatus'
     );
 
 
-  if (status) {
+  if (!status) {
 
-    status.textContent =
-      contas.length +
-      (
-        contas.length === 1
-          ? ' parcela encontrada.'
-          : ' parcelas encontradas.'
-      );
+    return;
 
   }
+
+
+  quantidade =
+    Number(
+      quantidade ||
+      0
+    );
+
+
+  if (
+    quantidade === 0
+  ) {
+
+    status.textContent =
+      'Nenhuma parcela encontrada.';
+
+    return;
+
+  }
+
+
+  status.textContent =
+    quantidade +
+    (
+      quantidade === 1
+        ? ' parcela encontrada.'
+        : ' parcelas encontradas.'
+    );
 
 }
 
@@ -1283,5 +1582,5 @@ function escapeContaReceber(
 
 /* =====================================================
    FIM
-   CONTAS A RECEBER 1.1
+   CONTAS A RECEBER 1.2
 ===================================================== */
