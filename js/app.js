@@ -252,7 +252,7 @@ document.addEventListener(
     =============================================== */
 
     atualizarColaboradorTopoVnnus();
-
+    aplicarPermissoesMenuVnnus();
 
     /* ===============================================
        ABRIR SISTEMA
@@ -795,7 +795,55 @@ async function sairVnnus() {
   }
 
 }
+/* =====================================================
+   PERMISSÕES DO MENU
+===================================================== */
 
+function aplicarPermissoesMenuVnnus() {
+
+  if (
+    !window.VNNUS_API ||
+    typeof window.VNNUS_API.obterUsuarioSessao !==
+      'function'
+  ) {
+
+    return;
+
+  }
+
+
+  const colaborador =
+    window.VNNUS_API
+      .obterUsuarioSessao();
+
+
+  const perfil =
+    String(
+      colaborador &&
+      colaborador.perfil
+        ? colaborador.perfil
+        : ''
+    )
+    .trim()
+    .toUpperCase();
+
+
+  document
+    .querySelectorAll(
+      '[data-admin-only="1"]'
+    )
+    .forEach(
+      function(elemento) {
+
+        elemento.style.display =
+          perfil === 'ADMINISTRADOR'
+            ? ''
+            : 'none';
+
+      }
+    );
+
+}
 
 /* =====================================================
    FIM
