@@ -146,15 +146,51 @@
       </nav>
 
 
-      <div class="sidebar-footer">
+     <div
+  class="sidebar-footer"
+  style="
+    flex-direction:column;
+    gap:10px;
+  ">
 
-        <span class="online-dot"></span>
+  <button
+    type="button"
+    onclick="sairVnnus()"
+    style="
+      width:100%;
+      min-height:42px;
+      padding:10px 12px;
+      border-radius:10px;
+      border:1px solid rgba(212,168,77,.25);
+      background:linear-gradient(
+        180deg,
+        #171717,
+        #0c0c0c
+      );
+      color:#f2cf78;
+      font-weight:700;
+      cursor:pointer;
+    ">
+    🚪 Sair / Trocar usuário
+  </button>
 
-        <small>
-          VNNUS • Online
-        </small>
+  <div
+    style="
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+    ">
 
-      </div>
+    <span class="online-dot"></span>
+
+    <small>
+      VNNUS • Online
+    </small>
+
+  </div>
+
+</div>
 
     </aside>
 
@@ -250,7 +286,7 @@
 
   <script src="js/config.js?v=2.0"></script>
   <script src="js/api.js?v=2.6"></script>
-  <script src="js/router.js?v=2.2"></script>
+  <script src="js/router.js?v=2.3"></script>
   <script src="js/dashboard.js?v=2.4"></script>
 
   <script src="js/produtos.js"></script>
