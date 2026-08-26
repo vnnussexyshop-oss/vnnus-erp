@@ -1,95 +1,127 @@
+/* =====================================================
+   VNNUS ERP
+   ROUTER 2.2
+===================================================== */
+
 const VNNUS_ROUTES = {
 
   dashboard: {
     file: "pages/dashboard.html",
     title: "Dashboard",
-    subtitle: "Visão geral da operação"
+    subtitle: "Visão geral da operação",
+    init: "init_dashboard"
   },
 
   produtos: {
     file: "pages/produtos.html",
     title: "Produtos",
-    subtitle: "Cadastro e gerenciamento de produtos"
+    subtitle: "Cadastro e gerenciamento de produtos",
+    init: "init_produtos"
   },
 
   scanner: {
     file: "pages/scanner.html",
     title: "Scanner",
-    subtitle: "Leitura de código de barras"
+    subtitle: "Leitura de código de barras",
+    init: "init_scanner"
   },
 
   estoque: {
     file: "pages/estoque.html",
     title: "Estoque",
-    subtitle: "Entradas, saídas e saldo"
+    subtitle: "Entradas, saídas e saldo",
+    init: "init_estoque"
   },
 
   pdv: {
     file: "pages/pdv.html",
     title: "PDV",
-    subtitle: "Nova venda"
+    subtitle: "Nova venda",
+    init: "init_pdv"
   },
 
   vendas: {
     file: "pages/vendas.html",
     title: "Vendas",
-    subtitle: "Histórico e comprovantes"
+    subtitle: "Histórico e comprovantes",
+    init: "init_vendas"
   },
 
   clientes: {
     file: "pages/clientes.html",
     title: "Clientes",
-    subtitle: "Cadastro e histórico"
+    subtitle: "Cadastro e histórico",
+    init: "init_clientes"
   },
 
   financeiro: {
     file: "pages/financeiro.html",
     title: "Financeiro",
-    subtitle: "Faturamento, custos e lucro"
+    subtitle: "Faturamento, custos e lucro",
+    init: "init_financeiro"
   },
 
   "contas-receber": {
     file: "pages/contas-receber.html",
     title: "Contas a Receber",
-    subtitle: "Parcelas, vencimentos e recebimentos"
+    subtitle: "Parcelas, vencimentos e recebimentos",
+    init: "init_contas_receber"
   },
 
   despesas: {
     file: "pages/despesas.html",
     title: "Despesas",
-    subtitle: "Contas a pagar e despesas"
+    subtitle: "Contas a pagar e despesas",
+    init: "init_despesas"
   },
 
   configuracoes: {
     file: "pages/configuracoes.html",
     title: "Configurações",
-    subtitle: "Preferências e integrações"
+    subtitle: "Preferências e integrações",
+    init: "init_configuracoes"
   }
 
 };
 
 
+/* =====================================================
+   NAVEGAR
+===================================================== */
+
 async function navigateTo(pageName) {
 
-  const r =
+  const rota =
     VNNUS_ROUTES[pageName] ||
     VNNUS_ROUTES.dashboard;
 
 
-  document
-    .getElementById(
+  const pageTitle =
+    document.getElementById(
       "pageTitle"
-    )
-    .textContent =
-      r.title;
+    );
 
 
-  document
-    .getElementById(
+  const pageSubtitle =
+    document.getElementById(
       "pageSubtitle"
-    )
-    .textContent =
-      r.subtitle;
+    );
+
+
+  if (pageTitle) {
+
+    pageTitle.textContent =
+      rota.title;
+
+  }
+
+
+  if (pageSubtitle) {
+
+    pageSubtitle.textContent =
+      rota.subtitle;
+
+  }
 
 
   document
@@ -115,6 +147,17 @@ async function navigateTo(pageName) {
     );
 
 
+  if (!conteudo) {
+
+    console.error(
+      "appContent não encontrado."
+    );
+
+    return;
+
+  }
+
+
   conteudo.innerHTML =
     '<div class="loading-card">Carregando...</div>';
 
@@ -123,21 +166,18 @@ async function navigateTo(pageName) {
 
     const resposta =
       await fetch(
-        r.file,
+        rota.file,
         {
-          cache:
-            "no-store"
+          cache: "no-store"
         }
       );
 
 
-    if (
-      !resposta.ok
-    ) {
+    if (!resposta.ok) {
 
       throw new Error(
         "Não foi possível carregar " +
-        r.file
+        rota.file
       );
 
     }
@@ -146,6 +186,10 @@ async function navigateTo(pageName) {
     conteudo.innerHTML =
       await resposta.text();
 
+
+    /* ===============================================
+       EXECUTAR SCRIPTS INTERNOS DA PÁGINA
+    =============================================== */
 
     [
       ...conteudo.querySelectorAll(
@@ -177,9 +221,20 @@ async function navigateTo(pageName) {
       );
 
 
+    /* ===============================================
+       INICIALIZAR MÓDULO
+    =============================================== */
+
     const nomeInit =
-      "init_" +
-      pageName;
+      rota.init ||
+      (
+        "init_" +
+        String(pageName)
+          .replace(
+            /-/g,
+            "_"
+          )
+      );
 
 
     if (
@@ -195,6 +250,15 @@ async function navigateTo(pageName) {
 
     }
 
+    else {
+
+      console.warn(
+        "Função de inicialização não encontrada:",
+        nomeInit
+      );
+
+    }
+
 
     history.replaceState(
       null,
@@ -203,20 +267,48 @@ async function navigateTo(pageName) {
     );
 
 
-    closeMobileMenu();
+    if (
+      typeof closeMobileMenu ===
+      "function"
+    ) {
+
+      closeMobileMenu();
+
+    }
 
   }
 
   catch (erro) {
 
-    conteudo.innerHTML =
-      '<div class="empty-state">' +
-      '<strong>Erro ao carregar a página.</strong>' +
-      '<p style="margin-top:8px">' +
-      erro.message +
-      '</p>' +
-      '</div>';
+    console.error(
+      "Router:",
+      erro
+    );
+
+
+    conteudo.innerHTML = `
+      <div class="empty-state">
+
+        <strong>
+          Erro ao carregar a página.
+        </strong>
+
+        <p style="margin-top:8px">
+          ${
+            erro.message ||
+            String(erro)
+          }
+        </p>
+
+      </div>
+    `;
 
   }
 
 }
+
+
+/* =====================================================
+   FIM
+   ROUTER 2.2
+===================================================== */
