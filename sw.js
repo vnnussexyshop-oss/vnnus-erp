@@ -1,5 +1,10 @@
+/* =====================================================
+   VNNUS ERP
+   SERVICE WORKER 4.0
+===================================================== */
+
 const CACHE_NAME =
-  'vnnus-erp-v3';
+  'vnnus-erp-v4';
 
 
 self.addEventListener(
@@ -25,15 +30,26 @@ self.addEventListener(
 
             return Promise.all(
 
-              chaves.map(
-                function(chave) {
+              chaves
+                .filter(
+                  function(chave) {
 
-                  return caches.delete(
-                    chave
-                  );
+                    return (
+                      chave !==
+                      CACHE_NAME
+                    );
 
-                }
-              )
+                  }
+                )
+                .map(
+                  function(chave) {
+
+                    return caches.delete(
+                      chave
+                    );
+
+                  }
+                )
 
             );
 
@@ -57,13 +73,15 @@ self.addEventListener(
   'fetch',
   function(event) {
 
-    /*
-      ERP 2.1:
-      sempre buscamos a versão atual
-      diretamente da internet.
+    if (
+      event.request.method !==
+      'GET'
+    ) {
 
-      Isso evita JS antigo no celular.
-    */
+      return;
+
+    }
+
 
     event.respondWith(
 
@@ -72,6 +90,14 @@ self.addEventListener(
         {
           cache:
             'no-store'
+        }
+      )
+
+      .then(
+        function(resposta) {
+
+          return resposta;
+
         }
       )
 
