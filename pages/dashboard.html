@@ -1,1455 +1,790 @@
-/* =====================================================
-   VNNUS SISTEMA
-   DASHBOARD 1.0
-===================================================== */
-
-function carregarDashboard() {
-
-  const planilha = getPlanilha();
-
-  const abaVendas =
-    planilha.getSheetByName('VENDAS');
-
-  const abaItens =
-    planilha.getSheetByName('ITENS_VENDA');
-
-  const abaProdutos =
-    planilha.getSheetByName('PRODUTOS');
-
-  const abaEstoque =
-    planilha.getSheetByName('ESTOQUE');
-
-
-  if (!abaVendas) {
-    throw new Error(
-      'A aba VENDAS não foi encontrada.'
-    );
-  }
-
-
-  /* ===============================================
-     VENDAS
-  =============================================== */
-
-  const vendas =
-    lerVendasDashboard_(abaVendas);
-
-
-  const vendasValidas =
-    vendas.filter(function(venda) {
-
-      return (
-        String(venda.STATUS || '')
-          .trim()
-          .toUpperCase() !==
-        'CANCELADA'
-      );
-
-    });
-
-
-  const hoje =
-    new Date();
-
-
-  const inicioHoje =
-    new Date(
-      hoje.getFullYear(),
-      hoje.getMonth(),
-      hoje.getDate()
-    );
-
-
-  const vendasHoje =
-    vendasValidas.filter(
-      function(venda) {
-
-        return (
-          venda.DATA_OBJ &&
-          venda.DATA_OBJ.getTime() ===
-          inicioHoje.getTime()
-        );
-
-      }
-    );
-
-
-  const faturamentoHoje =
-    vendasHoje.reduce(
-      function(total, venda) {
-
-        return (
-          total +
-          Number(venda.TOTAL || 0)
-        );
-
-      },
-      0
-    );
-
-
-  const pedidosHoje =
-    vendasHoje.length;
-
-
-  const ticketMedioHoje =
-    pedidosHoje
-      ? faturamentoHoje /
-        pedidosHoje
-      : 0;
-
-
-  /* ===============================================
-     PRODUTOS
-  =============================================== */
-
-  let totalProdutos = 0;
-
-
-  if (abaProdutos) {
-
-    const ultimaLinha =
-      abaProdutos.getLastRow();
-
-
-    if (ultimaLinha >= 2) {
-
-      const dados =
-        abaProdutos
-          .getRange(
-            2,
-            1,
-            ultimaLinha - 1,
-            Math.min(
-              12,
-              abaProdutos.getLastColumn()
-            )
-          )
-          .getDisplayValues();
-
-
-      totalProdutos =
-        dados.filter(function(linha) {
-
-          return (
-            linha[0] ||
-            linha[1] ||
-            linha[2]
-          );
-
-        }).length;
-
-    }
-
-  }
-
-
-  /* ===============================================
-     ESTOQUE
-  =============================================== */
-
-  let estoqueBaixo = 0;
-  let semEstoque = 0;
-
-
-  if (abaEstoque) {
-
-    sincronizarEstoqueComProdutos_();
-
-
-    const ultimaLinhaEstoque =
-      abaEstoque.getLastRow();
-
-
-    if (
-      ultimaLinhaEstoque >= 2
-    ) {
-
-      const dadosEstoque =
-        abaEstoque
-          .getRange(
-            2,
-            1,
-            ultimaLinhaEstoque - 1,
-            6
-          )
-          .getDisplayValues();
-
-
-      dadosEstoque.forEach(
-        function(linha) {
-
-          const status =
-            String(
-              linha[5] || ''
-            )
-            .trim()
-            .toUpperCase();
-
-
-          if (
-            status ===
-            'ESTOQUE BAIXO'
-          ) {
-
-            estoqueBaixo++;
-
-          }
-
-
-          if (
-            status ===
-            'SEM ESTOQUE'
-          ) {
-
-            semEstoque++;
-
-          }
-
-        }
-      );
-
-    }
-
-  }
-
-
-  /* ===============================================
-     ITENS VENDIDOS HOJE
-  =============================================== */
-
-  const idsVendasHoje =
-    new Set(
-      vendasHoje.map(
-        function(venda) {
-
-          return String(
-            venda.ID_VENDA
-          );
-
-        }
-      )
-    );
-
-
-  const resumoItens =
-    calcularResumoItensDashboard_(
-      abaItens,
-      idsVendasHoje,
-      abaProdutos
-    );
-
-
-  /* ===============================================
-     ÚLTIMAS VENDAS
-  =============================================== */
-
-  const ultimasVendas =
-    vendasValidas
-      .slice()
-      .reverse()
-      .slice(0, 5)
-      .map(function(venda) {
-
-        return {
-
-          ID_VENDA:
-            venda.ID_VENDA,
-
-          DATA:
-            venda.DATA,
-
-          HORA:
-            venda.HORA,
-
-          CLIENTE:
-            venda.CLIENTE ||
-            'Consumidor Final',
-
-          FORMA_PAGAMENTO:
-            venda.FORMA_PAGAMENTO,
-
-          TOTAL:
-            venda.TOTAL
-
-        };
-
-      });
-
-
-  return {
-
-    faturamentoHoje:
-      faturamentoHoje,
-
-    pedidosHoje:
-      pedidosHoje,
-
-    totalProdutos:
-      totalProdutos,
-
-    estoqueBaixo:
-      estoqueBaixo,
-
-    semEstoque:
-      semEstoque,
-
-    lucroHoje:
-      resumoItens.lucro,
-
-    produtosVendidosHoje:
-      resumoItens.quantidade,
-
-    ticketMedioHoje:
-      ticketMedioHoje,
-
-    produtoMaisVendido:
-      resumoItens.produtoMaisVendido,
-
-    ultimasVendas:
-      ultimasVendas
-
-  };
-
-}
-
-
-/* =====================================================
-   LER VENDAS
-===================================================== */
-
-function lerVendasDashboard_(aba) {
-
-  const ultimaLinha =
-    aba.getLastRow();
-
-
-  if (ultimaLinha < 2) {
-    return [];
-  }
-
-
-  const ultimaColuna =
-    aba.getLastColumn();
-
-
-  const cabecalhos =
-    aba
-      .getRange(
-        1,
-        1,
-        1,
-        ultimaColuna
-      )
-      .getDisplayValues()[0]
-      .map(function(valor) {
-
-        return normalizarDashboard_(
-          valor
-        );
-
-      });
-
-
-  const dados =
-    aba
-      .getRange(
-        2,
-        1,
-        ultimaLinha - 1,
-        ultimaColuna
-      )
-      .getDisplayValues();
-
-
-  return dados
-    .map(function(linha) {
-
-      const venda = {};
-
-
-      cabecalhos.forEach(
-        function(cabecalho, indice) {
-
-          venda[cabecalho] =
-            linha[indice];
-
-        }
-      );
-
-
-      return {
-
-        ID_VENDA:
-          venda.ID_VENDA || '',
-
-        DATA:
-          venda.DATA || '',
-
-        HORA:
-          venda.HORA || '',
-
-        DATA_OBJ:
-          converterDataDashboard_(
-            venda.DATA
-          ),
-
-        CLIENTE:
-          venda.CLIENTE ||
-          'Consumidor Final',
-
-        FORMA_PAGAMENTO:
-          venda.FORMA_PAGAMENTO ||
-          '',
-
-        TOTAL:
-          converterNumeroDashboard_(
-            venda.TOTAL
-          ),
-
-        STATUS:
-          venda.STATUS || ''
-
-      };
-
-    })
-    .filter(function(venda) {
-
-      return venda.ID_VENDA;
-
-    });
-
-}
-
-
-/* =====================================================
-   RESUMO DE ITENS
-===================================================== */
-
-function calcularResumoItensDashboard_(
-  abaItens,
-  idsVendas,
-  abaProdutos
-) {
-
-  const retorno = {
-
-    quantidade: 0,
-
-    lucro: 0,
-
-    produtoMaisVendido: {
-      produto: '-',
-      quantidade: 0
-    }
-
-  };
-
-
-  if (
-    !abaItens ||
-    !idsVendas.size
-  ) {
-
-    return retorno;
-
-  }
-
-
-  const ultimaLinha =
-    abaItens.getLastRow();
-
-
-  if (ultimaLinha < 2) {
-    return retorno;
-  }
-
-
-  const ultimaColuna =
-    abaItens.getLastColumn();
-
-
-  const cabecalhos =
-    abaItens
-      .getRange(
-        1,
-        1,
-        1,
-        ultimaColuna
-      )
-      .getDisplayValues()[0]
-      .map(function(valor) {
-
-        return normalizarDashboard_(
-          valor
-        );
-
-      });
-
-
-  const dados =
-    abaItens
-      .getRange(
-        2,
-        1,
-        ultimaLinha - 1,
-        ultimaColuna
-      )
-      .getDisplayValues();
-
-
-  /*
-    Mapa de custo atual por ID_PRODUTO.
-    É usado apenas como fallback para vendas antigas
-    que não possuem CUSTO_UNITARIO/LUCRO_ESTIMADO.
-  */
-
-  const mapaCustoProdutos = {};
-
-
-  if (abaProdutos) {
-
-    const ultimaLinhaProdutos =
-      abaProdutos.getLastRow();
-
-
-    if (ultimaLinhaProdutos >= 2) {
-
-      const ultimaColunaProdutos =
-        abaProdutos.getLastColumn();
-
-
-      const cabecalhosProdutos =
-        abaProdutos
-          .getRange(
-            1,
-            1,
-            1,
-            ultimaColunaProdutos
-          )
-          .getDisplayValues()[0]
-          .map(function(valor) {
-
-            return normalizarDashboard_(
-              valor
-            );
-
-          });
-
-
-      const dadosProdutos =
-        abaProdutos
-          .getRange(
-            2,
-            1,
-            ultimaLinhaProdutos - 1,
-            ultimaColunaProdutos
-          )
-          .getDisplayValues();
-
-
-      dadosProdutos.forEach(
-        function(linhaProduto) {
-
-          const produto = {};
-
-
-          cabecalhosProdutos.forEach(
-            function(cabecalho, indice) {
-
-              produto[cabecalho] =
-                linhaProduto[indice];
-
-            }
-          );
-
-
-          const idProduto =
-            String(
-              produto.ID_PRODUTO || ''
-            ).trim();
-
-
-          if (idProduto) {
-
-            mapaCustoProdutos[idProduto] =
-              converterNumeroDashboard_(
-                produto.CUSTO
-              );
-
-          }
-
-        }
-      );
-
-    }
-
-  }
-
-
-  const ranking = {};
-
-
-  dados.forEach(function(linha) {
-
-    const item = {};
-
-
-    cabecalhos.forEach(
-      function(cabecalho, indice) {
-
-        item[cabecalho] =
-          linha[indice];
-
-      }
-    );
-
-
-    if (
-      !idsVendas.has(
-        String(
-          item.ID_VENDA || ''
-        )
-      )
-    ) {
-
-      return;
-
-    }
-
-
-    const quantidade =
-      Number(
-        item.QUANTIDADE || 0
-      );
-
-
-    retorno.quantidade +=
-      quantidade;
-
-
-    const nomeProduto =
-      String(
-        item.PRODUTO || 'Produto'
-      );
-
-
-    if (!ranking[nomeProduto]) {
-
-      ranking[nomeProduto] = 0;
-
-    }
-
-
-    ranking[nomeProduto] +=
-      quantidade;
-
-
-    /* =============================================
-       LUCRO
-    ============================================= */
-
-    let lucroItem = 0;
-
-
-    /*
-      1) Preferência:
-         usa o lucro gravado no momento da venda.
-    */
-
-    if (
-      item.LUCRO_ESTIMADO !== undefined &&
-      String(
-        item.LUCRO_ESTIMADO
-      ).trim() !== ''
-    ) {
-
-      lucroItem =
-        converterNumeroDashboard_(
-          item.LUCRO_ESTIMADO
-        );
-
-    }
-
-
-    /*
-      2) Compatibilidade com registros antigos
-         que eventualmente usem a coluna LUCRO.
-    */
-
-    else if (
-      item.LUCRO !== undefined &&
-      String(
-        item.LUCRO
-      ).trim() !== ''
-    ) {
-
-      lucroItem =
-        converterNumeroDashboard_(
-          item.LUCRO
-        );
-
-    }
-
-
-    /*
-      3) Se não existe lucro gravado,
-         recalcula usando TOTAL e custo.
-    */
-
-    else {
-
-      const totalItem =
-        converterNumeroDashboard_(
-          item.TOTAL ||
-          item.SUBTOTAL
-        );
-
-
-      let custoUnitario = 0;
-
-
-      /*
-        Primeiro tenta o custo gravado na própria venda.
-      */
-
-      if (
-        item.CUSTO_UNITARIO !== undefined &&
-        String(
-          item.CUSTO_UNITARIO
-        ).trim() !== ''
-      ) {
-
-        custoUnitario =
-          converterNumeroDashboard_(
-            item.CUSTO_UNITARIO
-          );
-
-      }
-
-
-      /*
-        Compatibilidade com coluna antiga CUSTO.
-      */
-
-      else if (
-        item.CUSTO !== undefined &&
-        String(
-          item.CUSTO
-        ).trim() !== ''
-      ) {
-
-        custoUnitario =
-          converterNumeroDashboard_(
-            item.CUSTO
-          );
-
-      }
-
-
-      /*
-        Venda antiga sem custo:
-        busca o custo atual pelo ID_PRODUTO.
-      */
-
-      else {
-
-        const idProduto =
-          String(
-            item.ID_PRODUTO || ''
-          ).trim();
-
-
-        if (
-          idProduto &&
-          Object.prototype
-            .hasOwnProperty
-            .call(
-              mapaCustoProdutos,
-              idProduto
-            )
-        ) {
-
-          custoUnitario =
-            Number(
-              mapaCustoProdutos[idProduto] || 0
-            );
-
-        }
-
-      }
-
-
-      lucroItem =
-        totalItem -
-        (
-          custoUnitario *
-          quantidade
-        );
-
-    }
-
-
-    retorno.lucro +=
-      lucroItem;
-
-  });
-
-
-  Object.keys(ranking)
-    .forEach(function(produto) {
-
-      if (
-        ranking[produto] >
-        retorno.produtoMaisVendido
-          .quantidade
-      ) {
-
-        retorno.produtoMaisVendido = {
-
-          produto:
-            produto,
-
-          quantidade:
-            ranking[produto]
-
-        };
-
-      }
-
-    });
-
-
-  return retorno;
-
-}
-
-/* =====================================================
-   DATA
-===================================================== */
-
-function converterDataDashboard_(
-  valor
-) {
-
-  const texto =
-    String(
-      valor || ''
-    ).trim();
-
-
-  const partes =
-    texto.split('/');
-
-
-  if (
-    partes.length !== 3
-  ) {
-
-    return null;
-
-  }
-
-
-  const data =
-    new Date(
-
-      Number(partes[2]),
-
-      Number(partes[1]) - 1,
-
-      Number(partes[0])
-
-    );
-
-
-  return isNaN(
-    data.getTime()
-  )
-    ? null
-    : data;
-
-}
-
-
-/* =====================================================
-   NORMALIZAÇÃO
-===================================================== */
-
-function normalizarDashboard_(
-  valor
-) {
-
-  return String(
-    valor || ''
-  )
-    .trim()
-    .toUpperCase()
-    .normalize('NFD')
-    .replace(
-      /[\u0300-\u036f]/g,
-      ''
-    )
-    .replace(
-      /\s+/g,
-      '_'
-    );
-
-}
-
-
-/* =====================================================
-   NÚMEROS
-===================================================== */
-
-function converterNumeroDashboard_(
-  valor
-) {
-
-  if (
-    valor === null ||
-    valor === undefined ||
-    valor === ''
-  ) {
-
-    return 0;
-
-  }
-
-
-  if (
-    typeof valor === 'number'
-  ) {
-
-    return valor;
-
-  }
-
-
-  let texto =
-    String(valor)
-      .trim()
-      .replace(/R\$/gi, '')
-      .replace(/\s/g, '');
-
-
-  if (
-    texto.includes(',')
-  ) {
-
-    texto =
-      texto
-        .replace(/\./g, '')
-        .replace(',', '.');
-
-  }
-
-
-  const numero =
-    Number(texto);
-
-
-  return isNaN(numero)
-    ? 0
-    : numero;
-
-}
-/* =====================================================
-   COMPARAÇÃO DE DESEMPENHO
-   DASHBOARD 2.4
-===================================================== */
-
-function carregarComparacaoDashboard() {
-
-  const planilha =
-    getPlanilha();
-
-
-  const abaVendas =
-    planilha.getSheetByName(
-      'VENDAS'
-    );
-
-
-  const abaItens =
-    planilha.getSheetByName(
-      'ITENS_VENDA'
-    );
-
-
-  const abaProdutos =
-    planilha.getSheetByName(
-      'PRODUTOS'
-    );
-
-
-  if (!abaVendas) {
-
-    throw new Error(
-      'A aba VENDAS não foi encontrada.'
-    );
-
-  }
-
-
-  const vendas =
-    lerVendasDashboard_(
-      abaVendas
-    );
-
-
-  const vendasValidas =
-    vendas.filter(
-      function(venda) {
-
-        return (
-          String(
-            venda.STATUS || ''
-          )
-          .trim()
-          .toUpperCase() !==
-          'CANCELADA'
-        );
-
-      }
-    );
-
-
-  const hoje =
-    new Date();
-
-
-  const dataHoje =
-    new Date(
-      hoje.getFullYear(),
-      hoje.getMonth(),
-      hoje.getDate()
-    );
-
-
-  const dataOntem =
-    new Date(
-      hoje.getFullYear(),
-      hoje.getMonth(),
-      hoje.getDate() - 1
-    );
-
-
-  const vendasHoje =
-    filtrarVendasDataDashboard_(
-      vendasValidas,
-      dataHoje
-    );
-
-
-  const vendasOntem =
-    filtrarVendasDataDashboard_(
-      vendasValidas,
-      dataOntem
-    );
-
-
-  const hojeResumo =
-    calcularPeriodoComparacaoDashboard_(
-      vendasHoje,
-      abaItens,
-      abaProdutos
-    );
-
-
-  const ontemResumo =
-    calcularPeriodoComparacaoDashboard_(
-      vendasOntem,
-      abaItens,
-      abaProdutos
-    );
-
-
-  /* ===============================================
-     DESPESAS PAGAS / LUCRO LÍQUIDO
-     DASHBOARD 2.4
-  =============================================== */
-
-  const hojeIso =
-    formatarDataIsoDashboard_(
-      dataHoje
-    );
-
-  const ontemIso =
-    formatarDataIsoDashboard_(
-      dataOntem
-    );
-
-  const despesasHoje =
-    obterDespesasPagasComparacaoDashboard_(
-      hojeIso
-    );
-
-  const despesasOntem =
-    obterDespesasPagasComparacaoDashboard_(
-      ontemIso
-    );
-
-  hojeResumo.despesasPagas =
-    despesasHoje;
-
-  ontemResumo.despesasPagas =
-    despesasOntem;
-
-  hojeResumo.lucroLiquido =
-    Number(hojeResumo.lucroBruto || 0) -
-    despesasHoje;
-
-  ontemResumo.lucroLiquido =
-    Number(ontemResumo.lucroBruto || 0) -
-    despesasOntem;
-
-
-  return {
-
-    periodo:
-      'HOJE_X_ONTEM',
-
-    hoje:
-      hojeResumo,
-
-    ontem:
-      ontemResumo,
-
-    variacao: {
-
-      faturamento:
-        calcularVariacaoDashboard_(
-          hojeResumo.faturamento,
-          ontemResumo.faturamento
+<section>
+
+  <!-- =================================================
+       BOAS-VINDAS
+  ================================================== -->
+
+  <div
+    class="card"
+    style="
+      margin-bottom:18px;
+      background:
+        radial-gradient(
+          circle at right top,
+          rgba(150,0,18,.20),
+          transparent 38%
         ),
-
-      pedidos:
-        calcularVariacaoDashboard_(
-          hojeResumo.pedidos,
-          ontemResumo.pedidos
-        ),
-
-      lucroBruto:
-        calcularVariacaoDashboard_(
-          hojeResumo.lucroBruto,
-          ontemResumo.lucroBruto
-        ),
-
-      itensVendidos:
-        calcularVariacaoDashboard_(
-          hojeResumo.itensVendidos,
-          ontemResumo.itensVendidos
-        ),
-
-      despesasPagas:
-        calcularVariacaoDashboard_(
-          hojeResumo.despesasPagas,
-          ontemResumo.despesasPagas
-        ),
-
-      lucroLiquido:
-        calcularVariacaoDashboard_(
-          hojeResumo.lucroLiquido,
-          ontemResumo.lucroLiquido
-        )
-
-    }
-
-  };
-
-}
-
-
-/* =====================================================
-   DESPESAS PAGAS POR DIA
-   DASHBOARD 2.4
-===================================================== */
-
-function obterDespesasPagasComparacaoDashboard_(
-  dataIso
-) {
-
-  if (
-    typeof resumoDespesasVnnus !==
-    'function'
-  ) {
-
-    throw new Error(
-      'Função resumoDespesasVnnus() não encontrada.'
-    );
-
-  }
-
-
-  const resumo =
-    resumoDespesasVnnus(
-      dataIso,
-      dataIso
-    ) || {};
-
-
-  return converterNumeroDashboard_(
-    resumo.pago || 0
-  );
-
-}
-
-
-/* =====================================================
-   DATA ISO LOCAL
-===================================================== */
-
-function formatarDataIsoDashboard_(
-  data
-) {
-
-  const ano =
-    data.getFullYear();
-
-  const mes =
-    String(
-      data.getMonth() + 1
-    ).padStart(2, '0');
-
-  const dia =
-    String(
-      data.getDate()
-    ).padStart(2, '0');
-
-
-  return (
-    ano +
-    '-' +
-    mes +
-    '-' +
-    dia
-  );
-
-}
-
-
-/* =====================================================
-   FILTRAR VENDAS POR DATA
-===================================================== */
-
-function filtrarVendasDataDashboard_(
-  vendas,
-  data
-) {
-
-  const tempo =
-    data.getTime();
-
-
-  return vendas.filter(
-    function(venda) {
-
-      return (
-        venda.DATA_OBJ &&
-        venda.DATA_OBJ.getTime() ===
-        tempo
-      );
-
-    }
-  );
-
-}
-
-
-/* =====================================================
-   RESUMO DO PERÍODO
-===================================================== */
-
-function calcularPeriodoComparacaoDashboard_(
-  vendas,
-  abaItens,
-  abaProdutos
-) {
-
-  const faturamento =
-    vendas.reduce(
-      function(total, venda) {
-
-        return (
-          total +
-          Number(
-            venda.TOTAL || 0
-          )
+        linear-gradient(
+          145deg,
+          #151515,
+          #090909
         );
+    ">
 
-      },
-      0
-    );
+    <div
+      style="
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:18px;
+        flex-wrap:wrap;
+      ">
 
+      <div>
 
-  const pedidos =
-    vendas.length;
+        <div
+          style="
+            color:var(--gold);
+            font-size:12px;
+            text-transform:uppercase;
+            letter-spacing:.15em;
+            margin-bottom:8px;
+          ">
+          VNNUS ERP
+        </div>
 
+        <h2
+          style="
+            font-family:'Cinzel',serif;
+            color:var(--gold2);
+            font-size:24px;
+            line-height:1.2;
+          ">
+          Bem-vinda ao seu painel
+        </h2>
 
-  const idsVendas =
-    new Set(
-      vendas.map(
-        function(venda) {
+        <p
+          style="
+            color:var(--muted);
+            margin-top:7px;
+          ">
+          Aqui está o resumo da sua operação hoje.
+        </p>
 
-          return String(
-            venda.ID_VENDA
-          );
-
-        }
-      )
-    );
-
-
-  const itens =
-    calcularResumoItensDashboard_(
-      abaItens,
-      idsVendas,
-      abaProdutos
-    );
-
-
-  return {
-
-    faturamento:
-      faturamento,
-
-    pedidos:
-      pedidos,
-
-    lucroBruto:
-      Number(
-        itens.lucro || 0
-      ),
-
-    itensVendidos:
-      Number(
-        itens.quantidade || 0
-      ),
-
-    ticketMedio:
-      pedidos
-        ? faturamento /
-          pedidos
-        : 0
-
-  };
-
-}
+      </div>
 
 
-/* =====================================================
-   VARIAÇÃO PERCENTUAL
-===================================================== */
+      <div
+        style="
+          min-width:180px;
+          border:1px solid rgba(212,168,77,.20);
+          border-radius:13px;
+          padding:14px 16px;
+          background:#0d0d0d;
+        ">
 
-function calcularVariacaoDashboard_(
-  atual,
-  anterior
-) {
+        <div
+          style="
+            color:var(--gold-soft);
+            font-size:11px;
+            text-transform:uppercase;
+            letter-spacing:.08em;
+          ">
+          Hoje
+        </div>
 
-  atual =
-    Number(
-      atual || 0
-    );
+        <div
+          id="dashDataHoje"
+          style="
+            margin-top:6px;
+            font-weight:700;
+            color:#fff;
+          ">
+          -
+        </div>
 
+        <div
+          id="dashDiaSemana"
+          style="
+            color:var(--muted);
+            margin-top:3px;
+            font-size:12px;
+          ">
+        </div>
 
-  anterior =
-    Number(
-      anterior || 0
-    );
+      </div>
 
+    </div>
 
-  /*
-    Os dois períodos zerados.
-  */
-
-  if (
-    atual === 0 &&
-    anterior === 0
-  ) {
-
-    return {
-
-      percentual:
-        0,
-
-      direcao:
-        'IGUAL',
-
-      comparavel:
-        true
-
-    };
-
-  }
-
-
-  /*
-    Ontem foi zero e hoje houve movimento.
-
-    Não mostramos um percentual artificial,
-    porque matematicamente a variação percentual
-    não possui uma base anterior válida.
-  */
-
-  if (
-    anterior === 0
-  ) {
-
-    return {
-
-      percentual:
-        null,
-
-      direcao:
-        atual > 0
-          ? 'NOVO'
-          : 'IGUAL',
-
-      comparavel:
-        false
-
-    };
-
-  }
+  </div>
 
 
-  const percentual =
-    (
-      (
-        atual -
-        anterior
-      ) /
-      Math.abs(
-        anterior
-      )
-    ) *
-    100;
+  <!-- =================================================
+       CABEÇALHO
+  ================================================== -->
+
+  <div class="page-header">
+
+    <div>
+
+      <h2>
+        Visão Geral
+      </h2>
+
+      <p>
+        Indicadores reais da VNNUS em tempo real.
+      </p>
+
+    </div>
+
+    <button
+      class="btn-secondary"
+      onclick="init_dashboard()">
+      ↻ Atualizar
+    </button>
+
+  </div>
 
 
-  return {
-
-    percentual:
-      percentual,
-
-    direcao:
-      percentual > 0
-        ? 'ALTA'
-        : (
-            percentual < 0
-              ? 'BAIXA'
-              : 'IGUAL'
-          ),
-
-    comparavel:
-      true
-
-  };
-
-}
+  <div
+    id="dashStatus"
+    style="
+      color:var(--muted);
+      margin-bottom:15px;
+    ">
+    Conectando à API...
+  </div>
 
 
-/* =====================================================
-   FIM DA COMPARAÇÃO
-   VNNUS DASHBOARD 2.4
-===================================================== */
+  <!-- =================================================
+       PRINCIPAIS INDICADORES
+  ================================================== -->
+
+  <div class="cards">
+
+    <!-- FATURAMENTO -->
+
+    <div class="card card-accent">
+
+      <div class="card-icon">
+        💰
+      </div>
+
+      <div class="card-label">
+        Faturamento Hoje
+      </div>
+
+      <div
+        class="card-value"
+        id="dashVendasHoje">
+        R$ 0,00
+      </div>
+
+      <div
+        id="dashCompFaturamento"
+        style="
+          color:var(--muted);
+          font-size:11px;
+          margin-top:7px;
+          min-height:16px;
+        ">
+      </div>
+
+    </div>
+
+
+    <!-- PEDIDOS -->
+
+    <div class="card">
+
+      <div class="card-icon">
+        🛒
+      </div>
+
+      <div class="card-label">
+        Pedidos Hoje
+      </div>
+
+      <div
+        class="card-value"
+        id="dashPedidosHoje">
+        0
+      </div>
+
+      <div
+        id="dashCompPedidos"
+        style="
+          color:var(--muted);
+          font-size:11px;
+          margin-top:7px;
+          min-height:16px;
+        ">
+      </div>
+
+    </div>
+
+
+    <!-- LUCRO BRUTO -->
+
+    <div class="card">
+
+      <div class="card-icon">
+        💎
+      </div>
+
+      <div class="card-label">
+        Lucro Bruto Hoje
+      </div>
+
+      <div
+        class="card-value"
+        id="dashLucroHoje">
+        R$ 0,00
+      </div>
+
+      <div
+        id="dashCompLucro"
+        style="
+          color:var(--muted);
+          font-size:11px;
+          margin-top:7px;
+          min-height:16px;
+        ">
+      </div>
+
+    </div>
+
+
+    <!-- ESTOQUE -->
+
+    <div class="card card-accent">
+
+      <div class="card-icon">
+        ⚠️
+      </div>
+
+      <div class="card-label">
+        Estoque Crítico
+      </div>
+
+      <div
+        class="card-value"
+        id="dashEstoqueCritico">
+        0
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =================================================
+       RESULTADO FINANCEIRO DE HOJE
+  ================================================== -->
+
+  <div
+    class="cards"
+    style="margin-top:18px;">
+
+    <div class="card">
+
+      <div class="card-icon">
+        💸
+      </div>
+
+      <div class="card-label">
+        Despesas Pagas Hoje
+      </div>
+
+      <div
+        class="card-value"
+        id="dashDespesasHoje">
+        R$ 0,00
+      </div>
+
+      <div
+        id="dashCompDespesas"
+        style="
+          color:var(--muted);
+          font-size:11px;
+          margin-top:7px;
+          min-height:16px;
+        ">
+      </div>
+
+    </div>
+
+
+    <div class="card card-accent">
+
+      <div class="card-icon">
+        💰
+      </div>
+
+      <div class="card-label">
+        Lucro Líquido Hoje
+      </div>
+
+      <div
+        class="card-value"
+        id="dashLucroLiquidoHoje">
+        R$ 0,00
+      </div>
+
+      <div
+        id="dashCompLucroLiquido"
+        style="
+          color:var(--muted);
+          font-size:11px;
+          margin-top:7px;
+          min-height:16px;
+        ">
+      </div>
+
+      <div
+        style="
+          color:var(--muted);
+          font-size:11px;
+          margin-top:5px;
+        ">
+        Lucro bruto − despesas pagas
+      </div>
+
+    </div>
+
+
+    <div class="card">
+
+      <div class="card-icon">
+        ⏳
+      </div>
+
+      <div class="card-label">
+        Contas a Pagar
+      </div>
+
+      <div
+        class="card-value"
+        id="dashDespesasPendentes">
+        R$ 0,00
+      </div>
+
+    </div>
+
+
+    <div class="card">
+
+      <div class="card-icon">
+        🚨
+      </div>
+
+      <div class="card-label">
+        Contas Vencidas
+      </div>
+
+      <div
+        class="card-value"
+        id="dashDespesasVencidas">
+        R$ 0,00
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =================================================
+       INDICADORES SECUNDÁRIOS
+  ================================================== -->
+
+  <div
+    class="cards"
+    style="margin-top:18px;">
+
+    <!-- TICKET MÉDIO -->
+
+    <div class="card">
+
+      <div class="card-icon">
+        🎯
+      </div>
+
+      <div class="card-label">
+        Ticket Médio
+      </div>
+
+      <div
+        class="card-value"
+        id="dashTicketMedio">
+        R$ 0,00
+      </div>
+
+    </div>
+
+
+    <!-- ITENS -->
+
+    <div class="card">
+
+      <div class="card-icon">
+        📦
+      </div>
+
+      <div class="card-label">
+        Itens Vendidos
+      </div>
+
+      <div
+        class="card-value"
+        id="dashItensVendidos">
+        0
+      </div>
+
+      <div
+        id="dashCompItens"
+        style="
+          color:var(--muted);
+          font-size:11px;
+          margin-top:7px;
+          min-height:16px;
+        ">
+      </div>
+
+    </div>
+
+
+    <!-- PRODUTOS -->
+
+    <div class="card">
+
+      <div class="card-icon">
+        🗃️
+      </div>
+
+      <div class="card-label">
+        Produtos
+      </div>
+
+      <div
+        class="card-value"
+        id="dashProdutos">
+        0
+      </div>
+
+    </div>
+
+
+    <!-- SEM ESTOQUE -->
+
+    <div class="card">
+
+      <div class="card-icon">
+        🚫
+      </div>
+
+      <div class="card-label">
+        Sem Estoque
+      </div>
+
+      <div
+        class="card-value"
+        id="dashSemEstoque">
+        0
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =================================================
+       EVOLUÇÃO FINANCEIRA
+  ================================================== -->
+
+  <div
+    class="card"
+    style="margin-top:18px;">
+
+    <div
+      style="
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:15px;
+        flex-wrap:wrap;
+        margin-bottom:20px;
+      ">
+
+      <div>
+
+        <h3
+          class="section-title"
+          style="margin-bottom:5px;">
+          📈 Evolução Financeira
+        </h3>
+
+        <p
+          style="
+            color:var(--muted);
+            font-size:12px;
+          ">
+          Acompanhe faturamento, lucro e despesas da VNNUS.
+        </p>
+
+      </div>
+
+
+      <div
+        style="
+          display:flex;
+          gap:8px;
+        ">
+
+        <button
+          class="btn-primary"
+          id="dashGrafico7"
+          type="button">
+          7 dias
+        </button>
+
+        <button
+          class="btn-secondary"
+          id="dashGrafico30"
+          type="button">
+          30 dias
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <!-- LEGENDA -->
+
+    <div
+      style="
+        display:flex;
+        gap:18px;
+        flex-wrap:wrap;
+        margin-bottom:18px;
+        font-size:11px;
+        color:var(--muted);
+      ">
+
+      <span>
+        💰 Faturamento
+      </span>
+
+      <span>
+        💎 Lucro bruto
+      </span>
+
+      <span>
+        💸 Despesas
+      </span>
+
+      <span>
+        ✨ Lucro líquido
+      </span>
+
+    </div>
+
+
+    <div
+      id="dashGraficoStatus"
+      style="
+        color:var(--muted);
+        font-size:12px;
+        margin-bottom:12px;
+      ">
+      Carregando evolução financeira...
+    </div>
+
+
+    <div
+      id="dashGraficoFinanceiro"
+      style="
+        width:100%;
+        min-height:310px;
+        overflow-x:auto;
+      ">
+
+      <div class="loading-card">
+        Preparando gráfico...
+      </div>
+
+    </div>
+
+
+    <div
+      id="dashGraficoPeriodo"
+      style="
+        margin-top:13px;
+        padding-top:12px;
+        border-top:1px solid rgba(212,168,77,.12);
+        color:var(--muted);
+        font-size:11px;
+        text-align:right;
+      ">
+    </div>
+
+  </div>
+
+
+  <!-- =================================================
+       DESTAQUES
+  ================================================== -->
+
+  <div class="grid-2">
+
+    <!-- PRODUTO MAIS VENDIDO -->
+
+    <div class="card">
+
+      <h3 class="section-title">
+        🏆 Produto mais vendido
+      </h3>
+
+      <div
+        id="dashMaisVendidoNome"
+        style="
+          font-size:20px;
+          font-weight:800;
+          color:#fff;
+        ">
+        -
+      </div>
+
+      <div
+        id="dashMaisVendidoQtd"
+        style="
+          color:var(--muted);
+          margin-top:7px;
+        ">
+      </div>
+
+    </div>
+
+
+    <!-- AÇÕES RÁPIDAS -->
+
+    <div class="card">
+
+      <h3 class="section-title">
+        ⚡ Ações rápidas
+      </h3>
+
+      <div
+        style="
+          display:grid;
+          grid-template-columns:repeat(2,minmax(0,1fr));
+          gap:10px;
+        ">
+
+        <button
+          class="btn-secondary"
+          onclick="abrirPagina('pdv')">
+          🛒 Nova Venda
+        </button>
+
+        <button
+          class="btn-secondary"
+          onclick="abrirPagina('produtos')">
+          📦 Produtos
+        </button>
+
+        <button
+          class="btn-secondary"
+          onclick="abrirPagina('clientes')">
+          👥 Clientes
+        </button>
+
+        <button
+          class="btn-secondary"
+          onclick="abrirPagina('financeiro')">
+          💰 Financeiro
+        </button>
+
+        <button
+          class="btn-secondary"
+          onclick="abrirPagina('despesas')">
+          💳 Despesas
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =================================================
+       ÚLTIMAS VENDAS
+  ================================================== -->
+
+  <div
+    class="card"
+    style="margin-top:18px;">
+
+    <div
+      class="page-header"
+      style="margin-bottom:14px;">
+
+      <div>
+
+        <h3>
+          🧾 Últimas vendas
+        </h3>
+
+        <p>
+          Movimentações recentes da VNNUS.
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <div class="table-wrap">
+
+      <table>
+
+        <thead>
+
+          <tr>
+
+            <th>
+              Venda
+            </th>
+
+            <th>
+              Data
+            </th>
+
+            <th>
+              Cliente
+            </th>
+
+            <th>
+              Pagamento
+            </th>
+
+            <th>
+              Total
+            </th>
+
+          </tr>
+
+        </thead>
+
+
+        <tbody id="dashUltimasVendas">
+
+          <tr>
+
+            <td colspan="5">
+              Carregando...
+            </td>
+
+          </tr>
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
+
+</section>
