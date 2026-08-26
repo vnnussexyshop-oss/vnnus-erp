@@ -23,7 +23,6 @@ window.VNNUS_API = {
           );
 
           return;
-
         }
 
 
@@ -190,7 +189,6 @@ window.VNNUS_API = {
               );
 
               return;
-
             }
 
 
@@ -207,7 +205,6 @@ window.VNNUS_API = {
               );
 
               return;
-
             }
 
 
@@ -514,7 +511,6 @@ window.VNNUS_API = {
     if (!codigo) {
 
       return null;
-
     }
 
 
@@ -541,10 +537,7 @@ window.VNNUS_API = {
       null
     );
 
-  },
-
-
-  /* =====================================================
+  },  /* =====================================================
      DASHBOARD
   ===================================================== */
 
@@ -1014,10 +1007,7 @@ window.VNNUS_API = {
 
     });
 
-  },
-
-
-  /* =====================================================
+  },  /* =====================================================
      FINANCEIRO 2.0
   ===================================================== */
 
@@ -1088,7 +1078,7 @@ window.VNNUS_API = {
      SALVAR CONFIGURAÇÕES
   ===================================================== */
 
-    async salvarConfiguracoes(
+  async salvarConfiguracoes(
     dadosConfiguracoes
   ) {
 
@@ -1281,7 +1271,7 @@ window.VNNUS_API = {
       );
 
 
-      return (
+    return (
       resposta.resumo ||
       {}
     );
@@ -1324,35 +1314,99 @@ window.VNNUS_API = {
     );
 
   },
-/* =====================================================
-   COMPARAÇÃO DO DASHBOARD
-   DASHBOARD 2.3
-===================================================== */
 
-async comparacaoDashboard() {
 
-  const resposta =
-    await this.jsonp({
+  /* =====================================================
+     COMPARAÇÃO DO DASHBOARD
+     DASHBOARD 2.3
+  ===================================================== */
+
+  async comparacaoDashboard() {
+
+    const resposta =
+      await this.jsonp({
+
+        acao:
+          'comparacao_dashboard'
+
+      });
+
+
+    return (
+      resposta.comparacao ||
+      {}
+    );
+
+  },
+
+
+  /* =====================================================
+     CONTAS A RECEBER 1.1
+  ===================================================== */
+
+  async contasReceber() {
+
+    const resposta =
+      await this.jsonp({
+
+        acao:
+          'contas_receber'
+
+      });
+
+
+    return (
+      resposta.contas ||
+      []
+    );
+
+  },
+
+
+  /* =====================================================
+     BAIXAR CONTA A RECEBER
+  ===================================================== */
+
+  async baixarContaReceber(
+    idConta,
+    valor,
+    formaPagamento,
+    observacao
+  ) {
+
+    return await this.jsonp({
 
       acao:
-        'comparacao_dashboard'
+        'baixar_conta_receber',
+
+      idConta:
+        idConta,
+
+      valor:
+        valor,
+
+      formaPagamento:
+        formaPagamento ||
+        '',
+
+      observacao:
+        observacao ||
+        ''
 
     });
 
+  }
 
-  return (
-    resposta.comparacao ||
-    {}
-  );
-
-}
 };
+
+
 /* =====================================================
    FIM
-   VNNUS API FRONT-END 2.2
+   VNNUS API FRONT-END 2.5
    DASHBOARD 2.3
    FINANCEIRO 2.3
    CLIENTES 3.6
    CONFIGURAÇÕES 1.0
    DESPESAS 1.0
+   CONTAS A RECEBER 1.1
 ===================================================== */
