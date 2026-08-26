@@ -48,6 +48,12 @@ const VNNUS_ROUTES = {
     subtitle: "Faturamento, custos e lucro"
   },
 
+  "contas-receber": {
+    file: "pages/contas-receber.html",
+    title: "Contas a Receber",
+    subtitle: "Parcelas, vencimentos e recebimentos"
+  },
+
   despesas: {
     file: "pages/despesas.html",
     title: "Despesas",
@@ -61,17 +67,156 @@ const VNNUS_ROUTES = {
   }
 
 };
-async function navigateTo(pageName){
- const r=VNNUS_ROUTES[pageName]||VNNUS_ROUTES.dashboard;
- document.getElementById("pageTitle").textContent=r.title;
- document.getElementById("pageSubtitle").textContent=r.subtitle;
- document.querySelectorAll(".menu-item").forEach(b=>b.classList.toggle("active",b.dataset.page===pageName));
- const c=document.getElementById("appContent"); c.innerHTML='<div class="loading-card">Carregando...</div>';
- try{
-  const resp=await fetch(r.file,{cache:"no-store"}); if(!resp.ok)throw new Error("Não foi possível carregar "+r.file);
-  c.innerHTML=await resp.text();
-  [...c.querySelectorAll("script")].forEach(s=>{const n=document.createElement("script");n.textContent=s.textContent;document.body.appendChild(n);n.remove()});
-  if(typeof window["init_"+pageName]==="function") await window["init_"+pageName]();
-  history.replaceState(null,"","#"+pageName); closeMobileMenu();
- }catch(e){c.innerHTML='<div class="empty-state"><strong>Erro ao carregar a página.</strong><p style="margin-top:8px">'+e.message+'</p></div>'}
+
+
+async function navigateTo(pageName) {
+
+  const r =
+    VNNUS_ROUTES[pageName] ||
+    VNNUS_ROUTES.dashboard;
+
+
+  document
+    .getElementById(
+      "pageTitle"
+    )
+    .textContent =
+      r.title;
+
+
+  document
+    .getElementById(
+      "pageSubtitle"
+    )
+    .textContent =
+      r.subtitle;
+
+
+  document
+    .querySelectorAll(
+      ".menu-item"
+    )
+    .forEach(
+      function(botao) {
+
+        botao.classList.toggle(
+          "active",
+          botao.dataset.page ===
+            pageName
+        );
+
+      }
+    );
+
+
+  const conteudo =
+    document.getElementById(
+      "appContent"
+    );
+
+
+  conteudo.innerHTML =
+    '<div class="loading-card">Carregando...</div>';
+
+
+  try {
+
+    const resposta =
+      await fetch(
+        r.file,
+        {
+          cache:
+            "no-store"
+        }
+      );
+
+
+    if (
+      !resposta.ok
+    ) {
+
+      throw new Error(
+        "Não foi possível carregar " +
+        r.file
+      );
+
+    }
+
+
+    conteudo.innerHTML =
+      await resposta.text();
+
+
+    [
+      ...conteudo.querySelectorAll(
+        "script"
+      )
+    ]
+      .forEach(
+        function(script) {
+
+          const novoScript =
+            document.createElement(
+              "script"
+            );
+
+
+          novoScript.textContent =
+            script.textContent;
+
+
+          document.body
+            .appendChild(
+              novoScript
+            );
+
+
+          novoScript.remove();
+
+        }
+      );
+
+
+    const nomeInit =
+      "init_" +
+      pageName;
+
+
+    if (
+      typeof window[
+        nomeInit
+      ] ===
+      "function"
+    ) {
+
+      await window[
+        nomeInit
+      ]();
+
+    }
+
+
+    history.replaceState(
+      null,
+      "",
+      "#" + pageName
+    );
+
+
+    closeMobileMenu();
+
+  }
+
+  catch (erro) {
+
+    conteudo.innerHTML =
+      '<div class="empty-state">' +
+      '<strong>Erro ao carregar a página.</strong>' +
+      '<p style="margin-top:8px">' +
+      erro.message +
+      '</p>' +
+      '</div>';
+
+  }
+
 }
