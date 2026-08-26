@@ -3001,7 +3001,215 @@ canvas{
   }
 
 }
+/* =====================================================
+   VNNUS ERP 3.1
+   CORREÇÃO MOBILE — TOPBAR + SIDEBAR + FUNDO
+===================================================== */
 
+
+/* =====================================================
+   ALTURA TOTAL DA TELA
+===================================================== */
+
+html,
+body{
+  width:100%;
+  min-height:100%;
+  min-height:100dvh;
+
+  background:#060606 !important;
+
+  margin:0;
+}
+
+
+/* =====================================================
+   NÃO QUEBRAR O TOPBAR STICKY
+===================================================== */
+
+html,
+body,
+.app-shell,
+.main-area{
+  overflow-x:clip;
+}
+
+
+.app-shell{
+  min-height:100vh;
+  min-height:100dvh;
+
+  background:#060606;
+}
+
+
+.main-area{
+  min-height:100vh;
+  min-height:100dvh;
+
+  background:#060606;
+}
+
+
+/* =====================================================
+   CONTEÚDO
+===================================================== */
+
+.content{
+  min-height:
+    calc(100dvh - 72px);
+
+  background:#060606;
+}
+
+
+/* =====================================================
+   TOPBAR MOBILE
+===================================================== */
+
+@media(max-width:760px){
+
+  .topbar{
+    position:sticky !important;
+
+    top:0 !important;
+
+    z-index:500 !important;
+
+    width:100%;
+
+    background:
+      rgba(7,7,7,.98) !important;
+  }
+
+
+  /* Botão do menu sempre visível */
+
+  .mobile-menu-btn{
+    display:grid !important;
+
+    visibility:visible !important;
+
+    opacity:1 !important;
+
+    flex-shrink:0;
+  }
+
+
+  /* ===================================================
+     SIDEBAR MOBILE
+  =================================================== */
+
+  .sidebar{
+    position:fixed !important;
+
+    top:0 !important;
+    bottom:0 !important;
+    left:0 !important;
+
+    width:min(280px,86vw) !important;
+
+    height:100vh;
+    height:100dvh;
+
+    min-height:0;
+
+    overflow-y:auto;
+    overflow-x:hidden;
+
+    z-index:10001 !important;
+
+    transform:
+      translateX(-105%);
+
+    transition:
+      transform .25s ease;
+
+    background:#050505;
+  }
+
+
+  .sidebar.open{
+    transform:
+      translateX(0) !important;
+  }
+
+
+  .sidebar-overlay{
+    display:none;
+  }
+
+
+  .sidebar-overlay.open{
+    display:block !important;
+
+    position:fixed !important;
+
+    inset:0 !important;
+
+    width:100vw;
+    height:100vh;
+    height:100dvh;
+
+    z-index:10000 !important;
+
+    background:
+      rgba(0,0,0,.76);
+  }
+
+
+  /* ===================================================
+     ÁREA PRINCIPAL
+  =================================================== */
+
+  .main-area{
+    width:100% !important;
+
+    margin-left:0 !important;
+
+    min-height:100dvh;
+  }
+
+
+  .content{
+    width:100%;
+
+    min-height:
+      calc(100dvh - 68px);
+
+    padding-bottom:
+      calc(
+        30px +
+        env(safe-area-inset-bottom)
+      );
+
+    background:#060606;
+  }
+
+}
+
+
+/* =====================================================
+   CORREÇÃO FUNDO APÓS O ÚLTIMO ELEMENTO
+===================================================== */
+
+body::after{
+  content:"";
+
+  display:block;
+
+  width:100%;
+
+  height:
+    env(safe-area-inset-bottom);
+
+  background:#060606;
+}
+
+
+/* =====================================================
+   FIM — VNNUS ERP 3.1
+===================================================== */
 
 /* =====================================================
    FIM — VNNUS ERP 3.0 RESPONSIVO
