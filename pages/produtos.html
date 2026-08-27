@@ -1,34 +1,907 @@
-<section>
+<section id="produtosPage">
+
+  <!-- =================================================
+       CABEÇALHO
+  ================================================== -->
+
   <div class="page-header">
+
     <div>
-      <h2>📦 Produtos</h2>
-      <p>Produtos reais carregados da sua planilha.</p>
+
+      <h2>
+        📦 Produtos
+      </h2>
+
+      <p>
+        Cadastro, preços, estoque e situação dos produtos.
+      </p>
+
     </div>
-    <button class="btn-primary">+ Novo Produto</button>
+
+    <button
+      class="btn-primary"
+      type="button"
+      onclick="abrirModalNovoProdutoVnnus()">
+      ＋ Novo Produto
+    </button>
+
   </div>
 
-  <div id="produtoStatus" style="color:var(--muted);margin-bottom:15px;">Conectando à API...</div>
 
-  <div class="toolbar">
-    <input id="produtoBusca" class="input input-grow" type="text" placeholder="Pesquisar produto ou GTIN...">
+  <!-- =================================================
+       STATUS
+  ================================================== -->
+
+  <div
+    id="produtoStatus"
+    style="
+      color:var(--muted);
+      margin-bottom:15px;
+    ">
+    Conectando à API...
   </div>
 
-  <div class="table-wrap">
-    <table>
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>GTIN</th>
-          <th>Produto</th>
-          <th>Categoria</th>
-          <th>Preço</th>
-          <th>Estoque</th>
-          <th>Status</th>
-        </tr>
-      </thead>
-      <tbody id="produtoTabela">
-        <tr><td colspan="7">Carregando...</td></tr>
-      </tbody>
-    </table>
+
+  <!-- =================================================
+       INDICADORES
+  ================================================== -->
+
+  <div class="cards">
+
+    <div class="card card-accent">
+
+      <div class="card-icon">
+        📦
+      </div>
+
+      <div class="card-label">
+        Produtos
+      </div>
+
+      <div
+        class="card-value"
+        id="produtosTotal">
+        0
+      </div>
+
+    </div>
+
+
+    <div class="card">
+
+      <div class="card-icon">
+        ✅
+      </div>
+
+      <div class="card-label">
+        Ativos
+      </div>
+
+      <div
+        class="card-value"
+        id="produtosAtivos">
+        0
+      </div>
+
+    </div>
+
+
+    <div class="card">
+
+      <div class="card-icon">
+        🚫
+      </div>
+
+      <div class="card-label">
+        Inativos
+      </div>
+
+      <div
+        class="card-value"
+        id="produtosInativos">
+        0
+      </div>
+
+    </div>
+
+
+    <div class="card">
+
+      <div class="card-icon">
+        ⚠️
+      </div>
+
+      <div class="card-label">
+        Estoque crítico
+      </div>
+
+      <div
+        class="card-value"
+        id="produtosEstoqueCritico">
+        0
+      </div>
+
+    </div>
+
   </div>
+
+
+  <!-- =================================================
+       FILTROS
+  ================================================== -->
+
+  <div
+    class="card"
+    style="margin-top:18px;">
+
+    <h3 class="section-title">
+      🔎 Filtros
+    </h3>
+
+
+    <div
+      style="
+        display:grid;
+        grid-template-columns:
+          repeat(auto-fit,minmax(180px,1fr));
+        gap:12px;
+      ">
+
+      <div class="campo">
+
+        <label>
+          Produto ou GTIN
+        </label>
+
+        <input
+          id="produtoBusca"
+          type="text"
+          placeholder="Pesquisar produto ou GTIN...">
+
+      </div>
+
+
+      <div class="campo">
+
+        <label>
+          Situação
+        </label>
+
+        <select id="produtoFiltroAtivo">
+
+          <option value="">
+            Todos
+          </option>
+
+          <option value="SIM">
+            Ativos
+          </option>
+
+          <option value="NAO">
+            Inativos
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <div class="campo">
+
+        <label>
+          Estoque
+        </label>
+
+        <select id="produtoFiltroEstoque">
+
+          <option value="">
+            Todos
+          </option>
+
+          <option value="OK">
+            OK
+          </option>
+
+          <option value="ESTOQUE BAIXO">
+            Estoque baixo
+          </option>
+
+          <option value="SEM ESTOQUE">
+            Sem estoque
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <div
+        style="
+          display:flex;
+          align-items:end;
+          gap:8px;
+          flex-wrap:wrap;
+        ">
+
+        <button
+          class="btn-primary"
+          type="button"
+          onclick="filtrarProdutosVnnus()">
+          Aplicar
+        </button>
+
+        <button
+          class="btn-secondary"
+          type="button"
+          onclick="limparFiltrosProdutosVnnus()">
+          Limpar
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =================================================
+       LISTAGEM
+  ================================================== -->
+
+  <div
+    class="card"
+    style="margin-top:18px;">
+
+    <div
+      class="page-header"
+      style="margin-bottom:14px;">
+
+      <div>
+
+        <h3>
+          📋 Produtos cadastrados
+        </h3>
+
+        <p>
+          Situação do produto e status do estoque são controles separados.
+        </p>
+
+      </div>
+
+      <button
+        class="btn-secondary"
+        type="button"
+        onclick="carregarProdutosVnnus()">
+        ↻ Atualizar
+      </button>
+
+    </div>
+
+
+    <!-- ===============================================
+         DESKTOP / TABLET
+    ================================================ -->
+
+    <div
+      class="table-wrap produtos-tabela-desktop">
+
+      <table>
+
+        <thead>
+
+          <tr>
+
+            <th>
+              Produto
+            </th>
+
+            <th>
+              GTIN
+            </th>
+
+            <th>
+              Categoria
+            </th>
+
+            <th>
+              Preço
+            </th>
+
+            <th>
+              Estoque
+            </th>
+
+            <th>
+              Status estoque
+            </th>
+
+            <th>
+              Situação
+            </th>
+
+            <th>
+              Ações
+            </th>
+
+          </tr>
+
+        </thead>
+
+
+        <tbody id="produtoTabela">
+
+          <tr>
+
+            <td colspan="8">
+              Carregando...
+            </td>
+
+          </tr>
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+
+    <!-- ===============================================
+         MOBILE
+    ================================================ -->
+
+    <div
+      id="produtosCardsMobile"
+      class="produtos-cards-mobile">
+
+      <div class="loading-card">
+        Carregando...
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =================================================
+       MODAL NOVO / EDITAR PRODUTO
+  ================================================== -->
+
+  <div
+    class="modal"
+    id="produtoModal">
+
+    <div class="modal-conteudo">
+
+      <div class="modal-topo">
+
+        <h2 id="produtoModalTitulo">
+          Novo Produto
+        </h2>
+
+        <button
+          type="button"
+          onclick="fecharModalProdutoVnnus()">
+          ✕
+        </button>
+
+      </div>
+
+
+      <input
+        id="produtoId"
+        type="hidden">
+
+
+      <div class="form-grid">
+
+        <div class="campo">
+
+          <label>
+            GTIN
+          </label>
+
+          <input
+            id="produtoGtin"
+            type="text"
+            inputmode="numeric"
+            autocomplete="off"
+            placeholder="Código de barras">
+
+        </div>
+
+
+        <div class="campo">
+
+          <label>
+            Produto
+          </label>
+
+          <input
+            id="produtoNome"
+            type="text"
+            maxlength="150"
+            placeholder="Nome do produto">
+
+        </div>
+
+
+        <div class="campo">
+
+          <label>
+            Categoria
+          </label>
+
+          <input
+            id="produtoCategoria"
+            type="text"
+            maxlength="80"
+            placeholder="Categoria">
+
+        </div>
+
+
+        <div class="campo">
+
+          <label>
+            Marca
+          </label>
+
+          <input
+            id="produtoMarca"
+            type="text"
+            maxlength="80"
+            placeholder="Marca">
+
+        </div>
+
+
+        <div class="campo">
+
+          <label>
+            Fornecedor
+          </label>
+
+          <input
+            id="produtoFornecedor"
+            type="text"
+            maxlength="120"
+            placeholder="Fornecedor">
+
+        </div>
+
+
+        <div class="campo">
+
+          <label>
+            Custo
+          </label>
+
+          <input
+            id="produtoCusto"
+            type="number"
+            min="0"
+            step="0.01"
+            placeholder="0,00">
+
+        </div>
+
+
+        <div class="campo">
+
+          <label>
+            Preço de venda
+          </label>
+
+          <input
+            id="produtoPreco"
+            type="number"
+            min="0"
+            step="0.01"
+            placeholder="0,00">
+
+        </div>
+
+
+        <div class="campo">
+
+          <label>
+            Estoque mínimo
+          </label>
+
+          <input
+            id="produtoEstoqueMinimo"
+            type="number"
+            min="0"
+            step="1"
+            placeholder="0">
+
+        </div>
+
+
+        <div class="campo">
+
+          <label>
+            Situação
+          </label>
+
+          <select id="produtoAtivo">
+
+            <option value="SIM">
+              Ativo
+            </option>
+
+            <option value="NÃO">
+              Inativo
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <div class="campo campo-grande">
+
+          <label>
+            Foto / URL
+          </label>
+
+          <input
+            id="produtoFoto"
+            type="text"
+            placeholder="Opcional">
+
+        </div>
+
+      </div>
+
+
+      <div
+        id="produtoModalMensagem"
+        style="
+          display:none;
+          margin:0 17px 12px;
+        ">
+      </div>
+
+
+      <div class="modal-rodape">
+
+        <button
+          class="btn-secondary"
+          type="button"
+          onclick="fecharModalProdutoVnnus()">
+          Cancelar
+        </button>
+
+        <button
+          class="btn-primary"
+          type="button"
+          id="produtoSalvarBtn"
+          onclick="salvarProdutoVnnus()">
+          Salvar produto
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =================================================
+       MODAL ATIVAR / DESATIVAR
+  ================================================== -->
+
+  <div
+    class="modal"
+    id="produtoStatusModal">
+
+    <div
+      class="modal-conteudo"
+      style="max-width:480px;">
+
+      <div class="modal-topo">
+
+        <h2 id="produtoStatusModalTitulo">
+          Alterar situação
+        </h2>
+
+        <button
+          type="button"
+          onclick="fecharModalStatusProdutoVnnus()">
+          ✕
+        </button>
+
+      </div>
+
+
+      <input
+        id="produtoStatusId"
+        type="hidden">
+
+
+      <input
+        id="produtoStatusNovo"
+        type="hidden">
+
+
+      <div
+        style="
+          padding:20px 17px;
+        ">
+
+        <p
+          id="produtoStatusTexto"
+          style="
+            color:var(--muted);
+            line-height:1.55;
+          ">
+          -
+        </p>
+
+
+        <div
+          id="produtoStatusMensagem"
+          style="
+            display:none;
+            margin-top:15px;
+          ">
+        </div>
+
+      </div>
+
+
+      <div class="modal-rodape">
+
+        <button
+          class="btn-secondary"
+          type="button"
+          onclick="fecharModalStatusProdutoVnnus()">
+          Cancelar
+        </button>
+
+        <button
+          class="btn-primary"
+          type="button"
+          id="produtoStatusConfirmarBtn"
+          onclick="confirmarStatusProdutoVnnus()">
+          Confirmar
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =================================================
+       ESTILO DO MÓDULO
+  ================================================== -->
+
+  <style>
+
+    .produtos-cards-mobile{
+      display:none;
+    }
+
+
+    .produto-nome-lista{
+      color:#fff;
+      font-weight:700;
+      line-height:1.3;
+    }
+
+
+    .produto-id-lista{
+      color:var(--muted);
+      font-size:10px;
+      margin-top:4px;
+    }
+
+
+    .produto-situacao{
+      display:inline-flex;
+      align-items:center;
+      gap:5px;
+
+      padding:
+        5px 9px;
+
+      border-radius:999px;
+
+      font-size:10px;
+      font-weight:800;
+    }
+
+
+    .produto-situacao.ativo{
+      color:#78e498;
+
+      background:
+        rgba(84,197,122,.10);
+
+      border:
+        1px solid
+        rgba(84,197,122,.18);
+    }
+
+
+    .produto-situacao.inativo{
+      color:#ff8c8c;
+
+      background:
+        rgba(255,102,102,.09);
+
+      border:
+        1px solid
+        rgba(255,102,102,.16);
+    }
+
+
+    .produto-acoes{
+      display:flex;
+      flex-wrap:wrap;
+      gap:6px;
+    }
+
+
+    .produto-acao-btn{
+      min-height:34px;
+
+      padding:
+        7px 9px;
+
+      border-radius:8px;
+
+      border:
+        1px solid
+        rgba(212,168,77,.18);
+
+      background:#141414;
+
+      color:#eee;
+
+      font-size:11px;
+      font-weight:700;
+    }
+
+
+    .produto-acao-btn:hover{
+      border-color:var(--gold);
+      color:var(--gold2);
+    }
+
+
+    @media(max-width:760px){
+
+      .produtos-tabela-desktop{
+        display:none;
+      }
+
+
+      .produtos-cards-mobile{
+        display:grid;
+        gap:10px;
+      }
+
+
+      .produto-mobile-card{
+        min-width:0;
+
+        padding:14px;
+
+        border-radius:13px;
+
+        border:
+          1px solid
+          rgba(212,168,77,.18);
+
+        background:
+          linear-gradient(
+            145deg,
+            #151515,
+            #0c0c0c
+          );
+      }
+
+
+      .produto-mobile-topo{
+        display:flex;
+
+        align-items:flex-start;
+        justify-content:space-between;
+
+        gap:10px;
+      }
+
+
+      .produto-mobile-grid{
+        display:grid;
+
+        grid-template-columns:
+          1fr 1fr;
+
+        gap:8px;
+
+        margin-top:13px;
+      }
+
+
+      .produto-mobile-info{
+        min-width:0;
+
+        padding:9px;
+
+        border-radius:9px;
+
+        background:
+          rgba(255,255,255,.025);
+
+        border:
+          1px solid
+          rgba(255,255,255,.04);
+      }
+
+
+      .produto-mobile-info span{
+        display:block;
+
+        color:var(--muted);
+
+        font-size:9px;
+
+        text-transform:uppercase;
+
+        letter-spacing:.05em;
+      }
+
+
+      .produto-mobile-info strong{
+        display:block;
+
+        margin-top:4px;
+
+        color:#fff;
+
+        font-size:12px;
+
+        overflow-wrap:anywhere;
+      }
+
+
+      .produto-mobile-acoes{
+        display:grid;
+
+        grid-template-columns:
+          repeat(2,minmax(0,1fr));
+
+        gap:7px;
+
+        margin-top:12px;
+      }
+
+
+      .produto-mobile-acoes button{
+        width:100%;
+      }
+
+    }
+
+
+    @media(max-width:380px){
+
+      .produto-mobile-grid{
+        grid-template-columns:1fr;
+      }
+
+
+      .produto-mobile-acoes{
+        grid-template-columns:1fr;
+      }
+
+    }
+
+  </style>
+
 </section>
