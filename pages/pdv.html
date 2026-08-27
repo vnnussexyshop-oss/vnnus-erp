@@ -477,9 +477,111 @@
               Cartão Crédito
             </option>
 
-          </select>
+                   </select>
 
         </div>
+
+
+        <!-- ==========================================
+             PAGAMENTO EM DINHEIRO / TROCO
+        =========================================== -->
+
+        <div
+          class="campo campo-grande"
+          id="pdvDinheiroBox"
+          style="display:none;">
+
+          <div
+            style="
+              padding:14px;
+              border-radius:12px;
+              border:1px solid rgba(212,168,77,.20);
+              background:rgba(212,168,77,.04);
+            ">
+
+            <div
+              style="
+                color:var(--gold2);
+                font-weight:700;
+                margin-bottom:12px;
+              ">
+              💵 Pagamento em dinheiro
+            </div>
+
+
+            <div
+              style="
+                display:grid;
+                grid-template-columns:
+                  repeat(auto-fit,minmax(140px,1fr));
+                gap:12px;
+              ">
+
+
+              <!-- VALOR RECEBIDO -->
+
+              <div class="campo">
+
+                <label>
+                  Valor recebido (R$) *
+                </label>
+
+                <input
+                  id="pdvValorRecebido"
+                  type="number"
+                  inputmode="decimal"
+                  min="0"
+                  step="0.01"
+                  placeholder="0,00">
+
+              </div>
+
+
+              <!-- TROCO -->
+
+              <div class="campo">
+
+                <label>
+                  Troco
+                </label>
+
+                <div
+                  id="pdvTroco"
+                  style="
+                    min-height:44px;
+                    display:flex;
+                    align-items:center;
+                    padding:0 13px;
+                    border-radius:9px;
+                    border:1px solid rgba(212,168,77,.18);
+                    background:#101010;
+                    color:var(--gold2);
+                    font-size:20px;
+                    font-weight:800;
+                  ">
+                  R$ 0,00
+                </div>
+
+              </div>
+
+            </div>
+
+
+            <div
+              id="pdvDinheiroMensagem"
+              style="
+                display:none;
+                margin-top:10px;
+                font-size:12px;
+              ">
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- OBSERVAÇÃO -->
 
 
         <!-- OBSERVAÇÃO -->
