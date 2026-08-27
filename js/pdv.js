@@ -3649,11 +3649,23 @@ function criarDadosComprovantePDV32(
       dadosVenda.CLIENTE ||
       'Consumidor Final',
 
-    formaPagamento:
-      dadosVenda.FORMA_PAGAMENTO ||
-      '',
+   formaPagamento:
+  dadosVenda.FORMA_PAGAMENTO ||
+  '',
 
-    observacao:
+valorRecebido:
+  Number(
+    dadosVenda.VALOR_RECEBIDO ||
+    0
+  ),
+
+troco:
+  Number(
+    dadosVenda.TROCO ||
+    0
+  ),
+
+observacao:
       dadosVenda.OBSERVACAO ||
       '',
 
@@ -4248,7 +4260,29 @@ function montarHtmlComprovantePDV32(
         )
       )}
     </div>
+${
+  String(
+    dados.formaPagamento ||
+    ''
+  )
+  .toUpperCase() === 'DINHEIRO'
+    ? `
+      <div>
+        <strong>Valor recebido:</strong>
+        ${moedaPDV20(
+          dados.valorRecebido
+        )}
+      </div>
 
+      <div>
+        <strong>Troco:</strong>
+        ${moedaPDV20(
+          dados.troco
+        )}
+      </div>
+    `
+    : ''
+}
 
     <div
       style="
@@ -4429,14 +4463,33 @@ function montarTextoComprovantePDV32(
       ),
 
     'Pagamento: ' +
-      formatarPagamentoPDV20(
-        dados.formaPagamento
-      ),
+  formatarPagamentoPDV20(
+    dados.formaPagamento
+  ),
 
-    '',
+...(
+  String(
+    dados.formaPagamento ||
+    ''
+  )
+  .toUpperCase() === 'DINHEIRO'
+    ? [
+        'Valor recebido: ' +
+          moedaPDV20(
+            dados.valorRecebido
+          ),
 
-    'ITENS'
+        'Troco: ' +
+          moedaPDV20(
+            dados.troco
+          )
+      ]
+    : []
+),
 
+'',
+
+'ITENS'
   ];
 
 
