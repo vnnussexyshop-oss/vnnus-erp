@@ -614,7 +614,7 @@ async function buscarProdutoPorNomePDV20(
       await carregarProdutosBuscaPDV20();
 
 
-    const encontrados =
+   const encontrados =
   produtos
     .filter(
       function(produto) {
@@ -633,14 +633,12 @@ async function buscarProdutoPorNomePDV20(
             ''
           );
 
-
         const ativo =
           !(
             situacaoProduto === 'NAO' ||
             situacaoProduto === 'INATIVO' ||
             situacaoProduto === 'FALSE'
           );
-
 
         return (
           ativo &&
@@ -660,11 +658,6 @@ async function buscarProdutoPorNomePDV20(
       0,
       20
     );
-        .slice(
-          0,
-          20
-        );
-
 
     renderResultadosBuscaPDV20(
       encontrados
