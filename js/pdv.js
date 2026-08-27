@@ -1226,7 +1226,60 @@ async function buscarProdutoPDV31(
 function adicionarProdutoPDV31(
   produto
 ) {
+  /* ===================================================
+     PROTEÇÃO - PRODUTO INATIVO
+  =================================================== */
 
+  const situacaoProduto =
+    String(
+      produto.ativo ??
+      produto.ATIVO ??
+      'SIM'
+    )
+    .trim()
+    .toUpperCase()
+    .normalize('NFD')
+    .replace(
+      /[\u0300-\u036f]/g,
+      ''
+    );
+
+
+  const produtoInativo =
+    (
+      situacaoProduto === 'NAO' ||
+      situacaoProduto === 'INATIVO' ||
+      situacaoProduto === 'FALSE'
+    );
+
+
+  if (produtoInativo) {
+
+    definirStatusPDV31(
+      '🚫 ' +
+      (
+        produto.produto ||
+        produto.PRODUTO ||
+        'Produto'
+      ) +
+      ' está inativo e não pode ser vendido.'
+    );
+
+
+    alert(
+      'Produto inativo.\n\n' +
+      (
+        produto.produto ||
+        produto.PRODUTO ||
+        'Este produto'
+      ) +
+      ' não pode ser adicionado à venda.'
+    );
+
+
+    return false;
+
+  }
   const existente =
     carrinhoPDV31.find(
       function(item) {
