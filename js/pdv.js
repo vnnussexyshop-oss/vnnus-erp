@@ -260,7 +260,7 @@ window.init_pdv = async function() {
 
   }
 
-
+prepararPagamentoDinheiroPDV22();
   if (finalizar) {
 
     finalizar.onclick =
@@ -2674,7 +2674,431 @@ function formatarTelefonePDV34(
 
 }
 
+/* =====================================================
+   PAGAMENTO EM DINHEIRO + TROCO
+   PDV 2.2
+===================================================== */
 
+function prepararPagamentoDinheiroPDV22() {
+
+  const pagamento =
+    document.getElementById(
+      'pdvPagamento'
+    );
+
+  const recebido =
+    document.getElementById(
+      'pdvValorRecebido'
+    );
+
+
+  if (pagamento) {
+
+    pagamento.onchange =
+      function() {
+
+        atualizarPagamentoDinheiroPDV22();
+
+      };
+
+  }
+
+
+  if (recebido) {
+
+    recebido.oninput =
+      function() {
+
+        atualizarPagamentoDinheiroPDV22();
+
+      };
+
+  }
+
+}
+
+
+/* =====================================================
+   ATUALIZAR ÁREA DE DINHEIRO
+===================================================== */
+
+function atualizarPagamentoDinheiroPDV22() {
+
+  const pagamento =
+    document.getElementById(
+      'pdvPagamento'
+    );
+
+  const box =
+    document.getElementById(
+      'pdvDinheiroBox'
+    );
+
+  const recebido =
+    document.getElementById(
+      'pdvValorRecebido'
+    );
+
+  const trocoArea =
+    document.getElementById(
+      'pdvTroco'
+    );
+
+  const mensagem =
+    document.getElementById(
+      'pdvDinheiroMensagem'
+    );
+
+  const confirmar =
+    document.getElementById(
+      'pdvConfirmarVenda'
+    );
+
+
+  if (
+    !pagamento ||
+    !box
+  ) {
+
+    return;
+
+  }
+
+
+  const dinheiro =
+    String(
+      pagamento.value ||
+      ''
+    )
+    .trim()
+    .toUpperCase() ===
+      'DINHEIRO';
+
+
+  /* ===============================================
+     OUTRAS FORMAS DE PAGAMENTO
+  =============================================== */
+
+  if (!dinheiro) {
+
+    box.style.display =
+      'none';
+
+
+    if (recebido) {
+
+      recebido.value =
+        '';
+
+    }
+
+
+    if (trocoArea) {
+
+      trocoArea.textContent =
+        'R$ 0,00';
+
+    }
+
+
+    if (mensagem) {
+
+      mensagem.style.display =
+        'none';
+
+      mensagem.textContent =
+        '';
+
+    }
+
+
+    if (confirmar) {
+
+      confirmar.disabled =
+        false;
+
+    }
+
+
+    return;
+
+  }
+
+
+  /* ===============================================
+     PAGAMENTO EM DINHEIRO
+  =============================================== */
+
+  box.style.display =
+    'block';
+
+
+  const totais =
+    calcularTotaisPDV31();
+
+
+  const total =
+    Number(
+      totais.total ||
+      0
+    );
+
+
+  const valorRecebido =
+    Number(
+      recebido
+        ? recebido.value
+        : 0
+    ) || 0;
+
+
+  const troco =
+    Math.max(
+      0,
+      valorRecebido - total
+    );
+
+
+  if (trocoArea) {
+
+    trocoArea.textContent =
+      moedaPDV20(
+        troco
+      );
+
+  }
+
+
+  /* ===============================================
+     AINDA NÃO INFORMOU O VALOR
+  =============================================== */
+
+  if (
+    valorRecebido <= 0
+  ) {
+
+    if (mensagem) {
+
+      mensagem.style.display =
+        'block';
+
+      mensagem.style.color =
+        'var(--muted)';
+
+      mensagem.textContent =
+        'Informe quanto o cliente entregou em dinheiro.';
+
+    }
+
+
+    if (confirmar) {
+
+      confirmar.disabled =
+        true;
+
+    }
+
+
+    return;
+
+  }
+
+
+  /* ===============================================
+     VALOR INSUFICIENTE
+  =============================================== */
+
+  if (
+    valorRecebido < total
+  ) {
+
+    const falta =
+      total -
+      valorRecebido;
+
+
+    if (mensagem) {
+
+      mensagem.style.display =
+        'block';
+
+      mensagem.style.color =
+        '#ff8c8c';
+
+      mensagem.textContent =
+        'Valor insuficiente. Faltam ' +
+        moedaPDV20(
+          falta
+        ) +
+        '.';
+
+    }
+
+
+    if (confirmar) {
+
+      confirmar.disabled =
+        true;
+
+    }
+
+
+    return;
+
+  }
+
+
+  /* ===============================================
+     VALOR EXATO
+  =============================================== */
+
+  if (
+    Math.abs(
+      valorRecebido - total
+    ) < 0.005
+  ) {
+
+    if (mensagem) {
+
+      mensagem.style.display =
+        'block';
+
+      mensagem.style.color =
+        '#78e498';
+
+      mensagem.textContent =
+        '✅ Valor exato. Não há troco.';
+
+    }
+
+
+    if (confirmar) {
+
+      confirmar.disabled =
+        false;
+
+    }
+
+
+    return;
+
+  }
+
+
+  /* ===============================================
+     COM TROCO
+  =============================================== */
+
+  if (mensagem) {
+
+    mensagem.style.display =
+      'block';
+
+    mensagem.style.color =
+      '#78e498';
+
+    mensagem.textContent =
+      '✅ Troco para o cliente: ' +
+      moedaPDV20(
+        troco
+      );
+
+  }
+
+
+  if (confirmar) {
+
+    confirmar.disabled =
+      false;
+
+  }
+
+}
+
+
+/* =====================================================
+   OBTER VALORES DO DINHEIRO
+===================================================== */
+
+function obterPagamentoDinheiroPDV22() {
+
+  const pagamento =
+    document.getElementById(
+      'pdvPagamento'
+    );
+
+
+  const dinheiro =
+    pagamento &&
+    String(
+      pagamento.value ||
+      ''
+    )
+    .trim()
+    .toUpperCase() ===
+      'DINHEIRO';
+
+
+  if (!dinheiro) {
+
+    return {
+
+      dinheiro:
+        false,
+
+      recebido:
+        0,
+
+      troco:
+        0
+
+    };
+
+  }
+
+
+  const recebidoCampo =
+    document.getElementById(
+      'pdvValorRecebido'
+    );
+
+
+  const recebido =
+    Number(
+      recebidoCampo
+        ? recebidoCampo.value
+        : 0
+    ) || 0;
+
+
+  const totais =
+    calcularTotaisPDV31();
+
+
+  const total =
+    Number(
+      totais.total ||
+      0
+    );
+
+
+  return {
+
+    dinheiro:
+      true,
+
+    recebido:
+      recebido,
+
+    troco:
+      Math.max(
+        0,
+        recebido - total
+      )
+
+  };
+
+}
 /* =====================================================
    ABRIR FINALIZAÇÃO
 ===================================================== */
@@ -2714,7 +3138,7 @@ async function abrirFinalizacaoPDV31() {
       .toUpperCase();
 
   }
-
+atualizarPagamentoDinheiroPDV22();
 
   const modal =
     document.getElementById(
@@ -2908,7 +3332,20 @@ async function confirmarVendaPDV31() {
 
     }
 
-    return;
+      return;
+
+}
+
+
+const dinheiroPDV22 =
+  obterPagamentoDinheiroPDV22();
+
+
+if (
+  dinheiroPDV22.dinheiro
+) {
+
+  const totalVenda =
 
   }
 
@@ -2943,7 +3380,15 @@ async function confirmarVendaPDV31() {
 
     FORMA_PAGAMENTO:
       pagamento.value,
+    VALOR_RECEBIDO:
+      dinheiroPDV22.dinheiro
+        ? dinheiroPDV22.recebido
+        : 0,
 
+    TROCO:
+      dinheiroPDV22.dinheiro
+        ? dinheiroPDV22.troco
+        : 0,
     DESCONTO_GERAL:
       totais.desconto,
 
@@ -3423,7 +3868,21 @@ function novaVendaPDV32() {
       '';
 
   }
+  const valorRecebido =
+    document.getElementById(
+      'pdvValorRecebido'
+    );
 
+
+  if (valorRecebido) {
+
+    valorRecebido.value =
+      '';
+
+  }
+
+
+  atualizarPagamentoDinheiroPDV22();
 
   if (observacao) {
 
