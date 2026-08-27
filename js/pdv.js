@@ -4261,11 +4261,12 @@ function montarHtmlComprovantePDV32(
       )}
     </div>
 ${
-  String(
-    dados.formaPagamento ||
-    ''
-  )
-  .toUpperCase() === 'DINHEIRO'
+ String(
+  dados.formaPagamento ||
+  ''
+)
+.trim()
+.toUpperCase() === 'DINHEIRO'
     ? `
       <div>
         <strong>Valor recebido:</strong>
