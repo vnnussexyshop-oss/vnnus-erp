@@ -615,23 +615,51 @@ async function buscarProdutoPorNomePDV20(
 
 
     const encontrados =
-      produtos
-        .filter(
-          function(produto) {
+  produtos
+    .filter(
+      function(produto) {
 
-            return (
-              String(
-                produto.produto ||
-                ''
-              )
-              .toLowerCase()
-              .includes(
-                busca
-              )
-            );
+        const situacaoProduto =
+          String(
+            produto.ativo ??
+            produto.ATIVO ??
+            'SIM'
+          )
+          .trim()
+          .toUpperCase()
+          .normalize('NFD')
+          .replace(
+            /[\u0300-\u036f]/g,
+            ''
+          );
 
-          }
-        )
+
+        const ativo =
+          !(
+            situacaoProduto === 'NAO' ||
+            situacaoProduto === 'INATIVO' ||
+            situacaoProduto === 'FALSE'
+          );
+
+
+        return (
+          ativo &&
+          String(
+            produto.produto ||
+            ''
+          )
+          .toLowerCase()
+          .includes(
+            busca
+          )
+        );
+
+      }
+    )
+    .slice(
+      0,
+      20
+    );
         .slice(
           0,
           20
