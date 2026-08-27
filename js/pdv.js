@@ -3346,8 +3346,46 @@ if (
 ) {
 
   const totalVenda =
+    Number(
+      calcularTotaisPDV31()
+        .total ||
+      0
+    );
+
+
+  if (
+    dinheiroPDV22.recebido <= 0
+  ) {
+
+    if (mensagem) {
+
+      mensagem.textContent =
+        'Informe o valor recebido do cliente.';
+
+    }
+
+    return;
 
   }
+
+
+  if (
+    dinheiroPDV22.recebido <
+    totalVenda
+  ) {
+
+    if (mensagem) {
+
+      mensagem.textContent =
+        'Valor recebido é menor que o total da venda.';
+
+    }
+
+    return;
+
+  }
+
+}
 
 
   if (
