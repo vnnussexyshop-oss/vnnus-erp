@@ -723,7 +723,30 @@ function montarDetalheVenda33(
       <strong>Pagamento:</strong>
       ${escaparVendas33(venda.FORMA_PAGAMENTO)}
     </div>
+${
+  String(
+    venda.FORMA_PAGAMENTO ||
+    ''
+  )
+  .trim()
+  .toUpperCase() === 'DINHEIRO'
+    ? `
+      <div>
+        <strong>Valor recebido:</strong>
+        ${moedaVendas33(
+          venda.VALOR_RECEBIDO
+        )}
+      </div>
 
+      <div>
+        <strong>Troco:</strong>
+        ${moedaVendas33(
+          venda.TROCO
+        )}
+      </div>
+    `
+    : ''
+}
     <div>
       <strong>Status:</strong>
       ${escaparVendas33(venda.STATUS)}
