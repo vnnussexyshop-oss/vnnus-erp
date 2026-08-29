@@ -3673,11 +3673,13 @@ if (
   }
 
 
-  const totais =
-    calcularTotaisPDV31();
+ const totais =
+  calcularTotaisPDV31();
 
+const parcelamentoPDV23 =
+  obterParcelamentoPDV23();
 
-  const dadosVenda = {
+const dadosVenda = {
 
     CLIENTE:
       clienteSelecionado.nome,
@@ -3685,8 +3687,11 @@ if (
     ID_CLIENTE:
       clienteSelecionado.id,
 
-    FORMA_PAGAMENTO:
-      pagamento.value,
+   FORMA_PAGAMENTO:
+  pagamento.value,
+
+TOTAL_PARCELAS:
+  parcelamentoPDV23.quantidade,
     VALOR_RECEBIDO:
       dinheiroPDV22.dinheiro
         ? dinheiroPDV22.recebido
