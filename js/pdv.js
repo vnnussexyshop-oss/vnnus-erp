@@ -261,6 +261,7 @@ window.init_pdv = async function() {
   }
 
 prepararPagamentoDinheiroPDV22();
+  prepararParcelamentoPDV23();
   if (finalizar) {
 
     finalizar.onclick =
@@ -3406,7 +3407,8 @@ async function abrirFinalizacaoPDV31() {
 
   }
 atualizarPagamentoDinheiroPDV22();
-
+atualizarParcelamentoPDV23();
+  
   const modal =
     document.getElementById(
       'modalFinalizarVenda'
