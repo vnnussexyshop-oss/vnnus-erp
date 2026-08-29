@@ -6,6 +6,55 @@
 window.PRODUTOS_VNNUS = [];
 window.PRODUTOS_VNNUS_FILTRADOS = [];
 
+/* =====================================================
+   PERMISSÕES DE PRODUTOS
+===================================================== */
+
+function obterPerfilProdutosVnnus() {
+
+  if (
+    !window.VNNUS_API ||
+    typeof window.VNNUS_API.obterUsuarioSessao !==
+      'function'
+  ) {
+
+    return '';
+
+  }
+
+
+  const colaborador =
+    window.VNNUS_API
+      .obterUsuarioSessao();
+
+
+  return String(
+    colaborador &&
+    colaborador.perfil
+      ? colaborador.perfil
+      : ''
+  )
+  .trim()
+  .toUpperCase();
+
+}
+
+
+function podeGerenciarProdutosVnnus() {
+
+  const perfil =
+    obterPerfilProdutosVnnus();
+
+
+  return [
+    'ADMINISTRADOR',
+    'GERENTE',
+    'ESTOQUE'
+  ].includes(
+    perfil
+  );
+
+}
 
 /* =====================================================
    INICIALIZAÇÃO
