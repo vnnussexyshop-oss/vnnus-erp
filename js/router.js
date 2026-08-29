@@ -1,7 +1,7 @@
 /* =====================================================
    VNNUS ERP
-   ROUTER 2.3
-   ROTAS + CONTROLE DE ACESSO
+   ROUTER 2.4
+   ROTAS + CONTROLE DE ACESSO POR PERFIL
 ===================================================== */
 
 const VNNUS_ROUTES = {
@@ -10,70 +10,128 @@ const VNNUS_ROUTES = {
     file: "pages/dashboard.html",
     title: "Dashboard",
     subtitle: "Visão geral da operação",
-    init: "init_dashboard"
+    init: "init_dashboard",
+
+    perfisPermitidos: [
+      "ADMINISTRADOR",
+      "GERENTE"
+    ]
   },
 
   produtos: {
     file: "pages/produtos.html",
     title: "Produtos",
     subtitle: "Cadastro e gerenciamento de produtos",
-    init: "init_produtos"
+    init: "init_produtos",
+
+    perfisPermitidos: [
+      "ADMINISTRADOR",
+      "GERENTE",
+      "VENDEDOR",
+      "ESTOQUE"
+    ]
   },
 
   scanner: {
     file: "pages/scanner.html",
     title: "Scanner",
     subtitle: "Leitura de código de barras",
-    init: "init_scanner"
+    init: "init_scanner",
+
+    perfisPermitidos: [
+      "ADMINISTRADOR",
+      "GERENTE",
+      "VENDEDOR",
+      "ESTOQUE"
+    ]
   },
 
   estoque: {
     file: "pages/estoque.html",
     title: "Estoque",
     subtitle: "Entradas, saídas e saldo",
-    init: "init_estoque"
+    init: "init_estoque",
+
+    perfisPermitidos: [
+      "ADMINISTRADOR",
+      "GERENTE",
+      "ESTOQUE"
+    ]
   },
 
   pdv: {
     file: "pages/pdv.html",
     title: "PDV",
     subtitle: "Nova venda",
-    init: "init_pdv"
+    init: "init_pdv",
+
+    perfisPermitidos: [
+      "ADMINISTRADOR",
+      "GERENTE",
+      "VENDEDOR"
+    ]
   },
 
   vendas: {
     file: "pages/vendas.html",
     title: "Vendas",
     subtitle: "Histórico e comprovantes",
-    init: "init_vendas"
+    init: "init_vendas",
+
+    perfisPermitidos: [
+      "ADMINISTRADOR",
+      "GERENTE",
+      "VENDEDOR"
+    ]
   },
 
   clientes: {
     file: "pages/clientes.html",
     title: "Clientes",
     subtitle: "Cadastro e histórico",
-    init: "init_clientes"
+    init: "init_clientes",
+
+    perfisPermitidos: [
+      "ADMINISTRADOR",
+      "GERENTE",
+      "VENDEDOR"
+    ]
   },
 
   financeiro: {
     file: "pages/financeiro.html",
     title: "Financeiro",
     subtitle: "Faturamento, custos e lucro",
-    init: "init_financeiro"
+    init: "init_financeiro",
+
+    perfisPermitidos: [
+      "ADMINISTRADOR",
+      "GERENTE"
+    ]
   },
 
   "contas-receber": {
     file: "pages/contas-receber.html",
     title: "Contas a Receber",
     subtitle: "Parcelas, vencimentos e recebimentos",
-    init: "init_contas_receber"
+    init: "init_contas_receber",
+
+    perfisPermitidos: [
+      "ADMINISTRADOR",
+      "GERENTE"
+    ]
   },
 
   despesas: {
     file: "pages/despesas.html",
     title: "Despesas",
     subtitle: "Contas a pagar e despesas",
-    init: "init_despesas"
+    init: "init_despesas",
+
+    perfisPermitidos: [
+      "ADMINISTRADOR",
+      "GERENTE"
+    ]
   },
 
   colaboradores: {
@@ -91,10 +149,64 @@ const VNNUS_ROUTES = {
     file: "pages/configuracoes.html",
     title: "Configurações",
     subtitle: "Preferências e integrações",
-    init: "init_configuracoes"
+    init: "init_configuracoes",
+
+    perfisPermitidos: [
+      "ADMINISTRADOR"
+    ]
   }
 
 };
+
+
+/* =====================================================
+   OBTER COLABORADOR LOGADO
+===================================================== */
+
+function obterColaboradorLogadoVnnus() {
+
+  if (
+    !window.VNNUS_API ||
+    typeof window.VNNUS_API.obterUsuarioSessao !==
+      "function"
+  ) {
+
+    return null;
+
+  }
+
+
+  return window.VNNUS_API
+    .obterUsuarioSessao();
+
+}
+
+
+/* =====================================================
+   OBTER PERFIL ATUAL
+===================================================== */
+
+function obterPerfilAtualVnnus() {
+
+  const colaborador =
+    obterColaboradorLogadoVnnus();
+
+
+  if (!colaborador) {
+
+    return "";
+
+  }
+
+
+  return String(
+    colaborador.perfil ||
+    ""
+  )
+  .trim()
+  .toUpperCase();
+
+}
 
 
 /* =====================================================
@@ -105,8 +217,14 @@ function usuarioPodeAcessarRotaVnnus(
   rota
 ) {
 
+  if (!rota) {
+
+    return false;
+
+  }
+
+
   if (
-    !rota ||
     !Array.isArray(
       rota.perfisPermitidos
     ) ||
@@ -118,40 +236,113 @@ function usuarioPodeAcessarRotaVnnus(
   }
 
 
-  if (
-    !window.VNNUS_API
-  ) {
-
-    return false;
-
-  }
-
-
-  const colaborador =
-    window.VNNUS_API
-      .obterUsuarioSessao();
-
-
-  if (!colaborador) {
-
-    return false;
-
-  }
-
-
   const perfil =
-    String(
-      colaborador.perfil ||
-      ""
-    )
-    .trim()
-    .toUpperCase();
+    obterPerfilAtualVnnus();
+
+
+  if (!perfil) {
+
+    return false;
+
+  }
 
 
   return rota.perfisPermitidos
     .includes(
       perfil
     );
+
+}
+
+
+/* =====================================================
+   ROTA INICIAL POR PERFIL
+===================================================== */
+
+function obterRotaInicialVnnus() {
+
+  const perfil =
+    obterPerfilAtualVnnus();
+
+
+  switch (perfil) {
+
+    case "ADMINISTRADOR":
+      return "dashboard";
+
+
+    case "GERENTE":
+      return "dashboard";
+
+
+    case "VENDEDOR":
+      return "pdv";
+
+
+    case "ESTOQUE":
+      return "estoque";
+
+
+    default:
+      return "dashboard";
+
+  }
+
+}
+
+
+/* =====================================================
+   PRIMEIRA ROTA PERMITIDA
+===================================================== */
+
+function obterPrimeiraRotaPermitidaVnnus() {
+
+  const rotaInicial =
+    obterRotaInicialVnnus();
+
+
+  if (
+    VNNUS_ROUTES[rotaInicial] &&
+    usuarioPodeAcessarRotaVnnus(
+      VNNUS_ROUTES[rotaInicial]
+    )
+  ) {
+
+    return rotaInicial;
+
+  }
+
+
+  const nomesRotas =
+    Object.keys(
+      VNNUS_ROUTES
+    );
+
+
+  for (
+    let i = 0;
+    i < nomesRotas.length;
+    i++
+  ) {
+
+    const nome =
+      nomesRotas[i];
+
+
+    if (
+      usuarioPodeAcessarRotaVnnus(
+        VNNUS_ROUTES[nome]
+      )
+    ) {
+
+      return nome;
+
+    }
+
+  }
+
+
+  return null;
 
 }
 
@@ -170,28 +361,38 @@ async function navigateTo(
     ];
 
 
-  /*
-    Rota inexistente
-  */
+  /* ===================================================
+     ROTA INEXISTENTE
+  =================================================== */
 
   if (!rota) {
 
     pageName =
-      "dashboard";
+      obterPrimeiraRotaPermitidaVnnus();
+
+
+    if (!pageName) {
+
+      console.error(
+        "Nenhuma rota disponível para este usuário."
+      );
+
+      return;
+
+    }
+
 
     rota =
-      VNNUS_ROUTES.dashboard;
+      VNNUS_ROUTES[
+        pageName
+      ];
 
   }
 
 
-  /*
-    Proteção por perfil.
-
-    Mesmo digitando #colaboradores
-    manualmente, usuário sem autorização
-    não consegue carregar a página.
-  */
+  /* ===================================================
+     PROTEÇÃO POR PERFIL
+  =================================================== */
 
   if (
     !usuarioPodeAcessarRotaVnnus(
@@ -203,13 +404,6 @@ async function navigateTo(
       "Acesso negado à rota:",
       pageName
     );
-
-
-    pageName =
-      "dashboard";
-
-    rota =
-      VNNUS_ROUTES.dashboard;
 
 
     const conteudo =
@@ -224,7 +418,7 @@ async function navigateTo(
         <div class="empty-state">
 
           <strong>
-            Acesso não autorizado
+            🔒 Acesso não autorizado
           </strong>
 
           <p style="margin-top:8px">
@@ -238,10 +432,25 @@ async function navigateTo(
     }
 
 
+    const rotaDestino =
+      obterPrimeiraRotaPermitidaVnnus();
+
+
+    if (!rotaDestino) {
+
+      console.error(
+        "Usuário sem nenhuma rota permitida."
+      );
+
+      return;
+
+    }
+
+
     history.replaceState(
       null,
       "",
-      "#dashboard"
+      "#" + rotaDestino
     );
 
 
@@ -249,7 +458,7 @@ async function navigateTo(
       function() {
 
         navigateTo(
-          "dashboard"
+          rotaDestino
         );
 
       },
@@ -498,5 +707,5 @@ async function navigateTo(
 
 /* =====================================================
    FIM
-   ROUTER 2.3
+   ROUTER 2.4
 ===================================================== */
