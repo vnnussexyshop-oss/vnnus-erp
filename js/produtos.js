@@ -1068,7 +1068,7 @@ function abrirModalEditarProdutoVnnus(
 
 async function salvarProdutoVnnus() {
 
-     if (!podeGerenciarProdutosVnnus()) {
+  if (!podeGerenciarProdutosVnnus()) {
 
     alert(
       'Seu perfil não possui permissão para alterar produtos.'
@@ -1078,9 +1078,6 @@ async function salvarProdutoVnnus() {
 
   }
 
-  // restante da função...
-}
-   
   const id =
     String(
       obterValorProdutoVnnus(
@@ -1320,6 +1317,16 @@ function abrirModalStatusProdutoVnnus(
   id
 ) {
 
+  if (!podeGerenciarProdutosVnnus()) {
+
+    alert(
+      'Seu perfil possui acesso somente para consulta de produtos.'
+    );
+
+    return;
+
+  }
+
   const produto =
     buscarProdutoLocalVnnus(id);
 
@@ -1427,8 +1434,6 @@ async function confirmarStatusProdutoVnnus() {
 
   }
 
-  // restante da função...
-}
    
   const id =
     String(
