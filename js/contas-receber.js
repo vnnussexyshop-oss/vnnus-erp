@@ -1172,7 +1172,23 @@ async function salvarPagamentoContaReceber() {
       ''
     )
     .trim();
+   const contaPagamento =
+  (
+    window.VNNUS_CONTAS_RECEBER.contas ||
+    []
+  )
+  .find(
+    function(conta) {
 
+      return (
+        String(
+          conta.ID_CONTA || ''
+        ) ===
+        String(idConta)
+      );
+
+    }
+  );
 
   const valor =
     numeroContaReceber(
@@ -1288,7 +1304,68 @@ async function salvarPagamentoContaReceber() {
           observacao
         );
 
+     const dadosComprovante =
+  {
 
+    idConta:
+      idConta,
+
+    idVenda:
+      contaPagamento
+        ? contaPagamento.ID_VENDA
+        : '',
+
+    cliente:
+      contaPagamento
+        ? (
+            contaPagamento.CLIENTE ||
+            'Consumidor Final'
+          )
+        : 'Consumidor Final',
+
+    parcela:
+      contaPagamento
+        ? numeroContaReceber(
+            contaPagamento.PARCELA
+          )
+        : 1,
+
+    totalParcelas:
+      contaPagamento
+        ? numeroContaReceber(
+            contaPagamento.TOTAL_PARCELAS
+          )
+        : 1,
+
+    valorPago:
+      valor,
+
+    formaPagamento:
+      forma,
+
+    dataPagamento:
+      new Date()
+        .toLocaleDateString(
+          'pt-BR'
+        ),
+
+    saldoRestante:
+      numeroContaReceber(
+        resposta.saldo
+      ),
+
+    status:
+      String(
+        resposta.status ||
+        ''
+      )
+
+  };
+     
+abrirComprovanteParcelaVnnus(
+  dadosComprovante
+);
+     
     fecharModalContaReceber();
 
 
@@ -1335,7 +1412,324 @@ async function salvarPagamentoContaReceber() {
   }
 
 }
+/* =====================================================
+   COMPROVANTE DE PAGAMENTO DA PARCELA
+   CONTAS A RECEBER 1.4
+===================================================== */
 
+function abrirComprovanteParcelaVnnus(
+  dados
+) {
+
+  if (!dados) {
+
+    return;
+
+  }
+
+
+  const parcela =
+    Number(
+      dados.parcela || 1
+    );
+
+  const totalParcelas =
+    Number(
+      dados.totalParcelas || 1
+    );
+
+
+  const janela =
+    window.open(
+      '',
+      '_blank',
+      'width=520,height=760'
+    );
+
+
+  if (!janela) {
+
+    alert(
+      'Não foi possível abrir o comprovante. Verifique se o navegador bloqueou a nova janela.'
+    );
+
+    return;
+
+  }
+
+
+  janela.document.write(`
+    <!DOCTYPE html>
+
+    <html lang="pt-BR">
+
+    <head>
+
+      <meta charset="UTF-8">
+
+      <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+      >
+
+      <title>
+        Comprovante ${escapeContaReceber(dados.idConta)}
+      </title>
+
+      <style>
+
+        * {
+          box-sizing: border-box;
+        }
+
+        body {
+          margin: 0;
+          padding: 24px;
+          background: #f4f4f4;
+          font-family: Arial, sans-serif;
+          color: #111;
+        }
+
+        .comprovante {
+          width: 100%;
+          max-width: 440px;
+          margin: 0 auto;
+          padding: 28px;
+          background: #fff;
+          border: 1px solid #ddd;
+          border-radius: 14px;
+        }
+
+        .topo {
+          text-align: center;
+          margin-bottom: 24px;
+        }
+
+        .loja {
+          font-size: 25px;
+          font-weight: 900;
+          letter-spacing: 2px;
+        }
+
+        .titulo {
+          margin-top: 8px;
+          font-size: 15px;
+          font-weight: 700;
+        }
+
+        .linha {
+          display: flex;
+          justify-content: space-between;
+          gap: 20px;
+          padding: 10px 0;
+          border-bottom: 1px dashed #ccc;
+          font-size: 14px;
+        }
+
+        .linha span:first-child {
+          color: #666;
+        }
+
+        .linha strong {
+          text-align: right;
+        }
+
+        .valor {
+          margin: 24px 0;
+          text-align: center;
+        }
+
+        .valor-label {
+          color: #666;
+          font-size: 13px;
+        }
+
+        .valor-total {
+          margin-top: 5px;
+          font-size: 30px;
+          font-weight: 900;
+        }
+
+        .rodape {
+          margin-top: 25px;
+          text-align: center;
+          color: #666;
+          font-size: 11px;
+          line-height: 1.5;
+        }
+
+        .acoes {
+          max-width: 440px;
+          margin: 15px auto 0;
+          text-align: center;
+        }
+
+        button {
+          padding: 12px 22px;
+          border: 0;
+          border-radius: 8px;
+          background: #111;
+          color: #fff;
+          font-weight: 700;
+          cursor: pointer;
+        }
+
+        @media print {
+
+          body {
+            padding: 0;
+            background: #fff;
+          }
+
+          .comprovante {
+            border: 0;
+          }
+
+          .acoes {
+            display: none;
+          }
+
+        }
+
+      </style>
+
+    </head>
+
+    <body>
+
+      <div class="comprovante">
+
+        <div class="topo">
+
+          <div class="loja">
+            VNNUS
+          </div>
+
+          <div class="titulo">
+            COMPROVANTE DE PAGAMENTO
+          </div>
+
+        </div>
+
+
+        <div class="linha">
+
+          <span>Cliente</span>
+
+          <strong>
+            ${escapeContaReceber(dados.cliente)}
+          </strong>
+
+        </div>
+
+
+        <div class="linha">
+
+          <span>Venda</span>
+
+          <strong>
+            ${escapeContaReceber(dados.idVenda)}
+          </strong>
+
+        </div>
+
+
+        <div class="linha">
+
+          <span>Parcela</span>
+
+          <strong>
+            ${parcela} de ${totalParcelas}
+          </strong>
+
+        </div>
+
+
+        <div class="linha">
+
+          <span>Data do pagamento</span>
+
+          <strong>
+            ${escapeContaReceber(dados.dataPagamento)}
+          </strong>
+
+        </div>
+
+
+        <div class="linha">
+
+          <span>Forma de pagamento</span>
+
+          <strong>
+            ${escapeContaReceber(dados.formaPagamento)}
+          </strong>
+
+        </div>
+
+
+        <div class="valor">
+
+          <div class="valor-label">
+            VALOR PAGO
+          </div>
+
+          <div class="valor-total">
+            ${moedaContaReceber(dados.valorPago)}
+          </div>
+
+        </div>
+
+
+        <div class="linha">
+
+          <span>Saldo desta parcela</span>
+
+          <strong>
+            ${moedaContaReceber(dados.saldoRestante)}
+          </strong>
+
+        </div>
+
+
+        <div class="linha">
+
+          <span>Status</span>
+
+          <strong>
+            ${escapeContaReceber(dados.status)}
+          </strong>
+
+        </div>
+
+
+        <div class="rodape">
+
+          Comprovante gerado pelo sistema VNNUS.<br>
+
+          ${escapeContaReceber(dados.idConta)}
+
+        </div>
+
+      </div>
+
+
+      <div class="acoes">
+
+        <button onclick="window.print()">
+          🖨️ Imprimir / Salvar PDF
+        </button>
+
+      </div>
+
+    </body>
+
+    </html>
+  `);
+
+
+  janela.document.close();
+
+}
 
 /* =====================================================
    BADGE STATUS 1.3
