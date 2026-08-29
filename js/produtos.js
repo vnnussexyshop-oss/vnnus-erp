@@ -65,11 +65,34 @@ async function() {
 
   configurarFiltrosProdutosVnnus();
 
+  aplicarPermissoesProdutosVnnus();
+
   await carregarProdutosVnnus();
 
 };
 
+function aplicarPermissoesProdutosVnnus() {
 
+  const podeGerenciar =
+    podeGerenciarProdutosVnnus();
+
+
+  const botaoNovo =
+    document.querySelector(
+      '[onclick="abrirModalNovoProdutoVnnus()"]'
+    );
+
+
+  if (botaoNovo) {
+
+    botaoNovo.style.display =
+      podeGerenciar
+        ? ''
+        : 'none';
+
+  }
+
+}
 /* =====================================================
    CARREGAR
 ===================================================== */
