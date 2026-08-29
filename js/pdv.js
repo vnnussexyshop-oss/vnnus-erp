@@ -2694,12 +2694,13 @@ function prepararPagamentoDinheiroPDV22() {
 
   if (pagamento) {
 
-    pagamento.onchange =
-      function() {
+   pagamento.onchange =
+  function() {
 
-        atualizarPagamentoDinheiroPDV22();
+    atualizarPagamentoDinheiroPDV22();
+    atualizarParcelamentoPDV23();
 
-      };
+  };
 
   }
 
@@ -2717,6 +2718,272 @@ function prepararPagamentoDinheiroPDV22() {
 
 }
 
+/* =====================================================
+   PARCELAMENTO PIX / CRÉDITO
+   PDV 2.3
+===================================================== */
+
+function prepararParcelamentoPDV23() {
+
+  const parcelas =
+    document.getElementById(
+      'pdvParcelas'
+    );
+
+  if (parcelas) {
+
+    parcelas.onchange =
+      function() {
+
+        atualizarParcelamentoPDV23();
+
+      };
+
+  }
+
+}
+
+
+function atualizarParcelamentoPDV23() {
+
+  const pagamento =
+    document.getElementById(
+      'pdvPagamento'
+    );
+
+  const box =
+    document.getElementById(
+      'pdvParcelamentoBox'
+    );
+
+  const parcelas =
+    document.getElementById(
+      'pdvParcelas'
+    );
+
+  const resumo =
+    document.getElementById(
+      'pdvResumoParcelamento'
+    );
+
+
+  if (
+    !pagamento ||
+    !box
+  ) {
+
+    return;
+
+  }
+
+
+  const forma =
+    String(
+      pagamento.value ||
+      ''
+    )
+    .trim()
+    .toUpperCase();
+
+
+  const parcelavel =
+    forma === 'CREDITO' ||
+    forma === 'PIX';
+
+
+  if (!parcelavel) {
+
+    box.style.display =
+      'none';
+
+    if (parcelas) {
+
+      parcelas.value =
+        '1';
+
+    }
+
+    if (resumo) {
+
+      resumo.textContent =
+        '';
+
+    }
+
+    return;
+
+  }
+
+
+  box.style.display =
+    'block';
+
+
+  let quantidade =
+    Number(
+      parcelas
+        ? parcelas.value
+        : 1
+    ) || 1;
+
+
+  quantidade =
+    Math.max(
+      1,
+      Math.min(
+        5,
+        Math.floor(
+          quantidade
+        )
+      )
+    );
+
+
+  if (parcelas) {
+
+    parcelas.value =
+      String(
+        quantidade
+      );
+
+  }
+
+
+  const totais =
+    calcularTotaisPDV31();
+
+
+  const total =
+    Number(
+      totais.total ||
+      0
+    );
+
+
+  const valorBase =
+    Math.floor(
+      (
+        total /
+        quantidade
+      ) * 100
+    ) / 100;
+
+
+  const ultimaParcela =
+    Number(
+      (
+        total -
+        valorBase *
+        (
+          quantidade - 1
+        )
+      ).toFixed(2)
+    );
+
+
+  if (resumo) {
+
+    if (quantidade === 1) {
+
+      resumo.innerHTML =
+        '<strong>' +
+        moedaPDV20(total) +
+        '</strong> à vista';
+
+    }
+
+    else {
+
+      resumo.innerHTML =
+        '<strong>' +
+        quantidade +
+        'x</strong> • ' +
+        (
+          quantidade > 1
+            ? (
+                (quantidade - 1) +
+                ' parcela(s) de ' +
+                moedaPDV20(valorBase) +
+                '<br>Última parcela de ' +
+                moedaPDV20(ultimaParcela)
+              )
+            : moedaPDV20(total)
+        );
+
+    }
+
+  }
+
+}
+
+
+/* =====================================================
+   OBTER PARCELAMENTO DA VENDA
+===================================================== */
+
+function obterParcelamentoPDV23() {
+
+  const pagamento =
+    document.getElementById(
+      'pdvPagamento'
+    );
+
+  const parcelas =
+    document.getElementById(
+      'pdvParcelas'
+    );
+
+
+  const forma =
+    String(
+      pagamento
+        ? pagamento.value
+        : ''
+    )
+    .trim()
+    .toUpperCase();
+
+
+  const parcelavel =
+    forma === 'CREDITO' ||
+    forma === 'PIX';
+
+
+  if (!parcelavel) {
+
+    return {
+      quantidade: 1
+    };
+
+  }
+
+
+  let quantidade =
+    Number(
+      parcelas
+        ? parcelas.value
+        : 1
+    ) || 1;
+
+
+  quantidade =
+    Math.max(
+      1,
+      Math.min(
+        5,
+        Math.floor(
+          quantidade
+        )
+      )
+    );
+
+
+  return {
+    quantidade:
+      quantidade
+  };
+
+}
 
 /* =====================================================
    ATUALIZAR ÁREA DE DINHEIRO
