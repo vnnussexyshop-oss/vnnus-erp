@@ -817,12 +817,17 @@ function aplicarPermissoesMenuVnnus() {
       .obterUsuarioSessao();
 
 
+  if (!colaborador) {
+
+    return;
+
+  }
+
+
   const perfil =
     String(
-      colaborador &&
-      colaborador.perfil
-        ? colaborador.perfil
-        : ''
+      colaborador.perfil ||
+      ''
     )
     .trim()
     .toUpperCase();
@@ -830,13 +835,57 @@ function aplicarPermissoesMenuVnnus() {
 
   document
     .querySelectorAll(
-      '[data-admin-only="1"]'
+      '.menu-item[data-page]'
     )
     .forEach(
-      function(elemento) {
+      function(botao) {
 
-        elemento.style.display =
-          perfil === 'ADMINISTRADOR'
+        const pagina =
+          String(
+            botao.dataset.page ||
+            ''
+          )
+          .trim();
+
+
+        const rota =
+          window.VNNUS_ROUTES
+            ? window.VNNUS_ROUTES[pagina]
+            : (
+                typeof VNNUS_ROUTES !==
+                  'undefined'
+                  ? VNNUS_ROUTES[pagina]
+                  : null
+              );
+
+
+        if (!rota) {
+
+          botao.style.display =
+            'none';
+
+          return;
+
+        }
+
+
+        const permitidos =
+          Array.isArray(
+            rota.perfisPermitidos
+          )
+            ? rota.perfisPermitidos
+            : [];
+
+
+        const podeAcessar =
+          permitidos.length === 0 ||
+          permitidos.includes(
+            perfil
+          );
+
+
+        botao.style.display =
+          podeAcessar
             ? ''
             : 'none';
 
@@ -844,7 +893,6 @@ function aplicarPermissoesMenuVnnus() {
     );
 
 }
-
 /* =====================================================
    FIM
    VNNUS APP 3.0
