@@ -880,6 +880,16 @@ function acoesProdutoVnnus(item) {
 
 function abrirModalNovoProdutoVnnus() {
 
+     if (!podeGerenciarProdutosVnnus()) {
+
+    alert(
+      'Seu perfil possui acesso somente para consulta de produtos.'
+    );
+
+    return;
+
+  }
+
   limparFormularioProdutoVnnus();
 
 
@@ -932,6 +942,18 @@ function abrirModalNovoProdutoVnnus() {
 function abrirModalEditarProdutoVnnus(
   id
 ) {
+
+    if (!podeGerenciarProdutosVnnus()) {
+
+    alert(
+      'Seu perfil possui acesso somente para consulta de produtos.'
+    );
+
+    return;
+
+  }
+
+  // restante da função
 
   const produto =
     buscarProdutoLocalVnnus(id);
@@ -1046,6 +1068,19 @@ function abrirModalEditarProdutoVnnus(
 
 async function salvarProdutoVnnus() {
 
+     if (!podeGerenciarProdutosVnnus()) {
+
+    alert(
+      'Seu perfil não possui permissão para alterar produtos.'
+    );
+
+    return;
+
+  }
+
+  // restante da função...
+}
+   
   const id =
     String(
       obterValorProdutoVnnus(
@@ -1382,6 +1417,19 @@ function abrirModalStatusProdutoVnnus(
 
 async function confirmarStatusProdutoVnnus() {
 
+   if (!podeGerenciarProdutosVnnus()) {
+
+    alert(
+      'Seu perfil não possui permissão para alterar produtos.'
+    );
+
+    return;
+
+  }
+
+  // restante da função...
+}
+   
   const id =
     String(
       obterValorProdutoVnnus(
