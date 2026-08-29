@@ -800,6 +800,23 @@ function renderizarCardsProdutosVnnus(
 
 function acoesProdutoVnnus(item) {
 
+  if (
+    !podeGerenciarProdutosVnnus()
+  ) {
+
+    return `
+      <span
+        style="
+          font-size:12px;
+          opacity:.65;
+        ">
+        Somente consulta
+      </span>
+    `;
+
+  }
+
+
   const ativo =
     normalizarAtivoProdutoVnnus(
       item.ativo
@@ -833,7 +850,6 @@ function acoesProdutoVnnus(item) {
   `;
 
 }
-
 
 /* =====================================================
    NOVO PRODUTO
