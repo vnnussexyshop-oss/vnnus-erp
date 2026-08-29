@@ -636,15 +636,24 @@ function obterPaginaAtualVnnus() {
   */
 
   if (
-    !hash ||
-    hash.indexOf(
-      'auth='
-    ) === 0
+  !hash ||
+  hash.indexOf(
+    'auth='
+  ) === 0
+) {
+
+  if (
+    typeof obterRotaInicialVnnus ===
+      'function'
   ) {
 
-    return 'dashboard';
+    return obterRotaInicialVnnus();
 
   }
+
+  return 'dashboard';
+
+}
 
 
   return hash;
