@@ -481,6 +481,85 @@
 
         </div>
 
+        <!-- ==========================================
+     PARCELAMENTO CARTÃO DE CRÉDITO
+=========================================== -->
+
+<div
+  class="campo campo-grande"
+  id="pdvParcelamentoBox"
+  style="display:none;">
+
+  <div
+    style="
+      padding:14px;
+      border-radius:12px;
+      border:1px solid rgba(212,168,77,.20);
+      background:rgba(212,168,77,.04);
+    ">
+
+    <div
+      style="
+        color:var(--gold2);
+        font-weight:700;
+        margin-bottom:12px;
+      ">
+      💳 Parcelamento
+    </div>
+
+    <div class="campo">
+
+      <label>
+        Quantidade de parcelas *
+      </label>
+
+      <select id="pdvParcelas">
+
+        <option value="1">
+          1x — À vista
+        </option>
+
+        <option value="2">
+          2x
+        </option>
+
+        <option value="3">
+          3x
+        </option>
+
+        <option value="4">
+          4x
+        </option>
+
+        <option value="5">
+          5x
+        </option>
+
+      </select>
+
+    </div>
+
+
+    <div
+      id="pdvResumoParcelamento"
+      style="
+        margin-top:12px;
+        padding:12px;
+        border-radius:9px;
+        background:#101010;
+        border:1px solid rgba(212,168,77,.14);
+        color:var(--muted);
+        font-size:13px;
+        line-height:1.6;
+      ">
+
+      Selecione a quantidade de parcelas.
+
+    </div>
+
+  </div>
+
+</div>
 
         <!-- ==========================================
              PAGAMENTO EM DINHEIRO / TROCO
