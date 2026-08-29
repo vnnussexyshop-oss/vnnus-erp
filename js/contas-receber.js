@@ -1715,12 +1715,72 @@ function abrirComprovanteParcelaVnnus(
 
       <div class="acoes">
 
-        <button onclick="window.print()">
-          🖨️ Imprimir / Salvar PDF
-        </button>
+  <button onclick="window.print()">
+    🖨️ Imprimir / Salvar PDF
+  </button>
 
-      </div>
+  <button
+    onclick="compartilharComprovanteVnnus()"
+    style="margin-left:8px;"
+  >
+    📤 Compartilhar
+  </button>
 
+</div>
+
+<script>
+
+async function compartilharComprovanteVnnus() {
+
+  const texto =
+    'VNNUS - Comprovante de Pagamento\\n\\n' +
+    'Cliente: ${escapeContaReceber(dados.cliente)}\\n' +
+    'Venda: ${escapeContaReceber(dados.idVenda)}\\n' +
+    'Parcela: ${parcela} de ${totalParcelas}\\n' +
+    'Valor pago: ${moedaContaReceber(dados.valorPago)}\\n' +
+    'Forma de pagamento: ${escapeContaReceber(dados.formaPagamento)}\\n' +
+    'Data: ${escapeContaReceber(dados.dataPagamento)}\\n' +
+    'Status: ${escapeContaReceber(dados.status)}';
+
+
+  if (navigator.share) {
+
+    try {
+
+      await navigator.share({
+
+        title:
+          'Comprovante VNNUS',
+
+        text:
+          texto
+
+      });
+
+    }
+
+    catch (erro) {
+
+      console.log(
+        'Compartilhamento cancelado.',
+        erro
+      );
+
+    }
+
+  }
+
+  else {
+
+    alert(
+      'O compartilhamento direto não está disponível neste navegador.'
+    );
+
+  }
+
+}
+
+</script>
     </body>
 
     </html>
